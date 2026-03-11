@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Shoppings</h1>
+
+<section class="acoes">
+
+
+<button onclick="window.location.href='/shopping/novo'">
+    + Novo shopping
+</button>
+
+    <input type="text" id="campo-busca" placeholder="Buscar pelo nome..." onkeyup="filtrarTabela()" >
+
+</section>
+
+<section class="card">
+
+<table id="tabela-lista">
+
+    <tr>
+        <th>Nome</th>
+        <th>Cidade</th>
+        <th>Lojas</th>
+        <th>Clientes</th>
+        <th>Ações</th>
+    </tr>
+
+    <tr>
+        <td>Iguatemi</td>
+        <td>Porto Alegre</td>
+        <td>12</td>
+        <td>34</td>
+        <td class="acoes-tabela">
+
+            <a href="#" class="btn-editar">Editar</a>
+            <a href="#" class="btn-excluir">Excluir</a>
+            <a href="#" class="btn-verlojas">Ver Lojas</a>
+
+        </td>
+    </tr>
+
+    <tr>
+        <td>Barra Shopping</td>
+        <td>Porto Alegre</td>
+        <td>8</td>
+        <td>19</td>
+        <td class="acoes-tabela">
+
+            <a href="#" class="btn-editar">Editar</a>
+            <a href="#" class="btn-excluir">Excluir</a>
+            <a href="#" class="btn-verlojas">Ver Lojas</a>
+
+        </td>
+    </tr>
+
+</table>
+
+
+</section>
+
+<script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+
+{% endblock %}

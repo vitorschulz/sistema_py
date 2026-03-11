@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Novo shopping</h1>
+
+<section class="acoes">
+
+
+<button onclick="window.location.href='/shopping'">
+    ← Voltar
+</button>
+
+
+</section>
+
+<section class="card">
+
+<form method="POST">
+
+
+<div class="form-group">
+    <label>Nome do shopping</label>
+    <input type="text" name="nome" required>
+</div>
+
+<div class="form-group">
+    <label>Cidade</label>
+    <input type="text" name="cidade">
+</div>
+
+<div class="form-group">
+    <label>Endereço</label>
+    <input type="text" name="endereco">
+</div>
+
+<div class="form-group">
+    <label>Observações</label>
+    <textarea name="observacoes" rows="4"></textarea>
+</div>
+
+<button type="submit" class="btn-submit">
+    Salvar shopping
+</button>
+
+
+</form>
+
+</section>
+
+{% endblock %}

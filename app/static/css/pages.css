@@ -1,0 +1,187 @@
+/* AÇÕES */
+
+.acoes {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.acoes input {
+    width: 100%;
+    max-width: 350px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.acoes button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    max-width: 150px;
+}
+
+.acoes button:hover {
+    background-color: #073fdb;
+}
+
+.acoes-linha {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+/* CARDS */
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+/* input de pesquisa*/
+
+.busca{
+    margin:20px 0;
+}
+
+.busca input{
+    width:100%;
+    max-width:350px;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:14px;
+}
+
+
+/* listas */
+
+.acoes-tabela {
+    display: flex;
+    gap: 16px;
+    margin-left: -6px;
+}
+
+.btn-editar {
+    text-decoration: none;
+    color: #2563eb;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-editar:hover {
+    background-color: rgba(37, 99, 235, 0.08);
+}
+
+
+.btn-excluir {
+    text-decoration: none;
+    color: #dc2626;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-excluir:hover {
+    background-color: rgba(220, 38, 38, 0.08);
+}
+
+.btn-verlojas {
+    text-decoration: none;
+    color: #5db318;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-verlojas:hover {
+    background-color: rgba(76, 143, 22, 0.08);
+}
+
+/* FORMULÁRIO */
+
+form {
+    max-width: 500px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    transition: all 0.25s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    height: 90px;    
+    resize: vertical;  
+    max-height: 200px;  
+    transition: background 0.25s ease;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.btn-submit {
+    margin-top: 10px;
+    padding: 10px 16px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-submit:hover {
+    background-color: #1d4ed8;
+}
+
+
+
+
+
+

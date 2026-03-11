@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Clientes</h1>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/clientes/novo'">
+        + Novo cliente
+    </button>
+
+    <input type="text" id="campo-busca" placeholder="Buscar pelo nome..." onkeyup="filtrarTabela()" >
+
+</section>
+
+
+
+<section class="card">
+
+    <table id="tabela-lista">
+
+        <tr>
+            <th >Nome</th>
+            <th>CNPJ</th>
+            <th>Shopping</th>
+            <th>Loja</th>
+            <th>Ações</th>
+        </tr>
+
+        <tr>
+            <td>Cristal</td>
+            <td>00.000.000/0001-00</td>
+            <td>Iguatemi</td>
+            <td>23</td>
+            <td class="acoes-tabela">
+
+                <a href="#" class="btn-editar">Editar</a>
+                <a href="#" class="btn-excluir">Excluir</a>
+
+            </td>
+        </tr>
+
+    </table>
+
+</section>
+
+<script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+
+{% endblock %}

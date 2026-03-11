@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema da mãe</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <aside class="sidebar">
+
+        <div class="logo-container">
+            <a href="/" class="logo">Sistema p/mãe</a>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="/" class="menu-item">Menu</a></li>
+                <li><a href="{{ url_for('clientes.listar_clientes') }}" class="menu-item">Clientes</a></li>
+                <li><a href="{{ url_for('shopping.listar_shopping') }}" class="menu-item">Shoppings</a></li>
+                <li><a href="/viagens" class="menu-item">Viagens</a></li>
+                <li><a href="/cheques" class="menu-item">Cheques</a></li>
+                <li><a href="/financeiro" class="menu-item">Financeiro</a></li>
+            </ul>
+        </nav>
+
+    </aside>
+
+    <main class="content">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+</body>
+</html>
