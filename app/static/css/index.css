@@ -1,0 +1,121 @@
+/* RESET BASICO */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+}
+
+
+/* LAYOUT PRINCIPAL */
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* SIDEBAR */
+
+.sidebar {
+    width: 220px;
+    background-color: #1e293b;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    margin-bottom: 25px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: 12px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    display: block;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.sidebar a:hover {
+    background-color: #334155;
+}
+
+
+/* CONTEUDO */
+
+.content {
+    flex: 1;
+    padding: 30px;
+}
+
+.content h1 {
+    margin-bottom: 20px;
+}
+
+
+/* ACOES RAPIDAS */
+
+.acoes {
+    margin-bottom: 25px;
+}
+
+.acoes button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.acoes button:hover {
+    background-color: #1d4ed8;
+}
+
+
+/* CARDS */
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 15px;
+}
+
+
+/* TABELAS */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    background-color: #e5e7eb;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
