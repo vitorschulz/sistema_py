@@ -11,7 +11,7 @@
     + Novo shopping
 </button>
 
-    <input type="text" id="campo-busca" placeholder="Buscar pelo nome..." onkeyup="filtrarTabela()" >
+    <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
 
 </section>
 
@@ -22,38 +22,32 @@
     <tr>
         <th>Nome</th>
         <th>Cidade</th>
+        <th>Endereço</th>
         <th>Lojas</th>
         <th>Clientes</th>
         <th>Ações</th>
     </tr>
 
-    <tr>
-        <td>Iguatemi</td>
-        <td>Porto Alegre</td>
-        <td>12</td>
-        <td>34</td>
-        <td class="acoes-tabela">
+{% for shopping in shoppings %}
 
-            <a href="#" class="btn-editar">Editar</a>
-            <a href="#" class="btn-excluir">Excluir</a>
-            <a href="#" class="btn-verlojas">Ver Lojas</a>
+<tr>
+    <td>{{ shopping.nome }}</td>
+    <td>{{ shopping.cidade }}</td>
+    <td>{{ shopping.endereco }}</td>
+    <td>0</td>
+    <td>0</td>
 
-        </td>
-    </tr>
+    <td class="acoes-tabela">
 
-    <tr>
-        <td>Barra Shopping</td>
-        <td>Porto Alegre</td>
-        <td>8</td>
-        <td>19</td>
-        <td class="acoes-tabela">
+        <a href="#" class="btn-editar">Editar</a>
+        <a href="#" class="btn-excluir">Excluir</a>
+        <a href="#" class="btn-verlojas">Ver Lojas</a>
 
-            <a href="#" class="btn-editar">Editar</a>
-            <a href="#" class="btn-excluir">Excluir</a>
-            <a href="#" class="btn-verlojas">Ver Lojas</a>
+    </td>
 
-        </td>
-    </tr>
+</tr>
+
+{% endfor %}
 
 </table>
 

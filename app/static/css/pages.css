@@ -51,6 +51,7 @@
 .card h2 {
     margin-bottom: 15px;
 }
+
 /* input de pesquisa*/
 
 .busca{
@@ -68,6 +69,17 @@
 
 
 /* listas */
+
+.tabela-link {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+    transition: all 0.25s ease;
+}
+
+.tabela-link:hover {
+    color: #2563eb;
+}
 
 .acoes-tabela {
     display: flex;
@@ -161,6 +173,21 @@ form {
 }
 
 .form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background-color: white;
+    transition: all 0.25s ease;
+}
+
+.form-group select:focus {
     outline: none;
     border-color: #2563eb;
 }

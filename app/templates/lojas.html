@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Lojas</h1>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/lojas/novo'">
+        + Nova loja
+    </button>
+
+    <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
+
+</section>
+
+
+
+<section class="card">
+
+<table id="tabela-lista">
+
+    <tr>
+        <th>Loja</th>
+        <th>Shopping</th>
+        <th>Clientes</th>
+        <th>Observações</th>
+        <th>Ações</th>
+    </tr>
+
+    <tr>
+        <td>23</td>
+        <td>Iguatemi</td>
+        <td>3</td>
+        <td>Piso 2</td>
+
+        <td class="acoes-tabela">
+
+            <a href="#" class="btn-editar">Editar</a>
+            <a href="#" class="btn-excluir">Excluir</a>
+
+        </td>
+    </tr>
+
+    <tr>
+        <td>45</td>
+        <td>Barra Shopping</td>
+        <td>1</td>
+        <td>Perto da entrada</td>
+
+        <td class="acoes-tabela">
+
+            <a href="#" class="btn-editar">Editar</a>
+            <a href="#" class="btn-excluir">Excluir</a>
+
+        </td>
+    </tr>
+
+</table>
+
+</section>
+
+<script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+
+{% endblock %}

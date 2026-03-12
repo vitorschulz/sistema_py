@@ -19,27 +19,27 @@
 
     <div class="form-group">
         <label>Nome</label>
-        <input type="text" name="nome" required>
+        <input type="text" name="nome" required minlength="3" maxlength="120">
     </div>
 
     <div class="form-group">
         <label>CPF / CNPJ</label>
-        <input type="text" name="cpf_cnpj">
+        <input type="text" name="cpf_cnpj" id="cpf_cnpj" maxlength="18" placeholder="CPF ou CNPJ" pattern="[0-9./-]*" required>
     </div>
 
     <div class="form-group">
         <label>Telefone</label>
-        <input type="text" name="telefone">
+        <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15">
     </div>
 
     <div class="form-group">
         <label>Email</label>
-        <input type="email" name="email">
+        <input type="email" name="email" maxlength="120">
     </div>
 
     <div class="form-group">
         <label>Observações</label>
-        <textarea name="observacoes" rows="4"></textarea>
+        <textarea name="observacoes" rows="4" maxlength="500"></textarea>
     </div>
 
     <button type="submit" class="btn-submit">
@@ -50,5 +50,7 @@
 
 
 </section>
+
+<script src="{{ url_for('static', filename='js/form_cliente.js') }}"></script>
 
 {% endblock %}

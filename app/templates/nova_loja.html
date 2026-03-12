@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Nova loja</h1>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/lojas'">
+        ← Voltar
+    </button>
+
+</section>
+
+
+<section class="card">
+
+<form method="POST">
+
+<div class="form-group">
+    <label>Número / Nome da loja</label>
+    <input type="text" name="nome" required>
+</div>
+
+<div class="form-group">
+    <label>Shopping</label>
+    <select name="shopping_id">
+
+        <option value="">Selecione um shopping</option>
+        <option value="1">Iguatemi</option>
+        <option value="2">Barra Shopping</option>
+
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Observações</label>
+    <textarea name="observacoes" rows="4"></textarea>
+</div>
+
+<button type="submit" class="btn-submit">
+    Salvar loja
+</button>
+
+</form>
+
+
+</section>
+
+{% endblock %}

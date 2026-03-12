@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ cliente.nome }}</h1>
+
+<section class="card">
+
+<h2>Informações</h2>
+
+<p><strong>CPF/CNPJ:</strong> {{ cliente.cpf_cnpj }}</p>
+<p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+<p><strong>Email:</strong> {{ cliente.email }}</p>
+
+</section>
+
+<section class="card">
+
+<h2>Observações</h2>
+
+<p>{{ cliente.observacoes or "Nenhuma observação cadastrada." }}</p>
+
+</section>
+
+<section class="card">
+
+<h2 style="margin-bottom: 25px;">Relacionamentos no sistema</h2>
+
+<h3 style="margin-bottom: 10px;">Pedidos</h3>
+
+{% if pedidos %}
+<ul>
+    {% for pedido in pedidos %}
+    <li>Pedido #{{ pedido.id }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Nenhum pedido relacionado.</p>
+{% endif %}
+
+
+<h3 style="margin-top: 25px; margin-bottom: 10px;">Viagens</h3>
+
+{% if viagens %}
+<ul>
+    {% for viagem in viagens %}
+    <li>{{ viagem.nome }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Nenhuma viagem relacionada.</p>
+{% endif %}
+
+</section>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/clientes'" style="max-width: 75px;">
+        Voltar
+    </button>
+
+</section>
+
+{% endblock %}

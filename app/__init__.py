@@ -12,4 +12,7 @@ def create_app():
     from app.routes.shopping_routes import shopping
     app.register_blueprint(shopping)
 
+    from app.routes.lojas_routes import lojas
+    app.register_blueprint(lojas)
+
     return app
