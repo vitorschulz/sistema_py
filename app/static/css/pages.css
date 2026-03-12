@@ -116,19 +116,6 @@
     background-color: rgba(220, 38, 38, 0.08);
 }
 
-.btn-verlojas {
-    text-decoration: none;
-    color: #5db318;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 4px 6px;
-    border-radius: 4px;
-    transition: all 0.25s ease;
-}
-
-.btn-verlojas:hover {
-    background-color: rgba(76, 143, 22, 0.08);
-}
 
 /* FORMULÁRIO */
 
@@ -169,7 +156,7 @@ form {
     height: 90px;    
     resize: vertical;  
     max-height: 200px;  
-    transition: background 0.25s ease;
+    transition: border-color 0.25s ease;
 }
 
 .form-group textarea:focus {

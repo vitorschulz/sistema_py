@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ shopping.nome }}</h1>
+
+<section class="card">
+
+<h2>Informações</h2>
+
+<p><strong>Cidade:</strong> {{ shopping.cidade }}</p>
+<p><strong>Endereço:</strong> {{ shopping.endereco }}</p>
+
+</section>
+
+
+<section class="card">
+
+<h2>Observações</h2>
+
+<p>{{ shopping.observacoes or "Nenhuma observação cadastrada." }}</p>
+
+</section>
+
+
+<section class="card">
+
+<h2 style="margin-bottom:25px;">Lojas deste shopping</h2>
+
+<table class="tabela">
+
+    <thead>
+    <tr>
+        <th>Nome da loja</th>
+        <th style="width:150px;">Ações</th>
+    </tr>
+    </thead>
+
+<tbody>
+
+    {% if lojas %}
+
+    {% for loja in lojas %}
+    <tr>
+
+            <td>{{ loja.nome }}</td>
+
+             <td class="acoes-tabela">
+
+            <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}" class="btn-editar">
+            Editar
+            </a>
+
+            <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}" class="btn-excluir">
+            Excluir
+            </a>
+
+            </td>
+
+    </tr>
+    {% endfor %}
+
+    {% else %}
+
+    <tr>
+        <td colspan="2">
+        Nenhuma loja cadastrada neste shopping.
+        </td>
+    </tr>
+
+    {% endif %}
+
+</tbody>
+
+</table>
+
+</section>
+
+
+
+<section class="acoes" style="flex-direction: row;">
+
+    <button onclick="window.location.href='/shopping'" style="width: 75px;">
+        Voltar
+    </button>
+
+    <button onclick="window.location.href='/lojas/novo?shopping={{ shopping.id }}'">
+        Adicionar loja
+    </button>
+
+</section>
+
+{% endblock %}

@@ -2,11 +2,11 @@
 
 {% block content %}
 
-<h1>Nova loja</h1>
+<h1>{{ "Editar loja" if loja else "Nova loja" }}</h1>
 
 <section class="acoes">
 
-    <button onclick="window.location.href='/lojas'">
+    <button onclick="window.location.href='{% if shopping_preselecionado %}/shopping/{{ shopping_preselecionado }}{% else %}/lojas{% endif %}'">
         ← Voltar
     </button>
 
@@ -19,27 +19,45 @@
 
 <div class="form-group">
     <label>Número / Nome da loja</label>
-    <input type="text" name="nome" required>
+    <input type="text" name="nome" required value="{{ loja.nome if loja }}">
 </div>
 
 <div class="form-group">
     <label>Shopping</label>
-    <select name="shopping_id">
 
-        <option value="">Selecione um shopping</option>
-        <option value="1">Iguatemi</option>
-        <option value="2">Barra Shopping</option>
+    <select name="shopping_id" {% if shopping_preselecionado %}disabled{% endif %} required>
+
+    <option value="">Selecione um shopping</option>
+
+    {% for shopping in shoppings %}
+
+    <option value="{{ shopping.id }}" 
+    {% if loja and loja.shopping_id == shopping.id %}
+    selected
+    {% elif shopping_preselecionado and shopping_preselecionado|int == shopping.id %}
+    selected
+    {% endif %}
+    >
+        {{ shopping.nome }}
+    </option>
+
+    {% endfor %}
 
     </select>
+
+    {% if shopping_preselecionado %}
+    <input type="hidden" name="shopping_id" value="{{ shopping_preselecionado }}">
+    {% endif %}
+
 </div>
 
 <div class="form-group">
     <label>Observações</label>
-    <textarea name="observacoes" rows="4"></textarea>
+    <textarea name="observacoes" rows="4">{{ loja.observacoes if loja }}</textarea>
 </div>
 
 <button type="submit" class="btn-submit">
-    Salvar loja
+    {{ "Salvar loja" if not loja else "Atualizar loja" }}
 </button>
 
 </form>

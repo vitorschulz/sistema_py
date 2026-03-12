@@ -21,26 +21,26 @@
 
 <div class="form-group">
     <label>Nome do shopping</label>
-    <input type="text" name="nome" required maxlength="120">
+    <input type="text" name="nome" required maxlength="120" value="{{ shopping.nome if shopping else '' }}">
 </div>
 
 <div class="form-group">
     <label>Cidade</label>
-    <input type="text" name="cidade" maxlength="100">
+    <input type="text" name="cidade" maxlength="100" value="{{ shopping.cidade if shopping else '' }}">
 </div>
 
 <div class="form-group">
     <label>Endereço</label>
-    <input type="text" name="endereco" maxlength="200">
+    <input type="text" name="endereco" maxlength="200" value="{{ shopping.endereco if shopping else '' }}">
 </div>
 
 <div class="form-group">
     <label>Observações</label>
-    <textarea name="observacoes" rows="4" maxlength="500"></textarea>
+    <textarea name="observacoes" rows="4" maxlength="500">{{ shopping.observacoes if shopping else '' }}</textarea>
 </div>
 
 <button type="submit" class="btn-submit">
-    Salvar shopping
+    {{ "Editar" if shopping else "Salvar" }}
 </button>
 
 

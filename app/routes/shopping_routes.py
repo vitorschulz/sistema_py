@@ -3,6 +3,7 @@ from app.config import get_db_connection
 
 shopping = Blueprint("shopping", __name__)
 
+#listagem
 @shopping.route("/shopping")
 def listar_shopping():
 
@@ -23,6 +24,40 @@ def listar_shopping():
     return render_template("shoppings.html", shoppings=shoppings)
 
 
+#get pra ir pra pag especifica do shop
+@shopping.route("/shopping/<int:id>")
+def ver_shopping(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM shopping
+        WHERE id = %s
+    """, (id,))
+    
+    shopping_dados = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM lojas
+        WHERE shopping_id = %s
+        AND ativo = TRUE
+        ORDER BY nome
+    """, (id,))
+
+    lojas = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "shopping_detalhe.html",
+        shopping=shopping_dados,
+        lojas=lojas
+    )
+
+
+#funcao pra criar shopping post form
 @shopping.route("/shopping/novo", methods=["GET","POST"])
 def novo_shopping():
 
@@ -51,3 +86,64 @@ def novo_shopping():
         return redirect("/shopping")
 
     return render_template("novo_shopping.html")
+
+# editar botao do shopping
+@shopping.route("/shopping/<int:id>/editar", methods=["GET","POST"])
+def editar_shopping(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM shopping
+        WHERE id = %s
+    """, (id,))
+    shopping_dados = cursor.fetchone()
+
+    if request.method == "POST":
+
+        nome = request.form["nome"].strip()
+        cidade = request.form["cidade"].strip()
+        endereco = request.form["endereco"].strip()
+        observacoes = request.form["observacoes"].strip()
+
+        cursor.execute("""
+            UPDATE shopping
+            SET nome=%s, cidade=%s, endereco=%s, observacoes=%s
+            WHERE id=%s
+        """, (nome, cidade, endereco, observacoes, id))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return redirect("/shopping")
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "novo_shopping.html",
+        shopping=shopping_dados
+    )
+
+# botao excluir shopping
+@shopping.route("/shopping/<int:id>/excluir")
+def excluir_shopping(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE shopping
+        SET ativo = FALSE
+        WHERE id = %s
+    """, (id,))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect("/shopping")

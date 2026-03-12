@@ -28,33 +28,35 @@
         <th>Ações</th>
     </tr>
 
+    {% for loja in lojas %}
+
     <tr>
-        <td>23</td>
-        <td>Iguatemi</td>
-        <td>3</td>
-        <td>Piso 2</td>
+
+        <td>{{ loja.nome }}</td>
+
+        <td>{{ loja.shopping_nome or "Sem shopping" }}</td>
+
+        <td>0</td>
+
+        <td>{{ loja.observacoes }}</td>
 
         <td class="acoes-tabela">
 
-            <a href="#" class="btn-editar">Editar</a>
-            <a href="#" class="btn-excluir">Excluir</a>
+        <a href="/lojas/{{ loja.id }}/editar" class="btn-editar">
+        Editar
+        </a>
+
+        <a href="/lojas/{{ loja.id }}/excluir"
+        class="btn-excluir"
+        onclick="return confirm('Excluir esta loja?')">
+        Excluir
+        </a>
 
         </td>
+
     </tr>
 
-    <tr>
-        <td>45</td>
-        <td>Barra Shopping</td>
-        <td>1</td>
-        <td>Perto da entrada</td>
-
-        <td class="acoes-tabela">
-
-            <a href="#" class="btn-editar">Editar</a>
-            <a href="#" class="btn-excluir">Excluir</a>
-
-        </td>
-    </tr>
+{% endfor %}
 
 </table>
 

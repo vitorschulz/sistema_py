@@ -40,8 +40,15 @@
 
             <td class="acoes-tabela">
 
-                <a href="#" class="btn-editar">Editar</a>
-                <a href="#" class="btn-excluir">Excluir</a>
+                <a href="/clientes/{{ cliente.id }}/editar" class="btn-editar">
+                Editar
+                </a>
+
+                <a href="/clientes/{{ cliente.id }}/excluir"
+                class="btn-excluir"
+                onclick="return confirm('Deseja excluir este cliente?')">
+                Excluir
+                </a>
 
             </td>
 

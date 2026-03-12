@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1>Novo cliente</h1>
+<h1>{{ "Editar cliente" if cliente else "Novo cliente" }}</h1>
 
 <section class="acoes">
 
@@ -19,31 +19,31 @@
 
     <div class="form-group">
         <label>Nome</label>
-        <input type="text" name="nome" required minlength="3" maxlength="120">
+        <input type="text" name="nome" required minlength="3" maxlength="120" value="{{ cliente.nome if cliente }}">
     </div>
 
     <div class="form-group">
         <label>CPF / CNPJ</label>
-        <input type="text" name="cpf_cnpj" id="cpf_cnpj" maxlength="18" placeholder="CPF ou CNPJ" pattern="[0-9./-]*" required>
+        <input type="text" name="cpf_cnpj" id="cpf_cnpj" maxlength="18" placeholder="CPF ou CNPJ" pattern="[0-9./-]*" value="{{ cliente.cpf_cnpj if cliente }}" required>
     </div>
 
     <div class="form-group">
         <label>Telefone</label>
-        <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15">
+        <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15" value="{{ cliente.telefone if cliente }}">
     </div>
 
     <div class="form-group">
         <label>Email</label>
-        <input type="email" name="email" maxlength="120">
+        <input type="email" name="email" maxlength="120" value="{{ cliente.email if cliente }}">
     </div>
 
     <div class="form-group">
         <label>Observações</label>
-        <textarea name="observacoes" rows="4" maxlength="500"></textarea>
+        <textarea name="observacoes" rows="4" maxlength="500">{{ cliente.observacoes if cliente }}</textarea>
     </div>
 
     <button type="submit" class="btn-submit">
-        Salvar cliente
+        {{ "Salvar cliente" if not cliente else "Atualizar cliente" }}
     </button>
 
 </form>
