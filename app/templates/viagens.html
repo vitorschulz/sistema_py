@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Viagens</h1>
+
+<section class="grid-viagens">
+
+
+    <div class="card-viagem nova-viagem" onclick="window.location.href='/viagens/nova'">
+
+        <div class="icone">
+            +
+        </div>
+
+        <p>Nova viagem</p>
+
+    </div>
+
+
+    <div class="card-viagem">
+
+        <h3>Viagem São Paulo</h3>
+
+        <p><strong>Data:</strong> 20/03/2026</p>
+
+        <p>3 shoppings no roteiro</p>
+
+    </div>
+
+
+    <div class="card-viagem">
+
+        <h3>Viagem Porto Alegre</h3>
+
+        <p><strong>Data:</strong> 02/04/2026</p>
+
+        <p>5 shoppings no roteiro</p>
+
+    </div>
+
+
+    <div class="card-viagem">
+
+        <h3>Viagem Curitiba</h3>
+
+        <p><strong>Data:</strong> 15/04/2026</p>
+
+        <p>2 shoppings no roteiro</p>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -43,7 +43,11 @@
     {% for loja in lojas %}
     <tr>
 
-            <td>{{ loja.nome }}</td>
+            <td>
+                <a href="/lojas/{{ loja.id }}?shopping={{ shopping.id }}" class="tabela-link">
+                    {{ loja.nome }}
+                </a>
+            </td>
 
              <td class="acoes-tabela">
 

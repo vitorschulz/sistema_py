@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ loja.nome }}</h1>
+
+<section class="card">
+
+<h2>Informações</h2>
+
+<p><strong>Shopping:</strong> {{ loja.shopping_nome or "Sem shopping" }}</p>
+<p><strong>Observações:</strong> {{ loja.observacoes or "Nenhuma observação cadastrada." }}</p>
+
+</section>
+
+<section class="card">
+
+<h2>Pedidos da loja</h2>
+
+<p>Nenhum pedido cadastrado ainda.</p>
+
+</section>
+
+<section class="acoes">
+
+{% if shopping_id %}
+    <button onclick="window.location.href='/shopping/{{ shopping_id }}'" style="max-width:75px;">
+        Voltar
+    </button>
+{% else %}
+    <button onclick="window.location.href='/lojas'" style="max-width:75px;">
+        Voltar
+    </button>
+{% endif %}
+
+</section>
+
+{% endblock %}

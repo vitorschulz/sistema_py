@@ -11,9 +11,19 @@ def listar_shopping():
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT * FROM shopping
-        WHERE ativo = TRUE
-        ORDER BY nome
+        SELECT 
+        shopping.id,
+        shopping.nome,
+        shopping.cidade,
+        shopping.endereco,
+        COUNT(lojas.id) AS total_lojas
+        FROM shopping
+        LEFT JOIN lojas 
+            ON lojas.shopping_id = shopping.id 
+            AND lojas.ativo = TRUE
+        WHERE shopping.ativo = TRUE
+        GROUP BY shopping.id
+        ORDER BY shopping.nome
     """)
 
     shoppings = cursor.fetchall()

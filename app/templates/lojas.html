@@ -23,8 +23,7 @@
     <tr>
         <th>Loja</th>
         <th>Shopping</th>
-        <th>Clientes</th>
-        <th>Observações</th>
+        <th>Pedidos</th>
         <th>Ações</th>
     </tr>
 
@@ -32,13 +31,15 @@
 
     <tr>
 
-        <td>{{ loja.nome }}</td>
+        <td> 
+            <a href="/lojas/{{ loja.id }}" class="tabela-link">
+            {{ loja.nome }}
+            </a>
+        </td>
 
         <td>{{ loja.shopping_nome or "Sem shopping" }}</td>
 
         <td>0</td>
-
-        <td>{{ loja.observacoes }}</td>
 
         <td class="acoes-tabela">
 

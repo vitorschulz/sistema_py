@@ -187,3 +187,34 @@ def excluir_loja(id):
         return redirect(f"/shopping/{shopping_origem}")
 
     return redirect("/lojas")
+
+#get pra ir pros detalhes
+@lojas.route("/lojas/<int:id>")
+def ver_loja(id):
+
+    shopping_id = request.args.get("shopping")
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+         SELECT 
+            lojas.id,
+            lojas.nome,
+            lojas.observacoes,
+            shopping.nome AS shopping_nome
+        FROM lojas
+        LEFT JOIN shopping ON lojas.shopping_id = shopping.id
+        WHERE lojas.id = %s
+    """, (id,))
+
+    loja = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "loja_detalhe.html",
+        loja=loja,
+        shopping_id=shopping_id
+    )
