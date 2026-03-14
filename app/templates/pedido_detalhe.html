@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Pedido {{ numero_cliente }} — {{ pedido.cliente_nome }}
+    <span class="pedido-tipo tipo-{{ pedido.tipo }}" style="margin-left: 10px; vertical-align: 3px;">
+    {{ pedido.tipo.replace("_"," / ") }}
+    </span>
+</h1>
+
+    <section class="card">
+
+    <h2>Informações</h2>
+
+        <p>
+        <strong>Cliente:</strong>
+        <a href="/clientes/{{ pedido.cliente_id }}" class="tabela-link">
+        {{ pedido.cliente_nome }}
+        </a>
+        </p>
+
+        <p>
+        <strong>Tipo:</strong>
+        {{ pedido.tipo.replace("_", " / ") }}
+        </p>
+
+        <p>
+        <strong>Shopping:</strong>
+        <a href="/shopping/{{ pedido.shopping_id }}" class="tabela-link">
+        {{ pedido.shopping_nome }}
+        </a>
+        </p>
+
+        <p>
+        <strong>Loja:</strong>
+        <a href="/lojas/{{ pedido.loja_id }}" class="tabela-link">
+        {{ pedido.loja_nome }}
+        </a>
+        </p>
+
+        <p>
+        <strong>Viagem:</strong>
+        <a href="/viagens/{{ pedido.viagem_id }}" class="tabela-link">
+        {{ pedido.viagem_nome }}
+        </a>
+        </p>
+
+    </section>
+
+
+    <section class="card">
+
+        <h2>Observações</h2>
+
+        <p>
+        {{ pedido.observacoes or "Nenhuma observação cadastrada." }}
+        </p>
+
+    </section>
+
+
+    <section class="acoes" style="flex-direction: row;">
+
+        <button style="max-width: 75px;" onclick="window.location.href='/viagens/{{ pedido.viagem_id }}'">
+        Voltar
+        </button>
+
+        <button style="max-width: 75px;" onclick="window.location.href='/pedidos/{{ pedido.id }}/editar'">
+        Editar
+        </button>
+
+    </section>
+
+{% endblock %}

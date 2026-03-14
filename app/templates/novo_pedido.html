@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+    {% block content %}
+
+        <h1>{{ "Editar pedido" if pedido else "Novo pedido" }}</h1>
+
+    <section class="card">
+
+        <form method="POST">
+
+            <div class="form-group">
+
+            <label>Shopping</label>
+
+                <select id="shopping">
+                {% for s in shoppings %}
+                <option value="{{ s.id }}">
+                {{ s.nome }}
+                </option>
+                {% endfor %}
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+            <label>Loja</label>
+
+                <select name="loja_id" id="loja">
+
+                {% for l in lojas %}
+                <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
+                {% if pedido and pedido.loja_id == l.id %}selected{% endif %}>
+                {{ l.nome }}
+                </option>
+                {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+            <label>Cliente</label>
+
+                <select name="cliente_id">
+
+                {% for c in clientes %}
+                <option value="{{ c.id }}"
+                {% if pedido and pedido.cliente_id == c.id %}selected{% endif %}>
+                {{ c.nome }}
+                </option>
+                {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Tipo</label>
+
+                <select name="tipo">
+
+                <option value="PEDIDO" {% if pedido and pedido.tipo == "PEDIDO" %}selected{% endif %}>Pedido</option>
+                <option value="ACERTO" {% if pedido and pedido.tipo == "ACERTO" %}selected{% endif %}>Acerto</option>
+                <option value="ACERTO_PEDIDO" {% if pedido and pedido.tipo == "ACERTO_PEDIDO" %}selected{% endif %}>Acerto + Pedido</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Observações</label>
+
+                <textarea name="observacoes">{{ pedido.observacoes if pedido }}</textarea>
+
+            </div>
+
+            <section class="acoes" style="flex-direction: row;">
+
+                    <button 
+                    type="button"
+                    onclick="window.location.href='/viagens/{{ viagem_id }}'"
+                    style="width:75px;">
+
+                    Voltar
+
+                    </button>
+
+
+                    <button
+                    type="submit">
+
+                    {{ "Salvar tarefa" if not pedido else "Atualizar tarefa" }}
+
+                    </button>
+
+            </section>
+            
+<script src="{{ url_for('static', filename='js/pedido.js') }}"></script>
+
+{% endblock %}

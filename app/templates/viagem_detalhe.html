@@ -1,0 +1,151 @@
+    {% extends "base.html" %}
+
+    {% block content %}
+
+    <h1>{{ viagem.nome }}</h1>
+
+
+        <section class="card">
+
+            
+
+            <h2>Informações da viagem</h2>
+
+            <p>
+                <strong>Data:</strong>
+                {{ viagem.data_viagem.strftime('%d/%m/%Y') }}
+            </p>
+
+
+            <div class="status-form">
+
+            <strong>Status:</strong>
+
+                <select id="status-select" data-viagem-id="{{ viagem.id }}">
+
+                <option value="Planejada"
+                {% if viagem.status == "Planejada" %}selected{% endif %}>
+                Planejada
+                </option>
+
+                <option value="Em andamento"
+                {% if viagem.status == "Em andamento" %}selected{% endif %}>
+                Em andamento
+                </option>
+
+                <option value="Finalizada"
+                {% if viagem.status == "Finalizada" %}selected{% endif %}>
+                Finalizada
+                </option>
+
+                <option value="Cancelada"
+                {% if viagem.status == "Cancelada" %}selected{% endif %}>
+                Cancelada
+                </option>
+
+                </select>
+
+            </div>
+
+
+        </section>
+
+
+        <section class="card">
+
+            <h2>Observações</h2>
+
+            <p>
+                {{ viagem.observacoes or "Nenhuma observação cadastrada." }}
+            </p>
+
+        </section>
+
+
+        <section class="card">
+
+            <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
+
+        {% if pedidos %}
+
+            <div class="lista-pedidos">
+
+        {% for pedido in pedidos %}
+
+        <div class="pedido-item">
+
+            <div class="pedido-info">
+
+                <span class="pedido-ordem">
+                    {{ pedido.ordem }}.
+                </span>
+
+                <span class="pedido-cliente">
+                    <a href="/pedidos/{{ pedido.id }}" class="tabela-link pedido-cliente">
+                        {{ pedido.cliente_nome }}
+                    </a>
+                </span>
+
+                <span class="pedido-tipo tipo-{{ pedido.tipo }}">
+                    {{ pedido.tipo.replace("_", " / ") }}
+                </span>
+
+                <span class="pedido-loja">
+                    {{ pedido.shopping_nome }} → {{ pedido.loja_nome }}
+                </span>
+
+            </div>
+
+
+            <div class="pedido-acoes">
+
+                <a href="/pedidos/{{ pedido.id }}/subir" class="btn-ordem" title="Subir">
+                ↑
+                </a>
+
+                <a href="/pedidos/{{ pedido.id }}/descer" class="btn-ordem" title="Descer">
+                ↓
+                </a>
+
+                <a href="/pedidos/{{ pedido.id }}/editar" class="btn-editar">
+                Editar
+                </a>
+
+                <a href="/pedidos/{{ pedido.id }}/excluir"
+                class="btn-excluir"
+                onclick="return confirm('Deseja excluir este pedido?')">
+                Excluir
+                </a>
+
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <p>Nenhum pedido nesta viagem.</p>
+
+        {% endif %}
+
+        </section>
+
+    <section class="acoes" style="flex-direction: row;">
+
+        <button onclick="window.location.href='/viagens'" style="width: 75px;">
+            Voltar
+        </button>
+
+        <button onclick="window.location.href='/viagens/{{ viagem.id }}/novo_pedido'">
+            Adicionar Tarefa
+        </button>
+
+    </section>
+
+    <script src="{{ url_for('static', filename='js/viagem.js') }}"></script>
+
+    {% endblock %}
