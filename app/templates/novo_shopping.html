@@ -21,17 +21,44 @@
 
 <div class="form-group">
     <label>Nome do shopping</label>
-    <input type="text" name="nome" required maxlength="120" value="{{ shopping.nome if shopping else '' }}">
+    <input type="text" name="nome" placeholder="Iguatemi..." required maxlength="120" value="{{ shopping.nome if shopping else '' }}">
 </div>
 
 <div class="form-group">
-    <label>Cidade</label>
-    <input type="text" name="cidade" maxlength="100" value="{{ shopping.cidade if shopping else '' }}">
+    <label>Local</label>
+
+    <select name="local" required>
+
+    <option value="">Selecione o local</option>
+
+    <option value="Serra"
+    {% if shopping and shopping.local == "Serra" %}selected{% endif %}>
+    Serra
+    </option>
+
+    <option value="Santa Catarina"
+    {% if shopping and shopping.local == "Santa Catarina" %}selected{% endif %}>
+    Santa Catarina
+    </option>
+
+    </select>
+
 </div>
 
 <div class="form-group">
     <label>Endereço</label>
-    <input type="text" name="endereco" maxlength="200" value="{{ shopping.endereco if shopping else '' }}">
+    <input type="text" name="endereco" maxlength="200" placeholder="Rua, número, cidade..." value="{{ shopping.endereco if shopping else '' }}">
+</div>
+
+<div class="form-group">
+    <label>Contato</label>
+
+    <input type="text"
+    name="contato"
+    maxlength="120"
+    placeholder="Telefone ou responsável"
+    value="{{ shopping.contato if shopping else '' }}">
+
 </div>
 
 <div class="form-group">

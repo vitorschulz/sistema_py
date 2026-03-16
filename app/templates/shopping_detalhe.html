@@ -8,8 +8,12 @@
 
 <h2>Informações</h2>
 
-<p><strong>Cidade:</strong> {{ shopping.cidade }}</p>
-<p><strong>Endereço:</strong> {{ shopping.endereco }}</p>
+<p><strong>Local:</strong>
+        <span class="shopping-local local-{{ shopping.local.replace(" ", "_") }}">
+        {{ shopping.local }}
+        </span></p>
+<p><strong>Endereço:</strong> {{ shopping.endereco  or "Não informado" }}</p>
+<p><strong>Contato:</strong> {{ shopping.contato or "Não informado" }}</p>
 
 </section>
 
@@ -27,54 +31,61 @@
 
 <h2 style="margin-bottom:25px;">Lojas deste shopping</h2>
 
-<table class="tabela">
+<table id="tabela-lista">
 
-    <thead>
-    <tr>
-        <th>Nome da loja</th>
-        <th style="width:150px;">Ações</th>
-    </tr>
-    </thead>
+<tr>
+    <th>Loja</th>
+    <th>Shopping</th>
+    <th>Contato</th>
+    <th>Observação</th>
+    <th>Ações</th>
+</tr>
 
-<tbody>
+{% if lojas %}
 
-    {% if lojas %}
+{% for loja in lojas %}
 
-    {% for loja in lojas %}
-    <tr>
+<tr>
 
-            <td>
-                <a href="/lojas/{{ loja.id }}?shopping={{ shopping.id }}" class="tabela-link">
-                    {{ loja.nome }}
-                </a>
-            </td>
+    <td>
+        <a href="/lojas/{{ loja.id }}?shopping={{ shopping.id }}" class="tabela-link">
+            {{ loja.nome }}
+        </a>
+    </td>
 
-             <td class="acoes-tabela">
+    <td>{{ shopping.nome }}</td>
 
-            <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}" class="btn-editar">
+    <td>{{ loja.contato or "—" }}</td>
+
+    <td>{{ loja.observacoes or "—" }}</td>
+
+    <td class="acoes-tabela">
+
+        <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}" class="btn-editar">
             Editar
-            </a>
+        </a>
 
-            <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}" class="btn-excluir">
-            Excluir
-            </a>
+        <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}"
+           class="btn-excluir"
+           onclick="return confirm('Excluir esta loja?')">
+           Excluir
+        </a>
 
-            </td>
+    </td>
 
-    </tr>
-    {% endfor %}
+</tr>
 
-    {% else %}
+{% endfor %}
 
-    <tr>
-        <td colspan="2">
+{% else %}
+
+<tr>
+    <td colspan="5">
         Nenhuma loja cadastrada neste shopping.
-        </td>
-    </tr>
+    </td>
+</tr>
 
-    {% endif %}
-
-</tbody>
+{% endif %}
 
 </table>
 

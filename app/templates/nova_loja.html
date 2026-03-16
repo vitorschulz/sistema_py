@@ -19,7 +19,14 @@
 
 <div class="form-group">
     <label>Número / Nome da loja</label>
-    <input type="text" name="nome" required value="{{ loja.nome if loja }}">
+    <input type="text" name="nome" required placeholder="Nome da loja..." value="{{ loja.nome if loja }}">
+</div>
+
+<div class="form-group">
+    <label>Contato</label>
+    <input type="text" name="contato"
+    placeholder="Nome ou telefone do contato..."
+    value="{{ loja.contato if loja }}">
 </div>
 
 <div class="form-group">

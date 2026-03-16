@@ -46,7 +46,7 @@ def novo_cliente():
         nome = request.form["nome"]
         cpf_cnpj = request.form["cpf_cnpj"]
         telefone = request.form["telefone"]
-        email = request.form["email"]
+        endereco = request.form["endereco"]
         observacoes = request.form["observacoes"]
 
         conn = get_db_connection()
@@ -54,9 +54,9 @@ def novo_cliente():
 
         cursor.execute("""
             INSERT INTO clientes
-            (nome, cpf_cnpj, telefone, email, observacoes)
+            (nome, cpf_cnpj, telefone, endereco, observacoes)
             VALUES (%s,%s,%s,%s,%s)
-        """, (nome, cpf_cnpj, telefone, email, observacoes))
+        """, (nome, cpf_cnpj, telefone, endereco, observacoes))
 
         conn.commit()
 
@@ -85,14 +85,14 @@ def editar_cliente(id):
         nome = request.form["nome"]
         cpf_cnpj = request.form["cpf_cnpj"]
         telefone = request.form["telefone"]
-        email = request.form["email"]
+        endereco = request.form["endereco"]
         observacoes = request.form["observacoes"]
 
         cursor.execute("""
             UPDATE clientes
-            SET nome=%s, cpf_cnpj=%s, telefone=%s, email=%s, observacoes=%s
+            SET nome=%s, cpf_cnpj=%s, telefone=%s, endereco=%s, observacoes=%s
             WHERE id=%s
-        """, (nome, cpf_cnpj, telefone, email, observacoes, id))
+        """, (nome, cpf_cnpj, telefone, endereco, observacoes, id))
 
         conn.commit()
 

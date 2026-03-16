@@ -52,6 +52,13 @@
     background-color: #334155;
     padding-left: 16px;
 }
+
+.menu-item.ativo {
+    background-color: #334155;
+    padding-left: 16px;
+    font-weight: 600;
+}
+
 /* CONTEÚDO */
 
 .content {

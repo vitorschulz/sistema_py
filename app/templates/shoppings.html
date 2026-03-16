@@ -21,9 +21,12 @@
 
     <tr>
         <th>Nome</th>
-        <th>Cidade</th>
+        <th>
+            <a href="/shopping?ordem=local" class="tabela-link">
+                Local
+            </a></th>
         <th>Endereço</th>
-        <th>Lojas</th>
+        <th>Contato</th>
         <th>Ações</th>
     </tr>
 
@@ -35,9 +38,13 @@
         {{ shopping.nome }}
     </a>
     </td>
-    <td>{{ shopping.cidade }}</td>
-    <td>{{ shopping.endereco }}</td>
-    <td>{{ shopping.total_lojas }}</td>
+    <td>
+        <span class="shopping-local local-{{ shopping.local.replace(" ", "_") }}">
+        {{ shopping.local }}
+        </span>
+    </td>
+    <td>{{ shopping.endereco or "—"  }}</td>
+    <td>{{ shopping.contato or "—" }}</td>
 
     <td class="acoes-tabela">
 
@@ -45,7 +52,7 @@
         Editar
         </a>
 
-        <a href="/shopping/{{ shopping.id }}/excluir" class="btn-excluir">
+        <a href="/shopping/{{ shopping.id }}/excluir" class="btn-excluir" onclick="return confirm('Deseja excluir este cliente?')">
         Excluir
         </a>
 

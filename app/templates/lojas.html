@@ -23,7 +23,8 @@
     <tr>
         <th>Loja</th>
         <th>Shopping</th>
-        <th>Pedidos</th>
+        <th>Contato</th>
+        <th>Observação</th>
         <th>Ações</th>
     </tr>
 
@@ -39,7 +40,9 @@
 
         <td>{{ loja.shopping_nome or "Sem shopping" }}</td>
 
-        <td>0</td>
+        <td>{{ loja.contato or "—" }}</td>
+
+        <td>{{ loja.observacoes or "—" }}</td>
 
         <td class="acoes-tabela">
 

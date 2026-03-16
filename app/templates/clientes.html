@@ -24,7 +24,7 @@
             <th >Nome</th>
             <th>CPF/CNPJ</th>
             <th>Telefone</th>
-            <th>Email</th>
+            <th>Endereço</th>
             <th>Ações</th>
             
         {% for cliente in clientes %}
@@ -34,9 +34,9 @@
                 <a href="/clientes/{{ cliente.id }}" class="tabela-link">
                     {{ cliente.nome }}
                 </a></td>
-            <td>{{ cliente.cpf_cnpj }}</td>
-            <td>{{ cliente.telefone }}</td>
-            <td>{{ cliente.email }}</td>
+            <td>{{ cliente.cpf_cnpj or "—" }}</td>
+            <td>{{ cliente.telefone or "—" }}</td>
+            <td>{{ cliente.endereco or "—" }}</td>
 
             <td class="acoes-tabela">
 

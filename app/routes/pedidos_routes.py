@@ -22,7 +22,7 @@ def detalhe_pedido(id):
         FROM pedidos
         JOIN clientes ON pedidos.cliente_id = clientes.id
         JOIN lojas ON pedidos.loja_id = lojas.id
-        JOIN shopping ON lojas.shopping_id = shopping.id
+        JOIN shopping ON lojas.shopping_id = shopping.id AND shopping.ativo = TRUE
         JOIN viagens ON pedidos.viagem_id = viagens.id
         WHERE pedidos.id = %s
     """, (id,))

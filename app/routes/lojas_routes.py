@@ -15,12 +15,14 @@ def listar_lojas():
             lojas.id,
             lojas.nome,
             lojas.observacoes,
+            lojas.contato,
             shopping.nome AS shopping_nome
         FROM lojas
         LEFT JOIN shopping 
             ON lojas.shopping_id = shopping.id
+            AND shopping.ativo = TRUE
         WHERE lojas.ativo = TRUE
-        ORDER BY lojas.nome
+        ORDER BY shopping_nome
     """)
 
     lojas_lista = cursor.fetchall()
@@ -70,6 +72,7 @@ def nova_loja():
         nome = request.form["nome"]
         shopping_id = request.form["shopping_id"]
         observacoes = request.form["observacoes"]
+        contato = request.form["contato"]
     
         cursor.execute("""
         SELECT id FROM lojas
@@ -82,9 +85,9 @@ def nova_loja():
 
             cursor.execute("""
                 INSERT INTO lojas
-                (nome, shopping_id, observacoes)
-                VALUES (%s,%s,%s)
-            """, (nome, shopping_id, observacoes))
+                (nome, contato, shopping_id, observacoes)
+                VALUES (%s,%s,%s,%s)
+            """, (nome, contato, shopping_id, observacoes))
 
             conn.commit()
 
@@ -136,12 +139,13 @@ def editar_loja(id):
         nome = request.form["nome"]
         shopping_id = request.form["shopping_id"]
         observacoes = request.form["observacoes"]
+        contato = request.form["contato"]
 
         cursor.execute("""
             UPDATE lojas
-            SET nome=%s, shopping_id=%s, observacoes=%s
+            SET nome=%s, contato=%s, shopping_id=%s, observacoes=%s
             WHERE id=%s
-        """, (nome, shopping_id, observacoes, id))
+        """, (nome, contato, shopping_id, observacoes, id))
 
         conn.commit()
 
@@ -202,9 +206,11 @@ def ver_loja(id):
             lojas.id,
             lojas.nome,
             lojas.observacoes,
+            lojas.contato,
             shopping.nome AS shopping_nome
         FROM lojas
         LEFT JOIN shopping ON lojas.shopping_id = shopping.id
+        AND shopping.ativo = TRUE
         WHERE lojas.id = %s
     """, (id,))
 

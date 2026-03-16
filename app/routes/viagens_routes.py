@@ -88,7 +88,7 @@ def detalhe_viagem(id):
             ON pedidos.loja_id = lojas.id
 
         JOIN shopping 
-            ON lojas.shopping_id = shopping.id
+            ON lojas.shopping_id = shopping.id AND shopping.ativo = TRUE
 
         WHERE pedidos.viagem_id = %s
 

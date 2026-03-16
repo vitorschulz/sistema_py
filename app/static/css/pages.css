@@ -85,7 +85,10 @@
     display: flex;
     gap: 16px;
     margin-left: -6px;
+    margin-bottom: -1px;
 }
+
+
 
 .btn-editar {
     text-decoration: none;
@@ -116,6 +119,13 @@
     background-color: rgba(220, 38, 38, 0.08);
 }
 
+.local-Serra{
+    color:#2e7d32;
+}
+
+.local-Santa_Catarina{
+    color:#1565c0;
+}
 
 /* FORMULÁRIO */
 

@@ -6,7 +6,7 @@ shopping = Blueprint("shopping", __name__)
 #listagem
 @shopping.route("/shopping")
 def listar_shopping():
-
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -14,8 +14,9 @@ def listar_shopping():
         SELECT 
         shopping.id,
         shopping.nome,
-        shopping.cidade,
+        shopping.local,
         shopping.endereco,
+        shopping.contato,
         COUNT(lojas.id) AS total_lojas
         FROM shopping
         LEFT JOIN lojas 
@@ -23,7 +24,7 @@ def listar_shopping():
             AND lojas.ativo = TRUE
         WHERE shopping.ativo = TRUE
         GROUP BY shopping.id
-        ORDER BY shopping.nome
+        ORDER BY shopping.local, shopping.nome
     """)
 
     shoppings = cursor.fetchall()
@@ -74,8 +75,9 @@ def novo_shopping():
     if request.method == "POST":
 
         nome = request.form["nome"].strip()
-        cidade = request.form["cidade"].strip()
+        local = request.form["local"].strip()
         endereco = request.form["endereco"].strip()
+        contato = request.form["contato"].strip()
         observacoes = request.form["observacoes"].strip()
 
 
@@ -84,9 +86,9 @@ def novo_shopping():
 
         cursor.execute("""
             INSERT INTO shopping
-            (nome, cidade, endereco, observacoes)
-            VALUES (%s,%s,%s,%s)
-        """, (nome, cidade, endereco, observacoes))
+            (nome, local, endereco, contato, observacoes)
+            VALUES (%s,%s,%s,%s,%s)
+        """, (nome, local, endereco, contato, observacoes))
 
         conn.commit()
 
@@ -113,15 +115,20 @@ def editar_shopping(id):
     if request.method == "POST":
 
         nome = request.form["nome"].strip()
-        cidade = request.form["cidade"].strip()
+        local = request.form["local"].strip()
         endereco = request.form["endereco"].strip()
+        contato = request.form["contato"].strip()
         observacoes = request.form["observacoes"].strip()
 
         cursor.execute("""
             UPDATE shopping
-            SET nome=%s, cidade=%s, endereco=%s, observacoes=%s
+            SET nome=%s,
+                local=%s,
+                endereco=%s,
+                contato=%s,
+                observacoes=%s
             WHERE id=%s
-        """, (nome, cidade, endereco, observacoes, id))
+        """, (nome, local, endereco, contato, observacoes, id))
 
         conn.commit()
 
@@ -144,6 +151,12 @@ def excluir_shopping(id):
 
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE lojas
+        SET shopping_id = NULL
+        WHERE shopping_id = %s
+    """, (id,))
 
     cursor.execute("""
         UPDATE shopping

@@ -19,6 +19,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    
 }
 
 th {
@@ -28,6 +29,11 @@ th {
 }
 
 td {
+    
     padding: 10px;
     border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
