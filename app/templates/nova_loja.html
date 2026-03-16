@@ -22,12 +22,8 @@
     <input type="text" name="nome" required placeholder="Nome da loja..." value="{{ loja.nome if loja }}">
 </div>
 
-<div class="form-group">
-    <label>Contato</label>
-    <input type="text" name="contato"
-    placeholder="Nome ou telefone do contato..."
-    value="{{ loja.contato if loja }}">
-</div>
+
+
 
 <div class="form-group">
     <label>Shopping</label>
@@ -58,6 +54,11 @@
 
 </div>
 
+    <div class="form-group">
+        <label>Telefone</label>
+        <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ loja.contato if loja }}" id="telefone">
+    </div>
+
 <div class="form-group">
     <label>Observações</label>
     <textarea name="observacoes" rows="4">{{ loja.observacoes if loja }}</textarea>
@@ -71,5 +72,7 @@
 
 
 </section>
+
+<script src="{{ url_for('static', filename='js/formatar_numero.js') }}"></script>
 
 {% endblock %}

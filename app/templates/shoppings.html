@@ -21,12 +21,9 @@
 
     <tr>
         <th>Nome</th>
-        <th>
-            <a href="/shopping?ordem=local" class="tabela-link">
-                Local
-            </a></th>
+        <th>Local</th>
+        <th>Telefone</th>
         <th>Endereço</th>
-        <th>Contato</th>
         <th>Ações</th>
     </tr>
 
@@ -43,8 +40,8 @@
         {{ shopping.local }}
         </span>
     </td>
-    <td>{{ shopping.endereco or "—"  }}</td>
     <td>{{ shopping.contato or "—" }}</td>
+    <td>{{ shopping.endereco or "—"  }}</td>
 
     <td class="acoes-tabela">
 
