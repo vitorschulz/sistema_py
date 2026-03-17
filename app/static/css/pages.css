@@ -206,6 +206,8 @@ form {
 
 /*viagens*/
 
+
+
 .grid-viagens{
     display:grid;
     grid-template-columns:repeat(auto-fill,250px);
@@ -315,6 +317,68 @@ form {
     background: #1d4ed8;
 }
 
+.viagem-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.ordem-clientes {
+    grid-column: 2;
+    min-height: 300px;
+    flex: 1;
+}
+
+.tarefas {
+    grid-column: 1 / -1;
+}
+
+.resumo {
+    grid-column: 1 / -1;
+}
+
+.viagem-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.viagem-side {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+.observacoes,
+.ordem-clientes {
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.observacoes p {
+    white-space: pre-wrap;
+    margin-top: 0;
+}
+
+.conteudo-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 5px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin-top: 5px;
+}
+
+.conteudo-scroll p {
+    margin: 0;
+}
+
+.conteudo-scroll {
+    flex: 1;
+}
+
 /*pedidos*/
 
 .pedido-ordem{
@@ -404,5 +468,32 @@ form {
 }
 
 
+/* agrupamento tarefas */
 
+.shopping-grupo{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:25px;
+}
 
+.shopping-grupo h3{
+    margin-bottom:15px;
+}
+
+.loja-grupo{
+    margin-left:15px;
+    margin-bottom:15px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.loja-grupo h4{
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.loja-grupo .pedido-item{
+    margin-left:15px;
+}

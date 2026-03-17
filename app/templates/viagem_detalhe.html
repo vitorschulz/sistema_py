@@ -1,13 +1,23 @@
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
-    {% block content %}
+{% block content %}
 
-    <h1>{{ viagem.nome }}</h1>
+<h1>{{ viagem.data_viagem.strftime('%d/%m/%Y') }} — {{ viagem.local }} VER DPS</h1>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/viagens'">
+        ←  Voltar
+    </button>
+
+</section>
+
+<div class="viagem-layout">
 
 
-        <section class="card">
+    <div class="viagem-main">
 
-            
+        <section class="card info">
 
             <h2>Informações da viagem</h2>
 
@@ -16,136 +26,162 @@
                 {{ viagem.data_viagem.strftime('%d/%m/%Y') }}
             </p>
 
-
             <div class="status-form">
-
-            <strong>Status:</strong>
+                <strong>Status:</strong>
 
                 <select id="status-select" data-viagem-id="{{ viagem.id }}">
-
-                <option value="Planejada"
-                {% if viagem.status == "Planejada" %}selected{% endif %}>
-                Planejada
-                </option>
-
-                <option value="Em andamento"
-                {% if viagem.status == "Em andamento" %}selected{% endif %}>
-                Em andamento
-                </option>
-
-                <option value="Finalizada"
-                {% if viagem.status == "Finalizada" %}selected{% endif %}>
-                Finalizada
-                </option>
-
-                <option value="Cancelada"
-                {% if viagem.status == "Cancelada" %}selected{% endif %}>
-                Cancelada
-                </option>
-
+                    <option value="Planejada" {% if viagem.status == "Planejada" %}selected{% endif %}>Planejada</option>
+                    <option value="Em andamento" {% if viagem.status == "Em andamento" %}selected{% endif %}>Em andamento</option>
+                    <option value="Finalizada" {% if viagem.status == "Finalizada" %}selected{% endif %}>Finalizada</option>
+                    <option value="Cancelada" {% if viagem.status == "Cancelada" %}selected{% endif %}>Cancelada</option>
                 </select>
-
             </div>
-
 
         </section>
 
 
-        <section class="card">
+        <section class="card observacoes">
 
             <h2>Observações</h2>
+            <div class="conteudo-scroll" style="margin-top: -5px;">
 
-            <p>
-                {{ viagem.observacoes or "Nenhuma observação cadastrada." }}
-            </p>
-
-        </section>
-
-
-        <section class="card">
-
-            <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
-
-        {% if pedidos %}
-
-            <div class="lista-pedidos">
-
-        {% for pedido in pedidos %}
-
-        <div class="pedido-item">
-
-            <div class="pedido-info">
-
-                <span class="pedido-ordem">
-                    {{ pedido.ordem }}.
-                </span>
-
-                <span class="pedido-cliente">
-                    <a href="/pedidos/{{ pedido.id }}" class="tabela-link pedido-cliente">
-                        {{ pedido.cliente_nome }}
-                    </a>
-                </span>
-
-                <span class="pedido-tipo tipo-{{ pedido.tipo }}">
-                    {{ pedido.tipo.replace("_", " / ") }}
-                </span>
-
-                <span class="pedido-loja">
-                    {{ pedido.shopping_nome }} → {{ pedido.loja_nome }}
-                </span>
+                    {{ viagem.observacoes or "Nenhuma observação cadastrada." }}
 
             </div>
 
+        </section>
 
-            <div class="pedido-acoes">
+    </div>
 
-                <a href="/pedidos/{{ pedido.id }}/subir" class="btn-ordem" title="Subir">
-                ↑
-                </a>
+    <div class="viagem-side">
 
-                <a href="/pedidos/{{ pedido.id }}/descer" class="btn-ordem" title="Descer">
-                ↓
-                </a>
+        <section class="card ordem-clientes">
 
-                <a href="/pedidos/{{ pedido.id }}/editar" class="btn-editar">
-                Editar
-                </a>
+            <h2>Ordem de clientes</h2>
 
-                <a href="/pedidos/{{ pedido.id }}/excluir"
-                class="btn-excluir"
-                onclick="return confirm('Deseja excluir este pedido?')">
-                Excluir
-                </a>
-
-
+            <div class="conteudo-scroll">
+                <p style="color:#666;">
+                    (vai entrar lista aqui)
+                </p>
             </div>
-
-        </div>
-
-        {% endfor %}
-
-        </div>
-
-        {% else %}
-
-        <p>Nenhum pedido nesta viagem.</p>
-
-        {% endif %}
 
         </section>
 
-    <section class="acoes" style="flex-direction: row;">
+    </div>
 
-        <button onclick="window.location.href='/viagens'" style="width: 75px;">
-            Voltar
-        </button>
 
-        <button onclick="window.location.href='/viagens/{{ viagem.id }}/novo_pedido'">
-            Adicionar Tarefa
-        </button>
+        <section class="card tarefas">
 
-    </section>
+                <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
 
-    <script src="{{ url_for('static', filename='js/viagem.js') }}"></script>
+                <div class="shopping-grupo">
 
-    {% endblock %}
+                <h3>Shopping 1</h3>
+
+                <div class="loja-grupo">
+
+                <h4>Loja 1</h4>
+
+                <div class="pedido-item">
+                <div class="pedido-info">
+                <span class="pedido-ordem">1.</span>
+                <span class="pedido-cliente">Cliente João</span>
+                <span class="pedido-tipo tipo-PEDIDO">PEDIDO</span>
+                </div>
+
+                <div class="pedido-acoes">
+                <a class="btn-ordem">↑</a>
+                <a class="btn-ordem">↓</a>
+                <a class="btn-editar">Editar</a>
+                <a class="btn-excluir">Excluir</a>
+                </div>
+                </div>
+
+                <div class="pedido-item">
+                <div class="pedido-info">
+                <span class="pedido-ordem">2.</span>
+                <span class="pedido-cliente">Cliente Maria</span>
+                <span class="pedido-tipo tipo-ACERTO">ACERTO</span>
+                </div>
+
+                <div class="pedido-acoes">
+                <a class="btn-ordem">↑</a>
+                <a class="btn-ordem">↓</a>
+                <a class="btn-editar">Editar</a>
+                <a class="btn-excluir">Excluir</a>
+                </div>
+                </div>
+
+                </div>
+
+
+                <div class="loja-grupo">
+
+                <h4>Loja 2</h4>
+
+                <div class="pedido-item">
+                <div class="pedido-info">
+                <span class="pedido-ordem">3.</span>
+                <span class="pedido-cliente">Cliente Pedro</span>
+                <span class="pedido-tipo tipo-ACERTO_PEDIDO">ACERTO / PEDIDO</span>
+                </div>
+
+                <div class="pedido-acoes">
+                <a class="btn-ordem">↑</a>
+                <a class="btn-ordem">↓</a>
+                <a class="btn-editar">Editar</a>
+                <a class="btn-excluir">Excluir</a>
+                </div>
+                </div>
+
+                </div>
+
+                </div>
+
+
+
+                <div class="shopping-grupo">
+
+                <h3>Shopping 2</h3>
+
+                <div class="loja-grupo">
+
+                <h4>Loja 1</h4>
+
+                <div class="pedido-item">
+                <div class="pedido-info">
+                <span class="pedido-ordem">1.</span>
+                <span class="pedido-cliente">Cliente Lucas</span>
+                <span class="pedido-tipo tipo-PEDIDO">PEDIDO</span>
+                </div>
+
+                <div class="pedido-acoes">
+                <a class="btn-ordem">↑</a>
+                <a class="btn-ordem">↓</a>
+                <a class="btn-editar">Editar</a>
+                <a class="btn-excluir">Excluir</a>
+                </div>
+                </div>
+
+                </div>
+
+                </div>
+
+
+       
+</div>
+
+    <section class="card resumo">
+
+                <h2>Resumo financeiro</h2>
+
+                <p style="color:#666;">
+                    (em breve)
+                </p>
+
+            </section>
+
+
+<script src="{{ url_for('static', filename='js/viagem.js') }}"></script>
+
+{% endblock %}

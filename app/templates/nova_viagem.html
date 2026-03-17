@@ -18,8 +18,24 @@
 <form method="POST">
 
     <div class="form-group">
-        <label>Nome da viagem</label>
-        <input type="text" name="nome" required minlength="3" maxlength="120"  value="{{ viagem.nome if viagem }}">
+        <label>Local</label>
+
+            <select name="local" required>
+
+            <option value="">Selecione o local</option>
+
+            <option value="Serra"
+            {% if viagem and viagem.local == "Serra" %}selected{% endif %}>
+            Serra
+            </option>
+
+            <option value="Santa Catarina"
+            {% if viagem and viagem.local == "Santa Catarina" %}selected{% endif %}>
+            Santa Catarina
+            </option>
+
+            </select>
+
     </div>
 
     <div class="form-group">

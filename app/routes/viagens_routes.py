@@ -31,7 +31,7 @@ def nova_viagem():
 
     if request.method == "POST":
 
-        nome = request.form["nome"].strip()
+        local = request.form["local"]
         data_viagem = request.form["data_viagem"]
         observacoes = request.form["observacoes"].strip()
 
@@ -40,9 +40,9 @@ def nova_viagem():
 
         cursor.execute("""
             INSERT INTO viagens
-            (nome, data_viagem, observacoes, status)
+            (local, data_viagem, observacoes, status)
             VALUES (%s,%s,%s,%s)
-        """, (nome, data_viagem, observacoes, "Planejada"))
+        """, (local, data_viagem, observacoes, "Planejada"))
 
         conn.commit()
 
@@ -193,15 +193,15 @@ def editar_viagem(id):
 
     if request.method == "POST":
 
-        nome = request.form["nome"].strip()
+        local = request.form["local"]
         data_viagem = request.form["data_viagem"]
         observacoes = request.form["observacoes"].strip()
 
         cursor.execute("""
             UPDATE viagens
-            SET nome=%s, data_viagem=%s, observacoes=%s
+            SET local=%s, data_viagem=%s, observacoes=%s
             WHERE id=%s
-        """,(nome,data_viagem,observacoes,id))
+        """,(local,data_viagem,observacoes,id))
 
         conn.commit()
 

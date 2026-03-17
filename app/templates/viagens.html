@@ -40,11 +40,11 @@
             </div>
         </div>
 
-        <h3>{{ viagem.nome }}</h3>
+
+        <h3>{{ viagem.data_viagem.strftime('%d/%m/%Y') }}</h3>
 
         <p>
-            <strong>Data:</strong>
-            {{ viagem.data_viagem.strftime('%d/%m/%Y') }}
+            <span class="shopping-local local-{{ viagem.local.replace(" ", "_") }}"><strong>{{ viagem.local }}</strong></span>
         </p>
 
         <p>Status: {{ viagem.status }}</p>
