@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from app.config import get_db_connection
 
 shopping = Blueprint("shopping", __name__)
@@ -95,6 +95,8 @@ def novo_shopping():
         cursor.close()
         conn.close()
 
+        flash("Shopping criado com sucesso!", "success")
+
         return redirect("/shopping")
 
     return render_template("novo_shopping.html")
@@ -135,6 +137,8 @@ def editar_shopping(id):
         cursor.close()
         conn.close()
 
+        flash("Shopping atualizado com sucesso!", "success")
+
         return redirect("/shopping")
 
     cursor.close()
@@ -168,5 +172,7 @@ def excluir_shopping(id):
 
     cursor.close()
     conn.close()
+
+    flash("Shopping excluído com sucesso!", "success")
 
     return redirect("/shopping")

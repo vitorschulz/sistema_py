@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template
 from app.config import get_db_connection
 
 pedidos = Blueprint("pedidos", __name__)

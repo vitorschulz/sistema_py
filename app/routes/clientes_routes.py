@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect, flash
 from app.config import get_db_connection
 
 clientes = Blueprint("clientes", __name__)
@@ -63,6 +63,8 @@ def novo_cliente():
         cursor.close()
         conn.close()
 
+        flash("Cliente criado com sucesso!", "success")
+
         return redirect("/clientes")
 
     return render_template("novo_cliente.html")
@@ -99,6 +101,8 @@ def editar_cliente(id):
         cursor.close()
         conn.close()
 
+        flash("Cliente atualizado com sucesso!", "success")
+
         return redirect("/clientes")
 
     cursor.close()
@@ -126,5 +130,7 @@ def excluir_cliente(id):
 
     cursor.close()
     conn.close()
+
+    flash("Cliente excluído com sucesso!", "success")
 
     return redirect("/clientes")

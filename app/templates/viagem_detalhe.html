@@ -118,8 +118,7 @@
                         <a data-id="{{ cliente.id }}" class="btn-ordem descer">↓</a>
 
                         <a href="/viagem_cliente/{{ cliente.id }}/excluir?next={{ request.path }}"
-                        class="btn-excluir"
-                        onclick="return confirm('Remover cliente?')">
+                        class="btn-excluir">
                         ✕
                         </a>
 
@@ -221,15 +220,62 @@
 
     </section>
 
-            <section class="card resumo">
+            <section class="card resumo-financeiro">
 
-                <h2>Resumo financeiro</h2>
+            <h2>Resumo financeiro</h2>
 
-                <p style="color:#666;">
-                    (em breve)
-                </p>
+            <form method="POST" action="/viagens/{{ viagem.id }}/financeiro/add" id="form-financeiro" class="acoes financeiro-form">
 
-            </section>
+                <div class="acoes-linha">
+
+                    <select name="tipo" required>
+                        <option value="CUSTO">Custo</option>
+                        <option value="GANHO">Ganho</option>
+                    </select>
+
+                    <input type="number" step="0.01" name="valor" placeholder="Valor" min="0.01" required>
+
+                    <input type="text" name="descricao" placeholder="Descrição">
+
+                    <button type="submit" class="btn-add">+</button>
+
+                </div>
+
+            </form>
+
+            <div class="financeiro-lista" id="lista-financeiro">
+
+                {% for f in financeiro %}
+                    <div class="financeiro-item">
+
+                        <span class="financeiro-desc">
+                            {{ f.descricao or "-" }}
+                        </span>
+                        <div class="financeiro-acoes">   
+                        <span class="financeiro-valor {{ f.tipo|lower }}">
+                            {% if f.tipo == "CUSTO" %}
+                                - R$ {{ f.valor }}
+                            {% else %}
+                                + R$ {{ f.valor }}
+                            {% endif %}
+                        </span>
+
+                        <button class="menuTarefaItem btn-excluir" data-id="{{ f.id }}">✕</button>
+                        </div> 
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            <div class="financeiro-total">
+
+                <p>Ganhos: R$ <span id="total-ganho">{{ total_ganho }}</span></p>
+                <p>Custos: R$ <span id="total-custo">{{ total_custo }}</span></p>
+                <p><strong>Saldo: R$ <span id="saldo">{{ saldo }}</span></strong></p>
+
+            </div>
+
+        </section>
 
 
 <script src="{{ url_for('static', filename='js/viagem.js') }}"></script>

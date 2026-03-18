@@ -568,5 +568,114 @@ form {
     overflow: hidden;
     text-overflow: ellipsis;
 
-    max-width: 250px; /* ajusta se quiser */
+    max-width: 250px;
+}
+
+/*financeiro*/
+
+.financeiro-form {
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.financeiro-form select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.btn-add {
+    padding: 10px;
+    max-width: 40px;
+    text-align: center;
+    font-size: larger;
+}
+
+.financeiro-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+.financeiro-acoes{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.financeiro-item:hover {
+    background: #f9f9f9;
+}
+
+.financeiro-valor.custo {
+    color: #dc2626;
+    font-weight: 500;
+    margin-left: 400px;
+    min-width: 120px;
+}
+
+.financeiro-valor.ganho {
+    color: #16a34a;
+    font-weight: 500;
+    margin-left: 400px;
+    min-width: 120px;
+}
+
+.financeiro-total {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.financeiro-total p {
+    margin: 4px 0;
+}
+
+.financeiro-desc{
+    max-width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.acoes input:focus,
+.acoes select:focus,
+.status-form select:focus {
+    outline: none;
+    border-color: #2563eb;
+    transition: all 0.25s ease;
+}
+
+.acoes input,
+.acoes select,
+.status-form select {
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-excluir {
+    text-decoration: none;
+    color: #dc2626;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-excluir:hover {
+    background-color: rgba(220, 38, 38, 0.08);
+}
+
+
+button.btn-excluir {
+    background: none;
+    border: none;
+    cursor: pointer;
 }

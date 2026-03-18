@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, jsonify
+from flask import Blueprint, render_template, request, redirect, jsonify, flash
 from collections import defaultdict
 from app.config import get_db_connection
 
@@ -49,6 +49,8 @@ def nova_viagem():
 
         cursor.close()
         conn.close()
+
+        flash("Viagem criada com sucesso!", "success")
 
         return redirect("/viagens")
 
@@ -126,6 +128,19 @@ def detalhe_viagem(id):
 
     clientes = cursor.fetchall()
 
+    cursor.execute("""
+    SELECT *
+    FROM viagem_financeiro
+    WHERE viagem_id = %s
+""", (id,))
+
+    financeiro = cursor.fetchall()
+
+    total_ganho = sum(f["valor"] for f in financeiro if f["tipo"] == "GANHO")
+    total_custo = sum(f["valor"] for f in financeiro if f["tipo"] == "CUSTO")
+
+    saldo = total_ganho - total_custo
+
     cursor.close()
     conn.close()
 
@@ -134,7 +149,11 @@ def detalhe_viagem(id):
         viagem=viagem,
         estrutura=estrutura,
         clientes_viagem=clientes_viagem,
-        clientes=clientes
+        clientes=clientes,
+        financeiro=financeiro,
+        total_ganho=total_ganho,
+        total_custo=total_custo,
+        saldo=saldo
     )
 
 #registrar pedido na viagem
@@ -170,6 +189,8 @@ def novo_pedido(id):
 
         cursor.close()
         conn.close()
+
+        flash("Tarefa adicionada com sucesso!", "success")
 
         return redirect(f"/viagens/{id}")
 
@@ -240,6 +261,8 @@ def editar_viagem(id):
         cursor.close()
         conn.close()
 
+        flash("Viagem atualizada com sucesso!", "success")
+
         return redirect("/viagens")
 
 
@@ -273,6 +296,8 @@ def excluir_viagem(id):
 
     cursor.close()
     conn.close()
+
+    flash("Viagem excluída com sucesso!", "success")
 
     return redirect("/viagens")
 
@@ -323,14 +348,14 @@ def subir_pedido(id):
     return redirect(f"/viagens/{pedido['viagem_id']}")
 
 #botao descer
-@viagens.route("/pedidos/<int:id>/descer")
+@viagens.route("/pedidos/<int:id>/descer", methods=["POST"])
 def descer_pedido(id):
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT id, viagem_id, ordem
+        SELECT id, viagem_id, loja_id, ordem
         FROM pedidos
         WHERE id = %s
     """,(id,))
@@ -397,6 +422,8 @@ def editar_pedido(id):
         cursor.close()
         conn.close()
 
+        flash("Tarefa atualizada com sucesso!", "success")
+
         if next_url:
             return redirect(next_url)
 
@@ -462,6 +489,8 @@ def excluir_pedido(id):
     cursor.close()
     conn.close()
 
+    flash("Tarefa excluída com sucesso!", "success")
+
     return redirect(f"/viagens/{viagem_id}")
 
 #add cliente pra ordem
@@ -480,6 +509,7 @@ def add_cliente(id):
     """, (id, cliente_id))
 
     if cursor.fetchone():
+        flash("Este cliente já está na viagem!", "error")
         cursor.close()
         conn.close()
         return redirect(request.form.get("next") or f"/viagens/{id}")
@@ -493,7 +523,6 @@ def add_cliente(id):
 
     ordem = cursor.fetchone()["nova_ordem"]
 
-
     cursor.execute("""
         INSERT INTO viagem_clientes (viagem_id, cliente_id, ordem)
         VALUES (%s,%s,%s)
@@ -503,6 +532,8 @@ def add_cliente(id):
 
     cursor.close()
     conn.close()
+
+    flash("Cliente adicionado na ordem!", "success")
 
     return redirect(request.form.get("next") or f"/viagens/{id}")
 
@@ -535,6 +566,8 @@ def excluir_cliente_viagem(id):
 
     cursor.close()
     conn.close()
+
+    flash("Cliente removido com sucesso!", "success")
 
     if next_url:
         return redirect(next_url)
@@ -605,3 +638,65 @@ def descer_cliente(id):
     conn.close()
 
     return redirect(request.args.get("next") or f"/viagens/{atual['viagem_id']}")
+
+#add financeiro
+@viagens.route("/viagens/<int:id>/financeiro/add", methods=["POST"])
+def add_financeiro(id):
+
+    tipo = request.form["tipo"]
+    valor = float(request.form["valor"])
+    descricao = request.form.get("descricao", "")
+
+    if valor <= 0:
+        flash("O valor deve ser positivo!", "error")
+        return jsonify({"erro": "Valor inválido"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        INSERT INTO viagem_financeiro
+        (viagem_id, tipo, valor, descricao)
+        VALUES (%s,%s,%s,%s)
+    """, (id, tipo, valor, descricao))
+
+    conn.commit()
+
+    cursor.execute("SELECT LAST_INSERT_ID() as id")
+    novo_id = cursor.fetchone()["id"]
+
+    cursor.close()
+    conn.close()
+
+
+    return jsonify({
+    "id": novo_id,
+    "tipo": tipo,
+    "valor": valor,
+    "descricao": descricao
+    })
+
+#deletar financeiro
+@viagens.route("/financeiro/<int:id>/delete", methods=["POST"])
+def deletar_financeiro(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # pega antes de deletar (pra atualizar saldo)
+    cursor.execute("SELECT tipo, valor FROM viagem_financeiro WHERE id = %s", (id,))
+    item = cursor.fetchone()
+
+    if not item:
+        return jsonify({"erro": "Não encontrado"}), 404
+
+    cursor.execute("DELETE FROM viagem_financeiro WHERE id = %s", (id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({
+        "tipo": item["tipo"],
+        "valor": item["valor"]
+    })

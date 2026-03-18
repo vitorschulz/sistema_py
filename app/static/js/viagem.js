@@ -127,3 +127,162 @@ function atualizarOrdemClientes(container){
     })
 
 }
+
+const formFinanceiro = document.getElementById("form-financeiro");
+
+if (formFinanceiro) {
+
+    formFinanceiro.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData
+        })
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
+        .then(data => {
+
+            if (data.erro) {
+                alert(data.erro);
+                return;
+            }
+
+            const lista = document.getElementById("lista-financeiro");
+            const acoes = document.createElement("div");
+            const btnExcluir = document.createElement("button");
+
+            const item = document.createElement("div");
+            item.classList.add("financeiro-item");
+
+            const desc = document.createElement("span");
+            desc.classList.add("financeiro-desc");
+            desc.textContent = data.descricao || "-";
+
+            const valor = document.createElement("span");
+            valor.classList.add("financeiro-valor", data.tipo.toLowerCase());
+
+            const valorFormatado = parseFloat(data.valor).toFixed(2);
+
+            valor.textContent = (data.tipo === "CUSTO" ? "- R$ " : "+ R$ ") + valorFormatado;
+
+            acoes.classList.add("financeiro-acoes");
+            btnExcluir.classList.add("btn-excluir");
+            btnExcluir.dataset.id = data.id;
+            btnExcluir.textContent = "✕";
+
+            acoes.appendChild(valor);
+            acoes.appendChild(btnExcluir);
+
+            item.appendChild(desc);
+            item.appendChild(acoes);
+
+            lista.appendChild(item);
+
+            atualizarResumo(data.tipo, data.valor);
+
+            form.reset();
+
+            mostrarAlerta("Lançamento adicionado!");
+        })
+        .catch(() => {
+            alert("Erro ao adicionar lançamento");
+        });
+
+    });
+
+}
+
+function atualizarResumo(tipo, valor, operacao = "add") {
+
+    const ganhoEl = document.getElementById("total-ganho");
+    const custoEl = document.getElementById("total-custo");
+    const saldoEl = document.getElementById("saldo");
+
+    let ganho = parseFloat(ganhoEl.textContent);
+    let custo = parseFloat(custoEl.textContent);
+
+    valor = parseFloat(valor);
+
+    const fator = operacao === "add" ? 1 : -1;
+
+    if (tipo === "GANHO") {
+        ganho += valor * fator;
+    } else {
+        custo += valor * fator;
+    }
+
+    const saldo = ganho - custo;
+
+    ganhoEl.textContent = ganho.toFixed(2);
+    custoEl.textContent = custo.toFixed(2);
+    saldoEl.textContent = saldo.toFixed(2);
+}
+
+document.addEventListener("click", function(e) {
+
+    if (e.target.classList.contains("btn-excluir")) {
+
+        const btn = e.target;
+        const id = btn.dataset.id;
+
+        fetch(`/financeiro/${id}/delete`, {
+            method: "POST"
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.erro) {
+                alert(data.erro);
+                return;
+            }
+
+            const item = btn.closest(".financeiro-item");
+            item.remove();
+
+            atualizarResumo(data.tipo, parseFloat(data.valor), "remove");
+
+            mostrarAlerta("Lançamento removido!", "error");
+        });
+
+    }
+
+});
+
+function mostrarAlerta(mensagem, tipo = "success") {
+
+    let container = document.querySelector(".alerts");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.classList.add("alerts");
+        document.body.appendChild(container);
+    }
+
+    const alerta = document.createElement("div");
+    alerta.classList.add("alert");
+
+    if (tipo === "error") {
+        alerta.classList.add("error");
+    }
+
+    alerta.textContent = mensagem;
+
+    container.appendChild(alerta);
+
+    setTimeout(() => {
+
+        alerta.style.transition = "opacity 0.5s ease";
+        alerta.style.opacity = "0";
+
+        setTimeout(() => {
+            alerta.remove();
+        }, 500);
+
+    }, 3000);
+}
