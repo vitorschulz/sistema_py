@@ -31,7 +31,8 @@
 
 <section class="acoes">
 
-    <button onclick="window.location.href='/clientes'" style="max-width: 75px;">
+    <button data-url="{{ request.args.get('next', '/clientes') }}"
+    onclick="window.location.href=this.dataset.url" style="max-width: 75px;">
         Voltar
     </button>
 

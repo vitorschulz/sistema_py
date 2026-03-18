@@ -24,15 +24,11 @@
 
 <section class="acoes">
 
-{% if shopping_id %}
-    <button onclick="window.location.href='/shopping/{{ shopping_id }}'" style="max-width:75px;">
+    <button data-url="{{ request.args.get('next', '/lojas') }}"
+    onclick="window.location.href=this.dataset.url" style="max-width: 75px;">
         Voltar
     </button>
-{% else %}
-    <button onclick="window.location.href='/lojas'" style="max-width:75px;">
-        Voltar
-    </button>
-{% endif %}
+
 
 </section>
 

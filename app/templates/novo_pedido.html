@@ -2,9 +2,21 @@
 
     {% block content %}
 
-        <h1>{{ "Editar pedido" if pedido else "Novo pedido" }}</h1>
+        <h1>{{ "Editar tarefa" if pedido else "Nova tarefa" }}</h1>
+
+        <section class="acoes">
+
+            <button 
+            data-url="{{ request.args.get('next', '/viagens') }}"
+            onclick="window.location.href=this.dataset.url">
+            ← Voltar
+            </button>
+
+        </section>
 
     <section class="card">
+
+
 
         <form method="POST">
 
@@ -12,7 +24,7 @@
 
             <label>Shopping</label>
 
-                <select id="shopping">
+                <select id="shopping" required>
                 {% for s in shoppings %}
                 <option value="{{ s.id }}">
                 {{ s.nome }}
@@ -27,7 +39,7 @@
 
             <label>Loja</label>
 
-                <select name="loja_id" id="loja">
+                <select name="loja_id" id="loja" required>
 
                 {% for l in lojas %}
                 <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
@@ -45,7 +57,7 @@
 
             <label>Cliente</label>
 
-                <select name="cliente_id">
+                <select name="cliente_id" required>
 
                 {% for c in clientes %}
                 <option value="{{ c.id }}"
@@ -79,20 +91,11 @@
                 <label>Observações</label>
 
                 <textarea name="observacoes">{{ pedido.observacoes if pedido }}</textarea>
+                <input type="hidden" name="next" value="{{ request.args.get('next') }}">
 
             </div>
 
             <section class="acoes" style="flex-direction: row;">
-
-                    <button 
-                    type="button"
-                    onclick="window.location.href='/viagens/{{ viagem_id }}'"
-                    style="width:75px;">
-
-                    Voltar
-
-                    </button>
-
 
                     <button
                     type="submit">

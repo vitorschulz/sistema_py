@@ -18,7 +18,7 @@ def detalhe_pedido(id):
             lojas.id AS loja_id,
             shopping.nome AS shopping_nome,
             shopping.id AS shopping_id,
-            viagens.nome AS viagem_nome
+            viagens.local AS viagem_local
         FROM pedidos
         JOIN clientes ON pedidos.cliente_id = clientes.id
         JOIN lojas ON pedidos.loja_id = lojas.id
@@ -27,17 +27,9 @@ def detalhe_pedido(id):
         WHERE pedidos.id = %s
     """, (id,))
 
+
     pedido = cursor.fetchone()
-
-    cursor.execute("""
-        SELECT COUNT(*) AS numero
-        FROM pedidos
-        WHERE cliente_id = %s
-        AND viagem_id = %s
-        AND id <= %s
-    """, (pedido["cliente_id"], pedido["viagem_id"], pedido["id"]))
-
-    numero_cliente = cursor.fetchone()["numero"]
+    numero_cliente = pedido["ordem"]
 
     cursor.close()
     conn.close()

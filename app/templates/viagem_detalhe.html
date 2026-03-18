@@ -6,8 +6,10 @@
 
 <section class="acoes">
 
-    <button onclick="window.location.href='/viagens'">
-        ←  Voltar
+    <button 
+    data-url="{{ request.args.get('next', '/viagens') }}"
+    onclick="window.location.href=this.dataset.url">
+    ← Voltar
     </button>
 
 </section>
@@ -59,119 +61,167 @@
 
             <h2>Ordem de clientes</h2>
 
-            <div class="conteudo-scroll">
-                <p style="color:#666;">
-                    (vai entrar lista aqui)
-                </p>
-            </div>
+                <section class="status-form acoes acoes-linha"  style="margin-bottom:10px; justify-content:flex-start;">
 
-        </section>
+                    <form method="POST"
+                        action="/viagens/{{ viagem.id }}/add_cliente"
+                        style="display:flex; gap:8px; align-items:center; margin:0;">
+
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        
+
+                        <select name="cliente_id" class="select-padrao" required>
+                            <option value="">Selecionar cliente</option>
+
+                            {% for c in clientes %}
+                                <option value="{{ c.id }}">{{ c.nome }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <button type="submit" class="btn-primario">
+                            + Adicionar
+                        </button>
+
+                    </form>
+
+                </section>
+            
+            <div class="conteudo-scroll">
+
+                {% for cliente in clientes_viagem %}
+
+                    <div class="cliente-item">
+
+                    <div class="cliente-info">
+
+                        <span class="cliente-ordem">
+                            {{ cliente.ordem }}.
+                        </span>
+
+                        <span class="cliente-nome">
+                            <a href="/clientes/{{ cliente.cliente_id }}?next={{ request.path }}" class="tabela-link">
+                                {{ cliente.nome }}
+                            </a>
+                        </span>
+
+                        {% if cliente.endereco %}
+                        <span class="cliente-endereco">
+                            {{ cliente.endereco }}
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="cliente-acoes">
+
+                        <a data-id="{{ cliente.id }}" class="btn-ordem subir">↑</a>
+                        <a data-id="{{ cliente.id }}" class="btn-ordem descer">↓</a>
+
+                        <a href="/viagem_cliente/{{ cliente.id }}/excluir?next={{ request.path }}"
+                        class="btn-excluir"
+                        onclick="return confirm('Remover cliente?')">
+                        ✕
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+            <p style="color:#777;">Nenhum cliente na lista.</p>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
 
     </div>
 
 
         <section class="card tarefas">
 
-                <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
+    <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
+
+    <section class="acoes" style="flex-direction: row;">
+        <button onclick="window.location.href='/viagens/{{ viagem.id }}/novo_pedido?next={{ request.path }}'">
+            + Nova tarefa
+        </button>
+    </section>
+
+            {% for shopping, lojas in estrutura.items() %}
 
                 <div class="shopping-grupo">
 
-                <h3>Shopping 1</h3>
+                <h3>{{ shopping }}</h3>
+
+            {% for loja, pedidos in lojas.items() %}
 
                 <div class="loja-grupo">
 
-                <h4>Loja 1</h4>
+                <h4>{{ loja }}</h4>
+
+            {% for pedido in pedidos %}
 
                 <div class="pedido-item">
+
                 <div class="pedido-info">
-                <span class="pedido-ordem">1.</span>
-                <span class="pedido-cliente">Cliente João</span>
-                <span class="pedido-tipo tipo-PEDIDO">PEDIDO</span>
-                </div>
+
+                <span class="pedido-ordem">
+                {{ pedido.ordem }}.
+                </span>
+
+                <span class="pedido-cliente">
+                    <a href="/pedidos/{{ pedido.id }}?next={{ request.path }}" class="tabela-link">
+                    {{ pedido.cliente_nome }}
+                    </a>
+                </span>
+
+                <span class="pedido-tipo tipo-{{ pedido.tipo }}">
+                {{ pedido.tipo.replace("_"," / ") }}
+                </span>
+
+                {% if pedido.observacoes %}
+                    <span class="pedido-obs">
+                    {{ pedido.observacoes }}
+                    </span>
+                {% endif %}
+
+            </div>
 
                 <div class="pedido-acoes">
-                <a class="btn-ordem">↑</a>
-                <a class="btn-ordem">↓</a>
-                <a class="btn-editar">Editar</a>
-                <a class="btn-excluir">Excluir</a>
-                </div>
-                </div>
 
-                <div class="pedido-item">
-                <div class="pedido-info">
-                <span class="pedido-ordem">2.</span>
-                <span class="pedido-cliente">Cliente Maria</span>
-                <span class="pedido-tipo tipo-ACERTO">ACERTO</span>
-                </div>
+                    <a data-id="{{ pedido.id }}" class="btn-ordem subir">↑</a>
+                    <a data-id="{{ pedido.id }}" class="btn-ordem descer">↓</a>
 
-                <div class="pedido-acoes">
-                <a class="btn-ordem">↑</a>
-                <a class="btn-ordem">↓</a>
-                <a class="btn-editar">Editar</a>
-                <a class="btn-excluir">Excluir</a>
-                </div>
-                </div>
+                    <a href="/pedidos/{{ pedido.id }}/editar?next={{ request.path }}" class="btn-editar">
+                    Editar
+                    </a>
+
+                    <a href="/pedidos/{{ pedido.id }}/excluir"
+                    class="btn-excluir"
+                    onclick="return confirm('Deseja excluir este pedido?')">
+                    Excluir
+                    </a>
 
                 </div>
 
+            </div>
 
-                <div class="loja-grupo">
+            {% endfor %}
 
-                <h4>Loja 2</h4>
+        </div>
 
-                <div class="pedido-item">
-                <div class="pedido-info">
-                <span class="pedido-ordem">3.</span>
-                <span class="pedido-cliente">Cliente Pedro</span>
-                <span class="pedido-tipo tipo-ACERTO_PEDIDO">ACERTO / PEDIDO</span>
-                </div>
+        {% endfor %}
 
-                <div class="pedido-acoes">
-                <a class="btn-ordem">↑</a>
-                <a class="btn-ordem">↓</a>
-                <a class="btn-editar">Editar</a>
-                <a class="btn-excluir">Excluir</a>
-                </div>
-                </div>
+    </div>
 
-                </div>
+    {% endfor %}
 
-                </div>
+    </section>
 
-
-
-                <div class="shopping-grupo">
-
-                <h3>Shopping 2</h3>
-
-                <div class="loja-grupo">
-
-                <h4>Loja 1</h4>
-
-                <div class="pedido-item">
-                <div class="pedido-info">
-                <span class="pedido-ordem">1.</span>
-                <span class="pedido-cliente">Cliente Lucas</span>
-                <span class="pedido-tipo tipo-PEDIDO">PEDIDO</span>
-                </div>
-
-                <div class="pedido-acoes">
-                <a class="btn-ordem">↑</a>
-                <a class="btn-ordem">↓</a>
-                <a class="btn-editar">Editar</a>
-                <a class="btn-excluir">Excluir</a>
-                </div>
-                </div>
-
-                </div>
-
-                </div>
-
-
-       
-</div>
-
-    <section class="card resumo">
+            <section class="card resumo">
 
                 <h2>Resumo financeiro</h2>
 

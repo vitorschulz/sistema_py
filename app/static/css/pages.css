@@ -385,6 +385,7 @@ form {
     font-weight:600;
     margin-right:8px;
     color:#666;
+    width:30px;
 }
 
 .btn-ordem{
@@ -392,6 +393,12 @@ form {
     font-weight:bold;
     padding:2px 6px;
     margin-right:4px;
+    transition: all 0.5s ease;
+}
+
+.btn-ordem:hover {
+    cursor: pointer;
+    color: #073fdb;
 }
 
 .lista-pedidos{
@@ -418,12 +425,13 @@ form {
 .pedido-info{
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:10px;
 }
 
 .pedido-cliente{
     font-weight:600;
     min-width:140px;
+    width:150px;
 }
 
 .pedido-tipo{
@@ -432,6 +440,8 @@ form {
     font-size:13px;
     font-weight:500;
     margin-right: 100px;
+    width:131px;
+    text-align:center;
 }
 
 
@@ -450,6 +460,17 @@ form {
 .tipo-ACERTO_PEDIDO{
     background:#f3e5f5;
     color:#7b1fa2;
+}
+
+.pedido-obs{
+
+    color:#666;
+    font-size:13px;
+    white-space:nowrap;
+    overflow:hidden;
+    width:550px;
+    text-overflow:ellipsis;
+
 }
 
 .pedido-loja{
@@ -496,4 +517,56 @@ form {
 
 .loja-grupo .pedido-item{
     margin-left:15px;
+}
+
+/* ordem clientes pagina viagem */
+
+.cliente-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+}
+
+.cliente-item:hover {
+    background: #f9f9f9;
+}
+
+.cliente-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cliente-ordem {
+    font-weight: 600;
+    color: #666;
+    width: 25px;
+}
+
+.cliente-nome {
+    font-weight: 500;
+}
+
+.cliente-acoes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cliente-endereco {
+    color: #666;
+    font-size: 13px;
+    margin-left: 50px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    max-width: 250px; /* ajusta se quiser */
 }

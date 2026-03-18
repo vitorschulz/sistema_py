@@ -48,7 +48,7 @@
 <tr>
 
     <td>
-        <a href="/lojas/{{ loja.id }}?shopping={{ shopping.id }}" class="tabela-link">
+        <a href="/lojas/{{ loja.id }}?next={{ request.path }}" class="tabela-link">
             {{ loja.nome }}
         </a>
     </td>
@@ -61,11 +61,11 @@
 
     <td class="acoes-tabela">
 
-        <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}" class="btn-editar">
+        <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}&next={{ request.path }}" class="btn-editar">
             Editar
         </a>
 
-        <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}"
+        <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}&next={{ request.path }}"
            class="btn-excluir"
            onclick="return confirm('Excluir esta loja?')">
            Excluir
@@ -95,11 +95,12 @@
 
 <section class="acoes" style="flex-direction: row;">
 
-    <button onclick="window.location.href='/shopping'" style="width: 75px;">
+    <button data-url="{{ request.args.get('next', '/shopping') }}"
+    onclick="window.location.href=this.dataset.url" style="max-width: 75px;">
         Voltar
     </button>
 
-    <button onclick="window.location.href='/lojas/novo?shopping={{ shopping.id }}'">
+    <button onclick="window.location.href='/lojas/novo?shopping={{ shopping.id }}&next={{ request.path }}'">
         Adicionar loja
     </button>
 

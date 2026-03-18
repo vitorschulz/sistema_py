@@ -2,9 +2,14 @@
 
 {% block content %}
 
-<h1>Pedido {{ numero_cliente }} — {{ pedido.cliente_nome }}
+<h1>
+    #{{ numero_cliente }} — {{ pedido.cliente_nome }} 
+    <span style="color:#666; margin-left: 10px;">
+        ({{ pedido.loja_nome }} • {{ pedido.shopping_nome }})
+    </span>
+
     <span class="pedido-tipo tipo-{{ pedido.tipo }}" style="margin-left: 10px; vertical-align: 3px;">
-    {{ pedido.tipo.replace("_"," / ") }}
+        {{ pedido.tipo.replace("_"," / ") }}
     </span>
 </h1>
 
@@ -14,7 +19,7 @@
 
         <p>
         <strong>Cliente:</strong>
-        <a href="/clientes/{{ pedido.cliente_id }}" class="tabela-link">
+        <a href="/clientes/{{ pedido.cliente_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.cliente_nome }}
         </a>
         </p>
@@ -26,22 +31,22 @@
 
         <p>
         <strong>Shopping:</strong>
-        <a href="/shopping/{{ pedido.shopping_id }}" class="tabela-link">
+        <a href="/shopping/{{ pedido.shopping_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.shopping_nome }}
         </a>
         </p>
 
         <p>
         <strong>Loja:</strong>
-        <a href="/lojas/{{ pedido.loja_id }}" class="tabela-link">
+        <a href="/lojas/{{ pedido.loja_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.loja_nome }}
         </a>
         </p>
 
         <p>
         <strong>Viagem:</strong>
-        <a href="/viagens/{{ pedido.viagem_id }}" class="tabela-link">
-        {{ pedido.viagem_nome }}
+        <a href="/viagens/{{ pedido.viagem_id }}?next={{ request.path }}" class="tabela-link">
+        {{ pedido.viagem_local }}
         </a>
         </p>
 
@@ -61,12 +66,17 @@
 
     <section class="acoes" style="flex-direction: row;">
 
-        <button style="max-width: 75px;" onclick="window.location.href='/viagens/{{ pedido.viagem_id }}'">
+        <button 
+        style="max-width: 75px;" 
+        data-url="{{ request.args.get('next', '/viagens/' ~ pedido.viagem_id) }}"
+        onclick="window.location.href=this.dataset.url">
         Voltar
         </button>
 
-        <button style="max-width: 75px;" onclick="window.location.href='/pedidos/{{ pedido.id }}/editar'">
-        Editar
+        <button 
+            style="max-width: 75px;" 
+            onclick="window.location.href='/pedidos/{{ pedido.id }}/editar?next={{ request.path }}'">
+            Editar
         </button>
 
     </section>

@@ -16,6 +16,13 @@ function filtrarLojas(){
 
 }
 
-shopping.addEventListener("change", filtrarLojas)
+
+shopping.addEventListener("change", () => {
+
+    loja.value = ""
+    filtrarLojas()
+
+})
+
 
 filtrarLojas()
