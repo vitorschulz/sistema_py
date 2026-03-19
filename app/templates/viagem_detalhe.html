@@ -219,6 +219,7 @@
     {% endfor %}
 
     </section>
+    <div class="linha-resumos">
 
             <section class="card resumo-financeiro">
 
@@ -275,9 +276,35 @@
 
             </div>
 
+            
+
         </section>
+
+         <section class="card resumo-viagem">
+
+            <h2>Resumo da viagem</h2>
+
+            <div class="resumo-grid">
+
+                <p>Clientes na rota: <strong>{{ total_clientes }}</strong></p>
+                <p>Shoppings: <strong>{{ total_shoppings }}</strong></p>
+                <p>Lojas: <strong>{{ total_lojas }}</strong></p>
+                <p>Pedidos planejados: <strong>{{ total_pedidos }}</strong></p>
+
+            </div>
+
+            <div class="botoes-resumo acoes">
+
+                <button>Exportar Ordem</button>
+                <button>Exportar Tarefas</button>
+
+            </div>
+
+        </section>
+    </div>
 
 
 <script src="{{ url_for('static', filename='js/viagem.js') }}"></script>
+
 
 {% endblock %}

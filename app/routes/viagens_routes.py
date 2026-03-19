@@ -141,6 +141,18 @@ def detalhe_viagem(id):
 
     saldo = total_ganho - total_custo
 
+    total_clientes = len(clientes_viagem)
+
+    total_shoppings = len(estrutura)
+
+    total_lojas = sum(len(lojas) for lojas in estrutura.values())
+
+    total_pedidos = sum(
+        len(pedidos)
+        for lojas in estrutura.values()
+        for pedidos in lojas.values()
+    )
+
     cursor.close()
     conn.close()
 
@@ -153,7 +165,11 @@ def detalhe_viagem(id):
         financeiro=financeiro,
         total_ganho=total_ganho,
         total_custo=total_custo,
-        saldo=saldo
+        saldo=saldo,
+        total_clientes=total_clientes,
+        total_shoppings=total_shoppings,
+        total_lojas=total_lojas,
+        total_pedidos=total_pedidos
     )
 
 #registrar pedido na viagem

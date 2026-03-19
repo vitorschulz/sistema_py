@@ -349,6 +349,10 @@ form {
     height: 100%;
 }
 
+.ordem-clientes{
+        max-height:315px;
+    overflow-y:auto;
+}
 
 .observacoes,
 .ordem-clientes {
@@ -571,6 +575,7 @@ form {
     max-width: 250px;
 }
 
+
 /*financeiro*/
 
 .financeiro-form {
@@ -678,4 +683,52 @@ button.btn-excluir {
     background: none;
     border: none;
     cursor: pointer;
+}
+
+/* resumo */
+
+.linha-resumos{
+    grid-column: 1 / -1;
+    display:grid;
+    grid-template-columns: 1.5fr 1.5fr;
+    gap:50px;
+    width:100%;
+}
+
+.resumo-viagem{
+    height:250px;
+    display:flex;
+    flex-direction:column;
+}
+
+.botoes-resumo{
+    margin-top:auto;
+    display:flex;
+    flex-direction:row;
+    gap:10px;
+}
+
+.resumo-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px 20px;
+    margin-top:10px;
+    margin-bottom: 20px;
+}
+
+.resumo-grid p{
+    background:#f8fafc;
+    padding:10px;
+    border-radius:6px;
+    font-size:14px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.resumo-grid strong{
+    font-size:24px;
+    font-weight:700;
+    color:#2563eb;
+    min-width:30px;
+    text-align:right;
 }
