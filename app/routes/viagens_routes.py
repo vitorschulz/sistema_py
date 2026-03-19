@@ -11,19 +11,46 @@ def listar_viagens():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
+    data = request.args.get("data")
+    data_inicio = request.args.get("data_inicio")
+    data_fim = request.args.get("data_fim")
+
+    query = """
         SELECT *
         FROM viagens
         WHERE ativo = 1
-        ORDER BY data_viagem DESC
-    """)
+    """
 
-    viagens = cursor.fetchall()
+    params = []
+
+    if data:
+        query += " AND data_viagem = %s"
+        params.append(data)
+        
+
+    elif data_inicio and data_fim:
+        query += " AND data_viagem BETWEEN %s AND %s"
+        params.append(data_inicio)
+        params.append(data_fim)
+
+    elif data_inicio:
+        query += " AND data_viagem = %s"
+        params.append(data_inicio)
+
+    elif data_fim:
+        query += " AND data_viagem = %s"
+        params.append(data_fim)
+
+    query += " ORDER BY data_viagem DESC"
+
+    cursor.execute(query, tuple(params))
+    viagens_lista = cursor.fetchall()
+
 
     cursor.close()
     conn.close()
 
-    return render_template("viagens.html", viagens=viagens)
+    return render_template("viagens.html", viagens=viagens_lista)
 
 
 # nova viagem

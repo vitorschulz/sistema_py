@@ -381,6 +381,45 @@ form {
 
 /*viagens*/
 
+.filtro-viagens {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 15px 0;
+    flex-wrap: wrap;
+}
+
+.filtro-viagens input {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filtro-viagens button {
+    padding: 8px 14px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filtro-viagens button:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-limpar {
+    background-color: #e5e7eb;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.btn-limpar:hover {
+    background-color: #d1d5db;
+}
+
 
 
 .grid-viagens{

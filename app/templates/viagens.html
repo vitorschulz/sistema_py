@@ -4,6 +4,28 @@
 
 <h1>Viagens</h1>
 
+<section class="filtro-viagens">
+
+    <form method="GET" action="/viagens" class="filtro-viagens">
+
+        <input type="date" name="data_inicio" id="data_inicio"
+        value="{{ request.args.get('data_inicio') or request.args.get('data') }}">
+
+        <input type="date" name="data_fim" id="data_fim"
+        value="{{ request.args.get('data_fim') or request.args.get('data') }}">
+
+        <input type="hidden" name="filtrado" value="1">
+
+        <button type="submit">Filtrar</button>
+
+    </form>
+
+    <button class="btn-limpar" onclick="window.location.href='/viagens?limpo=1'">
+        Limpar
+    </button>
+
+</section>
+
 <section class="grid-viagens">
 
 
