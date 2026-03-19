@@ -6,7 +6,8 @@
 
 <section class="acoes">
 
-    <button onclick="window.location.href='/viagens'">
+    <button data-url="{{ request.args.get('next', '/viagens') }}"
+            onclick="window.location.href=this.dataset.url">
         ← Voltar
     </button>
 

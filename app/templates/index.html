@@ -5,17 +5,50 @@
 <h1>Menu</h1>
 
 <section class="acoes acoes-linha">
-    <button>Registrar viagem</button>
+    <button onclick="window.location.href='/viagens/nova?next={{ request.path }}'">Registrar viagem</button>
     <button>Registrar cheque</button>
-    <button onclick="window.location.href='/clientes/novo'">Cadastrar cliente</button> ARRUMAR BOTOES DPS
+    <button onclick="window.location.href='/clientes/novo?next={{ request.path }}'">Cadastrar cliente</button>
 </section>
 
 
 <section class="card">
+    <div class="agenda-header">
+        <a class="btn-seta" onclick="mesAnterior()">←</a>
 
-    <h2>Futura agenda</h2>
+        <div class="agenda-titulo">
+            <h2 class="titulo-agenda">Agenda de Viagens</h2>
+            <span id="mes-ano"></span>
+        </div>
 
+        <a class="btn-seta" onclick="proximoMes()">→</a>
+    </div>
+
+    <div id="calendario"></div>
 </section>
+
+    <section class="card">
+        <h2>Próximas viagens</h2>
+
+        <div class="lista-viagens">
+            {% for v in proximas_viagens %}
+                <div class="item-viagem"
+                    onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
+
+                    <div>
+                        <strong>{{ v.data_viagem.strftime('%d/%m') }}</strong>
+                        — {{ v.local or "Sem local" }}
+                    </div>
+
+                    <span class="status status-{{ v.status|replace(' ', '-') }}">
+                        {{ v.status }}
+                    </span>
+
+                </div>
+            {% else %}
+                <p style="color:#777;">Nenhuma viagem futura.</p>
+            {% endfor %}
+        </div>
+    </section>
 
 
 <section class="card">
@@ -47,14 +80,50 @@
 </section>
 
 
-<section class="card">
+    <section class="card resumo-dashboard">
 
-    <h2>Recebimentos hoje</h2>
+        <h2>Resumo geral</h2>
 
-    <p>Dinheiro: R$ 3.200</p>
-    <p>Cheques: R$ 5.600</p>
-    <p><strong>Total: R$ 8.800</strong></p>
+        <div class="resumo-grid-dashboard">
 
-</section>
+            <div class="resumo-item">
+                <span>Clientes</span>
+                <strong>{{ total_clientes }}</strong>
+            </div>
+
+            <div class="resumo-item">
+                <span>Viagens futuras</span>
+                <strong>{{ total_viagens }}</strong>
+            </div>
+
+            <div class="resumo-item">
+                <span>Shoppings</span>
+                <strong>{{ total_shoppings }}</strong>
+            </div>
+
+            <div class="resumo-item">
+                <span>Lojas</span>
+                <strong>{{ total_lojas }}</strong>
+            </div>
+
+            <div class="resumo-item">
+                <span>Cheques pendentes</span>
+                <strong> 0</strong>
+            </div>
+
+            <div class="resumo-item">
+                <span>Saldo</span>
+                <strong>R$ 0</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+<script id="datas-viagens" type="application/json">
+    {{ datas_viagens | tojson }}
+</script>
+
+<script src="{{ url_for('static', filename='js/agenda.js') }}"></script>
 
 {% endblock %}
