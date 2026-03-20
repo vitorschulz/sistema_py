@@ -286,3 +286,20 @@ function mostrarAlerta(mensagem, tipo = "success") {
 
     }, 3000);
 }
+
+document.addEventListener("click", function(e){
+
+    const link = e.target.closest(".cliente-link");
+
+    if(link){
+
+        const invalido = link.dataset.invalido === "1";
+
+        if(invalido){
+            e.preventDefault();
+            mostrarAlerta("Esse pedido está ligado a uma loja ou shopping removido!", "error");
+        }
+
+    }
+
+});

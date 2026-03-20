@@ -27,6 +27,28 @@
     letter-spacing: 1px;
     text-decoration: none;
     color: white;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.logo:hover {
+    color: #38bdf8;
+    text-shadow: 0 0 8px rgba(42, 147, 192, 0.6);
+}
+
+.logo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background-color: #38bdf8;
+    transition: width 0.3s ease;
+}
+
+.logo:hover::after {
+    width: 100%;
 }
 
 
@@ -58,6 +80,7 @@
     padding-left: 16px;
     font-weight: 600;
 }
+
 
 /* CONTEÚDO */
 

@@ -538,6 +538,12 @@ form {
     align-items: start;
 }
 
+.removido {
+    color: #a12d2d;
+    font-weight: 600;
+    font-style: italic;
+}
+
 .ordem-clientes {
     grid-column: 2;
     min-height: 300px;

@@ -98,11 +98,13 @@
                             {{ cliente.ordem }}.
                         </span>
 
-                        <span class="cliente-nome">
+                        {% if not cliente.nome or cliente.cliente_ativo == 0 %}
+                            <span class="removido">Cliente removido</span>
+                        {% else %}
                             <a href="/clientes/{{ cliente.cliente_id }}?next={{ request.path }}" class="tabela-link">
                                 {{ cliente.nome }}
                             </a>
-                        </span>
+                        {% endif %}
 
                         {% if cliente.endereco %}
                         <span class="cliente-endereco">
@@ -153,13 +155,27 @@
 
                 <div class="shopping-grupo">
 
-                <h3>{{ shopping }}</h3>
+                {% set primeiro_pedido = lojas.values() | list | first | first %}
+
+                <h3>{% if not shopping or primeiro_pedido.shopping_ativo == 0 %}
+                    <span class="removido">Shopping removido</span>
+                {% else %}
+                    {{ shopping }}
+                {% endif %}</h3>
 
             {% for loja, pedidos in lojas.items() %}
 
                 <div class="loja-grupo">
 
-                <h4>{{ loja }}</h4>
+            <h4>
+                    {% set pedido_ref = pedidos[0] %}
+            {% if not pedido_ref.loja_nome or pedido_ref.loja_ativo == 0 %}
+                <span class="removido">Loja removida</span>
+            {% else %}
+                {{ loja }}
+            {% endif %}
+
+            </h4>
 
             {% for pedido in pedidos %}
 
@@ -172,9 +188,17 @@
                 </span>
 
                 <span class="pedido-cliente">
-                    <a href="/pedidos/{{ pedido.id }}?next={{ request.path }}" class="tabela-link">
-                    {{ pedido.cliente_nome }}
-                    </a>
+                    {% if not pedido.cliente_nome or pedido.cliente_ativo == 0 %}
+                        <span class="removido">
+                            Cliente removido
+                        </span>
+                    {% else %}
+                        <a href="/pedidos/{{ pedido.id }}?next={{ request.path }}" 
+                            class="tabela-link cliente-link"
+                            data-invalido="{% if pedido.loja_ativo == 0 or not pedido.shopping_ativo %}1{% else %}0{% endif %}">
+                            {{ pedido.cliente_nome }}
+                        </a>
+                    {% endif %}
                 </span>
 
                 <span class="pedido-tipo tipo-{{ pedido.tipo }}">

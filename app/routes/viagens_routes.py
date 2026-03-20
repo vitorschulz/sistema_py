@@ -107,19 +107,22 @@ def detalhe_viagem(id):
             pedidos.tipo,
             pedidos.observacoes,
             clientes.nome AS cliente_nome,
+            clientes.ativo AS cliente_ativo,
             lojas.nome AS loja_nome,
-            shopping.nome AS shopping_nome
+            lojas.ativo AS loja_ativo,
+            shopping.nome AS shopping_nome,
+            shopping.ativo AS shopping_ativo
 
         FROM pedidos
 
-        JOIN clientes 
+        LEFT JOIN clientes 
             ON pedidos.cliente_id = clientes.id
 
-        JOIN lojas 
+        LEFT JOIN lojas 
             ON pedidos.loja_id = lojas.id
 
-        JOIN shopping 
-            ON lojas.shopping_id = shopping.id AND shopping.ativo = TRUE
+        LEFT JOIN shopping 
+            ON lojas.shopping_id = shopping.id
 
         WHERE pedidos.viagem_id = %s
 
@@ -138,9 +141,9 @@ def detalhe_viagem(id):
         estrutura[pedido["shopping_nome"]][pedido["loja_nome"]].append(pedido)
 
     cursor.execute("""
-    SELECT vc.id, vc.ordem, c.nome, c.endereco, vc.cliente_id
+    SELECT vc.id, vc.ordem, c.nome, c.endereco, c.ativo AS cliente_ativo, vc.cliente_id
     FROM viagem_clientes vc
-    JOIN clientes c ON c.id = vc.cliente_id
+    LEFT JOIN clientes c ON c.id = vc.cliente_id
     WHERE vc.viagem_id = %s
     ORDER BY vc.ordem
 """, (id,))
