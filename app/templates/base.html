@@ -29,7 +29,7 @@
                 <li><a href="{{ url_for('shopping.listar_shopping') }}" class="menu-item {% if '/shopping' in request.path %}ativo{% endif %}">Shoppings</a></li>
                 <li><a href="{{ url_for('lojas.listar_lojas') }}" class="menu-item {% if '/lojas' in request.path %}ativo{% endif %}">Lojas</a></li>
                 <li><a href="/viagens" class="menu-item {% if '/viagens' in request.path %}ativo{% endif %}">Viagens</a></li>
-                <li><a href="/cheques" class="menu-item">Cheques</a></li>
+                <li><a href="{{ url_for('cheques.listar_cheques') }}" class="menu-item {% if '/cheques' in request.path %}ativo{% endif %}">Cheques</a></li>
                 <li><a href="/financeiro" class="menu-item">Financeiro</a></li>
             </ul>
         </nav>

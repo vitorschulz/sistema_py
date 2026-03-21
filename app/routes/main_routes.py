@@ -13,7 +13,7 @@ def dashboard():
 
     hoje = date.today()
 
-    # 📅 DATAS PRA AGENDA
+
     cursor.execute("""
         SELECT data_viagem 
         FROM viagens
@@ -24,7 +24,7 @@ def dashboard():
     datas_viagens = [v["data_viagem"].strftime("%Y-%m-%d") for v in viagens]
 
 
-    # 🚗 PRÓXIMAS VIAGENS (limita tipo 5)
+
     cursor.execute("""
         SELECT id, data_viagem, local, status
         FROM viagens
@@ -35,12 +35,11 @@ def dashboard():
     proximas_viagens = cursor.fetchall()
 
 
-    # 👥 CLIENTES
+
     cursor.execute("SELECT COUNT(*) as total FROM clientes WHERE ativo = 1")
     total_clientes = cursor.fetchone()["total"]
 
 
-    # ✈️ VIAGENS FUTURAS
     cursor.execute("""
         SELECT COUNT(*) as total 
         FROM viagens 
@@ -49,15 +48,33 @@ def dashboard():
     total_viagens = cursor.fetchone()["total"]
 
 
-    # 🏬 SHOPPINGS
+
     cursor.execute("SELECT COUNT(*) as total FROM shopping WHERE ativo = 1")
     total_shoppings = cursor.fetchone()["total"]
 
 
-    # 🏪 LOJAS
+
     cursor.execute("SELECT COUNT(*) as total FROM lojas WHERE ativo = 1")
     total_lojas = cursor.fetchone()["total"]
 
+    cursor.execute("""
+    SELECT id, codigo, nome_destino, valor, data_vencimento
+    FROM cheques
+    WHERE status = 'PENDENTE' AND ativo = 1
+    ORDER BY data_vencimento ASC
+    LIMIT 5
+    """)
+    cheques_pendentes = cursor.fetchall()
+
+
+    cursor.execute("""
+    SELECT COUNT(*) as total
+    FROM cheques
+    WHERE status = 'PENDENTE' AND ativo = 1
+    """)
+    total_cheques_pendentes = cursor.fetchone()["total"]
+
+    hoje = date.today()
 
     cursor.close()
     conn.close()
@@ -74,5 +91,8 @@ def dashboard():
         total_clientes=total_clientes,
         total_viagens=total_viagens,
         total_shoppings=total_shoppings,
-        total_lojas=total_lojas
+        total_lojas=total_lojas,
+        cheques_pendentes=cheques_pendentes,
+        total_cheques_pendentes=total_cheques_pendentes,
+        hoje=hoje
     )

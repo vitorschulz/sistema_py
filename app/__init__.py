@@ -23,4 +23,7 @@ def create_app():
     from app.routes.pedidos_routes import pedidos
     app.register_blueprint(pedidos)
 
+    from app.routes.cheques_routes import cheques
+    app.register_blueprint(cheques)
+
     return app
