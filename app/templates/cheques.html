@@ -18,7 +18,7 @@
 
     <table id="tabela-lista">
 
-        <tr>
+        <tr class="thead-hover">
             <th>Código</th>
             <th>Destino</th>
             <th>Vencimento</th>
@@ -29,7 +29,7 @@
 
         {% for c in cheques %}
 
-        <tr>
+        <tr class="linha-clicavel">
             <td>{{ c.codigo or "—" }}</td>
 
             <td>

@@ -20,7 +20,7 @@
 
 <table id="tabela-lista">
 
-    <tr>
+    <tr class="thead-hover">
         <th>Loja</th>
         <th>Shopping</th>
         <th>Telefone</th>
@@ -30,7 +30,7 @@
 
     {% for loja in lojas %}
 
-    <tr>
+    <tr class="linha-clicavel">
 
         <td> 
             <a href="/lojas/{{ loja.id }}" class="tabela-link">

@@ -19,7 +19,7 @@
 
 <table id="tabela-lista">
 
-    <tr>
+    <tr class="thead-hover">
         <th>Nome</th>
         <th>Local</th>
         <th>Telefone</th>
@@ -29,7 +29,7 @@
 
 {% for shopping in shoppings %}
 
-<tr>
+<tr class="linha-clicavel">
     <td>
     <a href="/shopping/{{ shopping.id }}" class="tabela-link">
         {{ shopping.nome }}
