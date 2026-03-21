@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ "Editar cheque" if cheque else "Novo cheque" }}</h1>
+
+<section class="acoes">
+
+    <button 
+    data-url="{{ request.args.get('next', '/cheques') }}"
+    onclick="window.location.href=this.dataset.url">
+        ← Voltar
+    </button>
+
+</section>
+
+
+<section class="card">
+
+<form method="POST">
+
+    <div class="form-group">
+        <label>Código do cheque</label>
+        <input type="text" name="codigo" maxlength="50" required
+        placeholder="Ex: 123456"
+        value="{{ cheque.codigo if cheque and cheque.codigo else '' }}">
+    </div>
+
+
+    <div class="form-group">
+        <label>Nome</label>
+        <input type="text" name="nome_destino" maxlength="150" required
+        placeholder="Ex: Cliente João, Loja X..."
+        value="{{ cheque.nome_destino if cheque and cheque.nome_destino else '' }}">
+    </div>
+
+
+    <div class="form-group">
+        <label>Valor</label>
+        <input type="number" name="valor" step="0.01" min="0" required
+        placeholder="0.00"
+        value="{{ cheque.valor if cheque and cheque.valor else '' }}">
+    </div>
+
+    <div class="form-group">
+        <label>Data para depósito (vencimento)</label>
+        <input type="date" name="data_vencimento"
+        value="{{ cheque.data_vencimento.strftime('%Y-%m-%d') if cheque and cheque.data_vencimento else '' }}">
+    </div>
+
+
+    <button type="submit" class="btn-submit">
+        {{ "Salvar cheque" if not cheque else "Atualizar cheque" }}
+    </button>
+
+</form>
+
+</section>
+
+{% endblock %}

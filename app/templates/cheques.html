@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Cheques</h1>
+
+<section class="acoes">
+
+    <button onclick="window.location.href='/cheques/novo'">
+        + Novo cheque
+    </button>
+
+    <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
+
+</section>
+
+<section class="card">
+
+    <table id="tabela-lista">
+
+        <tr>
+            <th>Código</th>
+            <th>Destino</th>
+            <th>Vencimento</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th style="width: 340px;">Ações</th>
+        </tr>
+
+        {% for c in cheques %}
+
+        <tr>
+            <td>{{ c.codigo or "—" }}</td>
+
+            <td>
+                {{ c.nome_destino or "—" }}
+            </td>
+
+            <td>
+                {{ c.data_vencimento.strftime('%d/%m/%Y') if c.data_vencimento else "—" }}
+            </td>
+
+            <td>R$ {{ c.valor or "—" }}</td>
+
+            <td>
+                {% if c.status == 'PENDENTE' %}
+                    <span class="status-pendente">Pendente</span>
+                {% elif c.status == 'COMPENSADO' %}
+                    <span class="status-ok">Compensado</span>
+                {% elif c.status == 'SUSTADO' %}
+                    <span class="status-sustado">Sustado</span>
+                {% else %}
+                    {{ c.status  or "—" }}
+                {% endif %}
+            </td>
+
+            <td class="acoes-tabela">
+
+
+                    <a href="/cheques/{{ c.id }}/compensar" class="btn-compensar" onclick="return confirm('Confirmar compensação deste cheque?')">
+                        Compensar
+                    </a>
+
+                    <a href="/cheques/{{ c.id }}/devolver" class="btn-devolver" onclick="return confirm('Deseja sustar este cheque?')">
+                        Sustar
+                    </a>
+
+                    <a href="/cheques/{{ c.id }}/excluir" class="btn-excluir" onclick="return confirm('Deseja excluir este cheque?')">
+                        Excluir
+                    </a>
+
+                    <a href="/cheques/{{ c.id }}/editar" class="btn-editar">
+                        Editar
+                    </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</section>
+
+<script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+
+{% endblock %}

@@ -1,4 +1,18 @@
 /* dashboard */
+
+.grid-agenda {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .grid-agenda {
+        grid-template-columns: 1fr;
+    }
+}
+
 .agenda-header {
     display: flex;
     align-items: center;
@@ -41,7 +55,7 @@
 
 .btn-seta:hover {
     background-color: rgba(37, 99, 235, 0.08);
-    color: #2563eb;
+    color: #073fdb;
     cursor: pointer;
 }
 
@@ -61,7 +75,6 @@
     cursor: default;
 }
 
-
 .dia:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
@@ -78,6 +91,51 @@
     background: #43a047;
     transform: translateY(-6px);
 }
+
+.titulo-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.2s ease;
+}
+
+.titulo-link:hover {
+    color: #073fdb;
+}
+
+.thead-hover th {
+    transition: background 0.3s ease;
+}
+
+.thead-hover:hover th {
+    background: #d7dadd;
+}
+
+.tabela-dashboard {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-dashboard th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+    color: #555;
+}
+
+
+.tabela-dashboard td {
+    padding: 8px;
+}
+
+.linha-clicavel {
+    transition: background 0.2s ease;
+}
+
+.linha-clicavel:hover {
+    background: #f5f7fa;
+}
+
 
 .lista-viagens {
     display: flex;
@@ -263,8 +321,6 @@
     margin-bottom: -1px;
 }
 
-
-
 .btn-editar {
     text-decoration: none;
     color: #2563eb;
@@ -292,6 +348,20 @@
 
 .btn-excluir:hover {
     background-color: rgba(220, 38, 38, 0.08);
+}
+
+.btn-devolver {
+    text-decoration: none;
+    color: rgb(100, 100, 100);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-devolver:hover {
+background-color: rgba(100, 100, 100, 0.08);
 }
 
 .local-Serra{
@@ -951,4 +1021,35 @@ button.btn-excluir {
     color:#2563eb;
     min-width:30px;
     text-align:right;
+}
+
+/*cheques*/
+
+.btn-compensar{
+    text-decoration: none;
+    color: #2e7d32;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.25s ease;
+}
+
+.btn-compensar:hover{
+background-color: rgba(46, 125, 50, 0.08);
+
+}
+
+.status-pendente {
+    color: orange;
+    font-weight: bold;
+}
+
+.status-ok {
+    color: green;
+    font-weight: bold;
+}
+.status-sustado{
+    color: #dc2626;
+    font-weight: bold;
 }

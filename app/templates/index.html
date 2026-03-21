@@ -6,11 +6,11 @@
 
 <section class="acoes acoes-linha">
     <button onclick="window.location.href='/viagens/nova?next={{ request.path }}'">Registrar viagem</button>
-    <button>Registrar cheque</button>
+    <button onclick="window.location.href='/cheques/novo?next={{ request.path }}'">Registrar cheque</button>
     <button onclick="window.location.href='/clientes/novo?next={{ request.path }}'">Cadastrar cliente</button>
 </section>
 
-
+<div class="grid-agenda">
 <section class="card">
     <div class="agenda-header">
         <a class="btn-seta" onclick="mesAnterior()">←</a>
@@ -49,33 +49,52 @@
             {% endfor %}
         </div>
     </section>
-
+</div>
 
 <section class="card">
 
-    <h2>Cheques pendentes</h2>
+    <h2><a href="/cheques" class="titulo-link">
+        Cheques pendentes
+    </a></h2>
 
-    <table>
+        <table class="tabela-dashboard">
 
-        <tr>
+        <tr class="thead-hover">
             <th>Código</th>
-            <th>Cliente</th>
+            <th>Destino</th>
+            <th>Vencimento</th>
             <th>Valor</th>
         </tr>
 
-        <tr>
-            <td>850009</td>
-            <td>Cristal</td>
-            <td>R$ 690</td>
-        </tr>
+        {% for c in cheques_pendentes %}
+        <tr class="linha-clicavel">
 
-        <tr>
-            <td>850010</td>
-            <td>Prime</td>
-            <td>R$ 299</td>
-        </tr>
+            <td>
+                    {{ c.codigo }}
+            </td>
 
-    </table>
+            <td>{{ c.nome_destino }}</td>
+
+            <td>
+                {% if c.data_vencimento and c.data_vencimento < hoje %}
+                    <span style="color:red; font-weight:600; font-style:italic;">
+                        {{ c.data_vencimento.strftime('%d/%m/%Y') }}
+                    </span>
+                {% else %}
+                    {{ c.data_vencimento.strftime('%d/%m/%Y') if c.data_vencimento else "—" }}
+                {% endif %}
+            </td>
+
+            <td>R$ {{ c.valor }}</td>
+
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" style="color:#777;">Nenhum cheque pendente.</td>
+        </tr>
+        {% endfor %}
+
+        </table>
 
 </section>
 
@@ -108,7 +127,7 @@
 
             <div class="resumo-item">
                 <span>Cheques pendentes</span>
-                <strong> 0</strong>
+                <strong>{{ total_cheques_pendentes }}</strong>
             </div>
 
             <div class="resumo-item">
