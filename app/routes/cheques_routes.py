@@ -3,9 +3,10 @@ from app.config import get_db_connection
 
 cheques = Blueprint('cheques', __name__, url_prefix='/cheques')
 
-#lista
-@cheques.route('/')
+
+@cheques.route('', strict_slashes=False)
 def listar_cheques():
+
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
