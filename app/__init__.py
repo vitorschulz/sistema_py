@@ -26,4 +26,7 @@ def create_app():
     from app.routes.cheques_routes import cheques
     app.register_blueprint(cheques)
 
+    from app.routes.financeiro_routes import financeiro
+    app.register_blueprint(financeiro)
+
     return app

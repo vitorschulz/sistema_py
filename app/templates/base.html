@@ -28,9 +28,9 @@
                 <li><a href="{{ url_for('clientes.listar_clientes') }}" class="menu-item {% if '/clientes' in request.path %}ativo{% endif %}">Clientes</a></li>
                 <li><a href="{{ url_for('shopping.listar_shopping') }}" class="menu-item {% if '/shopping' in request.path %}ativo{% endif %}">Shoppings</a></li>
                 <li><a href="{{ url_for('lojas.listar_lojas') }}" class="menu-item {% if '/lojas' in request.path %}ativo{% endif %}">Lojas</a></li>
-                <li><a href="/viagens" class="menu-item {% if '/viagens' in request.path %}ativo{% endif %}">Viagens</a></li>
+                <li><a href="{{ url_for('viagens.listar_viagens') }}" class="menu-item {% if '/viagens' in request.path %}ativo{% endif %}">Viagens</a></li>
                 <li><a href="{{ url_for('cheques.listar_cheques') }}" class="menu-item {% if '/cheques' in request.path %}ativo{% endif %}">Cheques</a></li>
-                <li><a href="/financeiro" class="menu-item">Financeiro</a></li>
+                <li><a href="{{ url_for('financeiro.pagina_financeiro') }}" class="menu-item {% if '/financeiro' in request.path %}ativo{% endif %}">Financeiro</a></li>
             </ul>
         </nav>
 
@@ -57,5 +57,6 @@
 
 </div>
     <script src="{{ url_for('static', filename='js/alert.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

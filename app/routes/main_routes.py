@@ -23,7 +23,20 @@ def dashboard():
 
     datas_viagens = [v["data_viagem"].strftime("%Y-%m-%d") for v in viagens]
 
+    cursor.execute("""
+    SELECT 
+        SUM(CASE 
+            WHEN UPPER(vf.tipo) = 'GANHO' THEN COALESCE(vf.valor, 0)
+            WHEN UPPER(vf.tipo) = 'CUSTO' THEN -COALESCE(vf.valor, 0)
+            ELSE 0 
+        END) AS saldo_total
+    FROM viagem_financeiro vf
+    JOIN viagens v ON v.id = vf.viagem_id
+    WHERE v.ativo = 1
+    """)
 
+    resultado = cursor.fetchone()
+    saldo_total = resultado['saldo_total'] or 0
 
     cursor.execute("""
         SELECT id, data_viagem, local, status
@@ -94,5 +107,6 @@ def dashboard():
         total_lojas=total_lojas,
         cheques_pendentes=cheques_pendentes,
         total_cheques_pendentes=total_cheques_pendentes,
-        hoje=hoje
+        hoje=hoje,
+        saldo_total=saldo_total
     )

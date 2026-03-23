@@ -464,7 +464,14 @@ form {
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 14px;
+    transition: all 0.25s ease;
 }
+
+.filtro-viagens input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
 
 .filtro-viagens button {
     padding: 8px 14px;
@@ -473,7 +480,7 @@ form {
     color: white;
     border-radius: 6px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.25s ease;
 }
 
 .filtro-viagens button:hover {
@@ -526,7 +533,7 @@ form {
     cursor:pointer;
     padding:4px 6px;
     border-radius:6px;
-    transition:all 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .menu-card:hover{
@@ -1013,6 +1020,7 @@ button.btn-excluir {
     font-size:14px;
     display:flex;
     justify-content:space-between;
+    transition: all 0.25s ease;
 }
 
 .resumo-grid strong{
@@ -1021,6 +1029,11 @@ button.btn-excluir {
     color:#2563eb;
     min-width:30px;
     text-align:right;
+}
+
+.resumo-grid p:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 /*cheques*/
@@ -1052,4 +1065,65 @@ background-color: rgba(46, 125, 50, 0.08);
 .status-sustado{
     color: #dc2626;
     font-weight: bold;
+}
+
+
+/* financeiro */
+
+.fin-grafico-container {
+    max-width: 1500px;
+    height: 500px;
+    margin: 0 auto;
+}
+
+.fin-resumo-financeiro {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.fin-resumo-item {
+    flex: 1;
+    text-align: center;
+}
+
+.fin-resumo-item h3 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #777;
+}
+
+.fin-resumo-item p {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.fin-grafico-container {
+    margin-top: 20px;
+}
+
+.fin-filtros {
+    margin-bottom: 10px;
+}
+
+.fin-positivo {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.fin-negativo {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.fin-resumo-item:nth-child(1) {
+    border-left: 4px solid #16a34a;
+}
+
+.fin-resumo-item:nth-child(2) {
+    border-left: 4px solid #f59e0b;
+}
+
+.fin-saldo {
+    border-left: 4px solid #2563eb;
 }

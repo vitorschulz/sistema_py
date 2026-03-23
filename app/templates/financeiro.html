@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Financeiro</h1>
+
+<section class="card">
+    <h2>Visão geral</h2>
+
+
+    <section class="filtro-viagens">
+
+        <form method="GET" action="/financeiro" class="filtro-viagens">
+
+            <input type="date" name="data_inicio" id="data_inicio"
+            value="{{ request.args.get('data_inicio') or '' }}">
+
+            <input type="date" name="data_fim" id="data_fim"
+            value="{{ request.args.get('data_fim') or '' }}">
+
+            <button type="submit">Filtrar</button>
+
+        </form>
+
+        <button class="btn-limpar"
+            onclick="window.location.href='/financeiro?limpo=1'">
+            Limpar
+        </button>
+
+    </section>
+
+
+    <div class="grafico-container fin-grafico-container">
+        <canvas id="graficoFinanceiro"></canvas>
+    </div>
+
+</section>
+
+
+
+<section class="resumo-financeiro fin-resumo-financeiro">
+
+    <div class="card resumo-item fin-resumo-item fin-positivo">
+        <h3>Receita Total</h3>
+        <p class="financeiro-positivo">R$ {{ receita_total }}</p>
+    </div>
+
+    <div class="card resumo-item fin-resumo-item fin-negativo">
+        <h3>Custo Total</h3>
+        <p class="financeiro-negativo">R$ {{ custo_total }}</p>
+    </div>
+
+    <div class="card resumo-item fin-resumo-item fin-saldo">
+        <h3>Saldo</h3>
+        <p>R$ {{ saldo_total }}</p>
+    </div>
+
+</section>
+
+
+
+<section class="card">
+    <h2>Movimentações Viagens</h2>
+
+    <table class="tabela-dashboard">
+        <tr class="thead-hover">
+            <th>Data</th>
+            <th>Local</th>
+            <th>Receita</th>
+            <th>Custo</th>
+            <th>Lucro</th>
+        </tr>
+
+        {% for item in movimentacoes %}
+        <tr class="linha-clicavel" onclick="window.location.href='/viagens/{{ item.id }}?next={{ request.full_path }}'" style="cursor: pointer;">
+            <td>{{ item.data.strftime('%d/%m/%Y') or "—" }}</td>
+            <td>{{ item.local or "—" }}</td>
+            <td>R$ {{ item.receita or "—" }}</td>
+            <td>R$ {{ item.custo or "—" }}</td>
+            <td>R$ {{ item.lucro or "—" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+
+
+<section class="card">
+    <h2>Cheques</h2>
+
+    <table class="tabela-dashboard">
+        <tr class="thead-hover">
+            <th>Código</th>
+            <th>Destino</th>
+            <th>Valor</th>
+            <th>Status</th>
+        </tr>
+
+        {% for c in cheques %}
+        <tr class="linha-clicavel">
+            <td>{{ c.codigo or "—" }}</td>
+            <td>{{ c.nome_destino or "—" }}</td>
+            <td>R$ {{ c.valor or "—" }}</td>
+            <td>
+                {% if c.status == 'PENDENTE' %}
+                    <span class="status-pendente">Pendente</span>
+                {% elif c.status == 'COMPENSADO' %}
+                    <span class="status-ok">Compensado</span>
+                {% elif c.status == 'SUSTADO' %}
+                    <span class="status-sustado">Sustado</span>
+                {% else %}
+                    {{ c.status or "—" }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+</section>
+
+
+
+<section class="resumo-financeiro fin-resumo-financeiro">
+
+    <div class="card resumo-item fin-resumo-item">
+        <h3>Recebido</h3>
+        <p class="financeiro-positivo">R$ {{ total_compensado }}</p>
+    </div>
+
+    <div class="card resumo-item fin-resumo-item">
+        <h3>A Receber</h3>
+        <p class="financeiro-negativo">R$ {{ total_pendente }}</p>
+    </div>
+
+</section>
+
+
+<script id="dados-grafico" type="application/json">
+    {{ {
+        'labels': labels,
+        'receitas': receitas,
+        'custos': custos,
+        'lucros': lucros
+    } | tojson }}
+</script>
+
+<script src="{{ url_for('static', filename='js/grafico.js') }}"></script>
+
+{% endblock %}
