@@ -100,6 +100,10 @@
         Voltar
     </button>
 
+    <button onclick="window.location.href='/shopping/{{ shopping.id }}/editar?next={{ request.path }}'">
+        Editar
+    </button>
+
     <button onclick="window.location.href='/lojas/novo?shopping={{ shopping.id }}&next={{ request.path }}'">
         Adicionar loja
     </button>

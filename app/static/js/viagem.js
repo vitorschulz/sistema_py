@@ -18,47 +18,80 @@ select.addEventListener("change", function(){
 
 })
 
-document.querySelectorAll(".subir").forEach(btn => {
+document.addEventListener("click", async function(e){
 
-    btn.addEventListener("click", async function(){
+    const subir = e.target.closest(".subir-shopping")
+    const descer = e.target.closest(".descer-shopping")
 
-        const id = this.dataset.id
+    if(subir){
+        const id = subir.dataset.id
+        await fetch(`/shopping/${id}/subir`)
+        location.reload()
+    }
 
-        await fetch(`/pedidos/${id}/subir`, {
-            method: "POST"
-        })
+    if(descer){
+        const id = descer.dataset.id
+        await fetch(`/shopping/${id}/descer`)
+        location.reload()
+    }
 
-        const item = this.closest(".pedido-item")
+})
+
+document.addEventListener("click", async function(e){
+
+    const subir = e.target.closest(".subir-loja")
+    const descer = e.target.closest(".descer-loja")
+
+    if(subir){
+        const id = subir.dataset.id
+        await fetch(`/loja/${id}/subir`)
+        location.reload()
+    }
+
+    if(descer){
+        const id = descer.dataset.id
+        await fetch(`/loja/${id}/descer`)
+        location.reload()
+    }
+
+})
+
+document.addEventListener("click", async function(e){
+
+    const btnSubir = e.target.closest(".pedido-acoes .subir")
+    const btnDescer = e.target.closest(".pedido-acoes .descer")
+
+    if(btnSubir){
+
+        const id = btnSubir.dataset.id
+
+        await fetch(`/pedidos/${id}/subir`, { method: "POST" })
+
+        const item = btnSubir.closest(".pedido-item")
         const anterior = item.previousElementSibling
+
         if(anterior && anterior.classList.contains("pedido-item")){
             item.parentNode.insertBefore(item, anterior)
             atualizarOrdem(item.parentNode)
         }
 
-    })
+    }
 
-})
+    if(btnDescer){
 
+        const id = btnDescer.dataset.id
 
-document.querySelectorAll(".descer").forEach(btn => {
+        await fetch(`/pedidos/${id}/descer`, { method: "POST" })
 
-    btn.addEventListener("click", async function(){
-
-        const id = this.dataset.id
-
-        await fetch(`/pedidos/${id}/descer`, {
-            method: "POST"
-        })
-
-        const item = this.closest(".pedido-item")
+        const item = btnDescer.closest(".pedido-item")
         const proximo = item.nextElementSibling
+
         if(proximo && proximo.classList.contains("pedido-item")){
             item.parentNode.insertBefore(proximo, item)
             atualizarOrdem(item.parentNode)
         }
 
-
-    })
+    }
 
 })
 
@@ -75,15 +108,18 @@ function atualizarOrdem(container){
 
 }
 
-document.querySelectorAll(".cliente-item .subir").forEach(btn => {
+document.addEventListener("click", async function(e){
 
-    btn.addEventListener("click", async function(){
+    const subir = e.target.closest(".cliente-acoes .subir")
+    const descer = e.target.closest(".cliente-acoes .descer")
 
-        const id = this.dataset.id
+    if(subir){
+
+        const id = subir.dataset.id
 
         await fetch(`/viagem_cliente/${id}/subir`)
 
-        const item = this.closest(".cliente-item")
+        const item = subir.closest(".cliente-item")
         const anterior = item.previousElementSibling
 
         if(anterior && anterior.classList.contains("cliente-item")){
@@ -91,19 +127,15 @@ document.querySelectorAll(".cliente-item .subir").forEach(btn => {
             atualizarOrdemClientes(item.parentNode)
         }
 
-    })
+    }
 
-})
+    if(descer){
 
-document.querySelectorAll(".cliente-item .descer").forEach(btn => {
-
-    btn.addEventListener("click", async function(){
-
-        const id = this.dataset.id
+        const id = descer.dataset.id
 
         await fetch(`/viagem_cliente/${id}/descer`)
 
-        const item = this.closest(".cliente-item")
+        const item = descer.closest(".cliente-item")
         const proximo = item.nextElementSibling
 
         if(proximo && proximo.classList.contains("cliente-item")){
@@ -111,7 +143,7 @@ document.querySelectorAll(".cliente-item .descer").forEach(btn => {
             atualizarOrdemClientes(item.parentNode)
         }
 
-    })
+    }
 
 })
 
@@ -303,3 +335,4 @@ document.addEventListener("click", function(e){
     }
 
 });
+
