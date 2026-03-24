@@ -22,13 +22,16 @@
 </section>
 
 
-<section class="acoes">
+<section class="acoes" style="flex-direction: row;">
 
     <button data-url="{{ request.args.get('next', '/lojas') }}"
     onclick="window.location.href=this.dataset.url" style="max-width: 75px;">
         Voltar
     </button>
 
+    <button onclick="window.location.href='/lojas/{{ loja.id }}/editar?next={{ request.path }}'">
+        Editar
+    </button>
 
 </section>
 

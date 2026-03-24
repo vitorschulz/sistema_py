@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, flash
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from flask import Blueprint, render_template, request, redirect, jsonify, flash, send_file
 from collections import defaultdict
 from app.config import get_db_connection
 
@@ -108,37 +110,66 @@ def detalhe_viagem(id):
             pedidos.observacoes,
             clientes.nome AS cliente_nome,
             clientes.ativo AS cliente_ativo,
+            lojas.id AS loja_id,
             lojas.nome AS loja_nome,
             lojas.ativo AS loja_ativo,
+            shopping.id AS shopping_id,
             shopping.nome AS shopping_nome,
-            shopping.ativo AS shopping_ativo
+            shopping.ativo AS shopping_ativo,
+            vl.id AS viagem_loja_id,
+            vs.id AS viagem_shopping_id
 
         FROM pedidos
 
         LEFT JOIN clientes 
-            ON pedidos.cliente_id = clientes.id
+        ON pedidos.cliente_id = clientes.id
 
         LEFT JOIN lojas 
-            ON pedidos.loja_id = lojas.id
+        ON pedidos.loja_id = lojas.id
 
         LEFT JOIN shopping 
-            ON lojas.shopping_id = shopping.id
+        ON lojas.shopping_id = shopping.id
+
+        LEFT JOIN viagem_loja vl 
+        ON vl.loja_id = lojas.id 
+        AND vl.viagem_id = pedidos.viagem_id   
+
+        LEFT JOIN viagem_shopping vs 
+        ON vs.shopping_id = shopping.id 
+        AND vs.viagem_id = pedidos.viagem_id        
 
         WHERE pedidos.viagem_id = %s
 
         ORDER BY 
-        shopping.nome,
-        lojas.nome,
+        COALESCE(vs.ordem, 9999),
+        COALESCE(vl.ordem, 9999),
         pedidos.ordem
     """, (id,))
 
     pedidos = cursor.fetchall()
 
-    estrutura = defaultdict(lambda: defaultdict(list))
+    estrutura = {}
 
     for pedido in pedidos:
 
-        estrutura[pedido["shopping_nome"]][pedido["loja_nome"]].append(pedido)
+        shopping = pedido["shopping_nome"] or "Sem shopping"
+        loja = pedido["loja_nome"] or "Sem loja"
+
+        if shopping not in estrutura:
+            estrutura[shopping] = {
+                "id": pedido["viagem_shopping_id"],
+                "shopping_id": pedido["shopping_id"],
+                "lojas": {}
+            }
+
+        if loja not in estrutura[shopping]["lojas"]:
+            estrutura[shopping]["lojas"][loja] = {
+                "id": pedido["viagem_loja_id"],
+                "loja_id": pedido["loja_id"],
+                "pedidos": []
+            }
+
+        estrutura[shopping]["lojas"][loja]["pedidos"].append(pedido)
 
     cursor.execute("""
     SELECT vc.id, vc.ordem, c.nome, c.endereco, c.ativo AS cliente_ativo, vc.cliente_id
@@ -175,12 +206,12 @@ def detalhe_viagem(id):
 
     total_shoppings = len(estrutura)
 
-    total_lojas = sum(len(lojas) for lojas in estrutura.values())
+    total_lojas = sum(len(shopping["lojas"]) for shopping in estrutura.values())
 
     total_pedidos = sum(
-        len(pedidos)
-        for lojas in estrutura.values()
-        for pedidos in lojas.values()
+    len(dados_loja["pedidos"])
+    for dados in estrutura.values()
+    for dados_loja in dados["lojas"].values()
     )
 
     cursor.close()
@@ -201,6 +232,173 @@ def detalhe_viagem(id):
         total_lojas=total_lojas,
         total_pedidos=total_pedidos
     )
+
+#botao subir shop
+@viagens.route("/shopping/<int:id>/subir", methods=["GET"])
+def subir_shopping(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM viagem_shopping
+        WHERE id = %s
+    """, (id,))
+    atual = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM viagem_shopping
+        WHERE viagem_id = %s
+        AND ordem < %s
+        ORDER BY ordem DESC
+        LIMIT 1
+    """, (atual["viagem_id"], atual["ordem"]))
+
+    anterior = cursor.fetchone()
+
+    if anterior:
+        cursor.execute(
+            "UPDATE viagem_shopping SET ordem=%s WHERE id=%s",
+            (anterior["ordem"], atual["id"])
+        )
+
+        cursor.execute(
+            "UPDATE viagem_shopping SET ordem=%s WHERE id=%s",
+            (atual["ordem"], anterior["id"])
+        )
+
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(f"/viagens/{atual['viagem_id']}")
+
+#descer shop
+@viagens.route("/shopping/<int:id>/descer", methods=["GET"])
+def descer_shopping(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM viagem_shopping
+        WHERE id = %s
+    """, (id,))
+    atual = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM viagem_shopping
+        WHERE viagem_id = %s
+        AND ordem > %s
+        ORDER BY ordem ASC
+        LIMIT 1
+    """, (atual["viagem_id"], atual["ordem"]))
+
+    proximo = cursor.fetchone()
+
+    if proximo:
+        cursor.execute(
+            "UPDATE viagem_shopping SET ordem=%s WHERE id=%s",
+            (proximo["ordem"], atual["id"])
+        )
+
+        cursor.execute(
+            "UPDATE viagem_shopping SET ordem=%s WHERE id=%s",
+            (atual["ordem"], proximo["id"])
+        )
+
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(f"/viagens/{atual['viagem_id']}")
+
+#subir botao loja
+@viagens.route("/loja/<int:id>/subir", methods=["GET"])
+def subir_loja(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM viagem_loja
+        WHERE id = %s
+    """, (id,))
+    atual = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM viagem_loja
+        WHERE viagem_id = %s
+        AND shopping_id = %s
+        AND ordem < %s
+        ORDER BY ordem DESC
+        LIMIT 1
+    """, (atual["viagem_id"], atual["shopping_id"], atual["ordem"]))
+
+    anterior = cursor.fetchone()
+
+    if anterior:
+        cursor.execute(
+            "UPDATE viagem_loja SET ordem=%s WHERE id=%s",
+            (anterior["ordem"], atual["id"])
+        )
+
+        cursor.execute(
+            "UPDATE viagem_loja SET ordem=%s WHERE id=%s",
+            (atual["ordem"], anterior["id"])
+        )
+
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(f"/viagens/{atual['viagem_id']}")
+
+#descer loja
+
+@viagens.route("/loja/<int:id>/descer", methods=["GET"])
+def descer_loja(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM viagem_loja
+        WHERE id = %s
+    """, (id,))
+    atual = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT * FROM viagem_loja
+        WHERE viagem_id = %s
+        AND shopping_id = %s
+        AND ordem > %s
+        ORDER BY ordem ASC
+        LIMIT 1
+    """, (atual["viagem_id"], atual["shopping_id"], atual["ordem"]))
+
+    proximo = cursor.fetchone()
+
+    if proximo:
+        cursor.execute(
+            "UPDATE viagem_loja SET ordem=%s WHERE id=%s",
+            (proximo["ordem"], atual["id"])
+        )
+
+        cursor.execute(
+            "UPDATE viagem_loja SET ordem=%s WHERE id=%s",
+            (atual["ordem"], proximo["id"])
+        )
+
+        conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return redirect(f"/viagens/{atual['viagem_id']}")
 
 #registrar pedido na viagem
 @viagens.route("/viagens/<int:id>/novo_pedido", methods=["GET","POST"])
@@ -349,7 +547,7 @@ def excluir_viagem(id):
 
 
 #seta p cima
-@viagens.route("/pedidos/<int:id>/subir")
+@viagens.route("/pedidos/<int:id>/subir", methods=["POST"])
 def subir_pedido(id):
 
     conn = get_db_connection()
@@ -391,7 +589,7 @@ def subir_pedido(id):
     cursor.close()
     conn.close()
 
-    return redirect(f"/viagens/{pedido['viagem_id']}")
+    return ("", 204)
 
 #botao descer
 @viagens.route("/pedidos/<int:id>/descer", methods=["POST"])
@@ -437,7 +635,8 @@ def descer_pedido(id):
     cursor.close()
     conn.close()
 
-    return redirect(f"/viagens/{pedido['viagem_id']}")
+    return ("", 204)
+
 
 #editar pedido
 @viagens.route("/pedidos/<int:id>/editar", methods=["GET","POST"])
@@ -746,3 +945,294 @@ def deletar_financeiro(id):
         "tipo": item["tipo"],
         "valor": item["valor"]
     })
+
+#tabelas export
+import io
+
+@viagens.route("/viagens/<int:id>/exportar_tarefas")
+def exportar_tarefas(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # viagem
+    cursor.execute("SELECT * FROM viagens WHERE id=%s", (id,))
+    viagem = cursor.fetchone()
+
+    # pedidos (ordem do site)
+    cursor.execute("""
+        SELECT 
+            pedidos.ordem,
+            pedidos.tipo,
+            clientes.nome AS cliente_nome,
+            clientes.cpf_cnpj,
+            lojas.nome AS loja_nome,
+            shopping.nome AS shopping_nome,
+            lojas.id AS loja_id,
+            shopping.id AS shopping_id
+        FROM pedidos
+
+        LEFT JOIN clientes 
+            ON pedidos.cliente_id = clientes.id
+
+        LEFT JOIN lojas 
+            ON pedidos.loja_id = lojas.id
+
+        LEFT JOIN shopping 
+            ON lojas.shopping_id = shopping.id
+
+        LEFT JOIN viagem_loja vl 
+            ON vl.loja_id = lojas.id 
+            AND vl.viagem_id = pedidos.viagem_id   
+
+        LEFT JOIN viagem_shopping vs 
+            ON vs.shopping_id = shopping.id 
+            AND vs.viagem_id = pedidos.viagem_id        
+
+        WHERE pedidos.viagem_id = %s
+
+        ORDER BY 
+            COALESCE(vs.ordem, 9999),
+            COALESCE(vl.ordem, 9999),
+            pedidos.ordem
+    """, (id,))
+
+    pedidos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # organiza mantendo ordem
+    estrutura = defaultdict(lambda: defaultdict(list))
+    ordem_shoppings = []
+    ordem_lojas = {}
+
+    for p in pedidos:
+
+        shopping_id = p.get("shopping_id") or 0
+        loja_id = p.get("loja_id") or 0
+
+        shopping_nome = p["shopping_nome"] or "-"
+        loja_nome = p["loja_nome"] or "-"
+
+        # shopping
+        if shopping_id not in estrutura:
+            ordem_shoppings.append((shopping_id, shopping_nome))
+
+        # loja
+        if shopping_id not in ordem_lojas:
+            ordem_lojas[shopping_id] = []
+
+        if loja_id not in estrutura[shopping_id]:
+            ordem_lojas[shopping_id].append((loja_id, loja_nome))
+
+        estrutura[shopping_id][loja_id].append(p)
+
+    # cria excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Tarefas"
+
+    # 🔹 largura das colunas
+    ws.column_dimensions['A'].width = 6   # checkbox
+    ws.column_dimensions['B'].width = 25  # loja
+    ws.column_dimensions['C'].width = 35  # cliente
+    ws.column_dimensions['D'].width = 20  # tipo
+    ws.column_dimensions['E'].width = 25  # doc
+
+    row = 1
+
+    # 🔹 TOPO (LOCAL + DATA)
+    local = (viagem.get("local") or "-").upper()
+    data = str(viagem.get("data_viagem") or "-")
+
+    cell_local = ws.cell(row=row, column=2, value=local)
+    cell_data = ws.cell(row=row, column=3, value=data)
+
+    cell_local.font = Font(bold=True)
+    cell_data.font = Font(bold=True)
+
+    cell_local.alignment = Alignment(vertical="center")
+    cell_data.alignment = Alignment(vertical="center")
+
+    ws.row_dimensions[row].height = 30
+
+    row += 2  # espaço
+
+    # 🔹 LOOP DOS SHOPPINGS
+    for shopping_id, shopping_nome in ordem_shoppings:
+
+        # nome do shopping
+        cell_shop = ws.cell(row=row, column=2, value=shopping_nome.upper())
+        cell_shop.font = Font(bold=True)
+        ws.row_dimensions[row].height = 25
+
+        row += 1
+
+        # lojas e clientes
+        for loja_id, loja_nome in ordem_lojas[shopping_id]:
+
+            for p in estrutura[shopping_id][loja_id]:
+
+                cliente = (p["cliente_nome"] or "-").title() if p["cliente_nome"] else "-"
+                tipo = (p["tipo"] or "-")
+                tipo = tipo.replace("_", "/").title() if tipo != "-" else "-"
+                doc = p["cpf_cnpj"] or "-"
+
+                check = ws.cell(row=row, column=1, value="☐")
+                check.alignment = Alignment(horizontal="center", vertical="center")
+
+                # loja (coluna B)
+                cell_loja = ws.cell(row=row, column=2, value=loja_nome.title())
+                cell_loja.alignment = Alignment(vertical="center")
+
+                # cliente (coluna C)
+                cell_cliente = ws.cell(row=row, column=3, value=cliente)
+                cell_cliente.alignment = Alignment(wrap_text=True, vertical="center")
+
+                # tipo (coluna D)
+                cell_tipo = ws.cell(row=row, column=4, value=tipo)
+                cell_tipo.alignment = Alignment(horizontal="center", vertical="center")
+
+                # doc (coluna E)
+                cell_doc = ws.cell(row=row, column=5, value=doc)
+                cell_doc.alignment = Alignment(horizontal="center", vertical="center")
+
+                # alinhamento
+                ws.cell(row=row, column=3).alignment = Alignment(horizontal="center", vertical="center")
+                ws.cell(row=row, column=4).alignment = Alignment(horizontal="center", vertical="center")
+
+                # altura da linha
+                ws.row_dimensions[row].height = 22
+
+                row += 1
+
+        # espaço entre shoppings
+        row += 2
+
+    # 🔹 OBSERVAÇÕES
+    cell_obs = ws.cell(row=row, column=2, value="Observações:")
+    cell_obs.font = Font(bold=True)
+    cell_obs.alignment = Alignment(vertical="top")
+    ws.row_dimensions[row].height = 25
+
+    row += 1
+
+    # linhas pra escrever
+    for i in range(20):
+        ws.cell(row=row, column=1, value="")
+        ws.row_dimensions[row].height = 30
+        row += 1
+
+    # salva em memória
+    file = io.BytesIO()
+    wb.save(file)
+    file.seek(0)
+
+    return send_file(
+        file,
+        as_attachment=True,
+        download_name=f"viagem_{id}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+#exportar ordem
+@viagens.route("/viagens/<int:id>/exportar_ordem")
+def exportar_ordem(id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            clientes.nome,
+            clientes.endereco,
+            clientes.telefone,
+            vc.ordem
+        FROM viagem_clientes vc
+        JOIN clientes ON vc.cliente_id = clientes.id
+        WHERE vc.viagem_id = %s
+        ORDER BY vc.ordem
+    """, (id,))
+
+    clientes = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Ordem de Clientes"
+
+    # largura das colunas
+    ws.column_dimensions['A'].width = 10   # ordem
+    ws.column_dimensions['B'].width = 35   # nome
+    ws.column_dimensions['C'].width = 45   # endereço
+    ws.column_dimensions['D'].width = 20  # telefone
+    ws.column_dimensions['E'].width = 6 #checkbx
+
+    row = 1
+
+    # título
+    titulo = ws.cell(row=row, column=1, value="ORDEM DE CLIENTES")
+    titulo.font = Font(bold=True, size=14)
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=5)
+
+    titulo.alignment = Alignment(horizontal="center", vertical="center")
+
+    ws.row_dimensions[row].height = 30
+
+    row += 2
+
+    headers = ["Ordem", "Nome", "Endereço", "Telefone", ""]
+    fill = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
+
+    for col, texto in enumerate(headers, start=1):
+        cell = ws.cell(row=row, column=col, value=texto)
+        cell.font = Font(bold=True)
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.fill = fill
+
+    ws.row_dimensions[row].height = 25
+
+    row += 1
+
+    # conteúdo
+    for i, c in enumerate(clientes, start=1):
+
+        nome = (c["nome"] or "-").title()
+        endereco = c["endereco"] or "-"
+        telefone = c["telefone"] or "-"
+
+        # ordem (esquerda)
+        cell_ordem = ws.cell(row=row, column=1, value=f"{i}.")
+        cell_ordem.alignment = Alignment(horizontal="center", vertical="center")
+
+        # nome (meio)
+        cell_nome = ws.cell(row=row, column=2, value=nome)
+        cell_nome.alignment = Alignment(vertical="center")
+
+        # endereço (direita)
+        cell_end = ws.cell(row=row, column=3, value=endereco)
+        cell_end.alignment = Alignment(wrap_text=True, vertical="center")
+
+        cell_tel = ws.cell(row=row, column=4, value=telefone)
+        cell_tel.font = Font(bold=True)
+        cell_tel.alignment = Alignment(horizontal="center", vertical="center")
+        ws.cell(row=row, column=5, value="☐").alignment = Alignment(horizontal="center", vertical="center")
+
+        # altura maior pra leitura
+        ws.row_dimensions[row].height = 28
+
+        row += 1
+
+    file = io.BytesIO()
+    wb.save(file)
+    file.seek(0)
+
+    return send_file(
+        file,
+        as_attachment=True,
+        download_name=f"ordem_clientes_viagem_{id}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

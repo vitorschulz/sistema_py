@@ -151,33 +151,49 @@
         </button>
     </section>
 
-            {% for shopping, lojas in estrutura.items() %}
+            {% for shopping, dados in estrutura.items() %}
 
                 <div class="shopping-grupo">
 
-                {% set primeiro_pedido = lojas.values() | list | first | first %}
+                {% set primeira_loja = dados.lojas.values() | list | first %}
+                {% if primeira_loja %}
+                    {% set primeiro_pedido = primeira_loja.pedidos[0] %}
+                {% endif %}
 
                 <h3>{% if not shopping or primeiro_pedido.shopping_ativo == 0 %}
                     <span class="removido">Shopping removido</span>
                 {% else %}
+
+                    <div class="grupo-acoes">
+                        <a data-id="{{ dados.id }}" class="btn-ordem subir-shopping">↑</a>
+                        <a data-id="{{ dados.id }}" class="btn-ordem descer-shopping">↓</a>
+                </div> 
+                <a href="/shopping/{{ dados.shopping_id }}?next={{ request.path }}" class="link-titulo">
                     {{ shopping }}
+                </a>
                 {% endif %}</h3>
 
-            {% for loja, pedidos in lojas.items() %}
+            {% for loja, dados_loja in dados.lojas.items() %}
 
                 <div class="loja-grupo">
 
             <h4>
-                    {% set pedido_ref = pedidos[0] %}
+                    {% set pedido_ref = dados_loja.pedidos[0] %}
             {% if not pedido_ref.loja_nome or pedido_ref.loja_ativo == 0 %}
                 <span class="removido">Loja removida</span>
             {% else %}
-                {{ loja }}
+                <div class="grupo-acoes">
+                <a data-id="{{ dados_loja.id }}" class="btn-ordem subir-loja">↑</a>
+                <a data-id="{{ dados_loja.id }}" class="btn-ordem descer-loja">↓</a>
+                </div>     
+                <a href="/lojas/{{ dados_loja.loja_id }}?next={{ request.path }}" class="link-titulo">
+                    {{ loja }}
+                </a>
             {% endif %}
 
             </h4>
 
-            {% for pedido in pedidos %}
+            {% for pedido in dados_loja.pedidos %}
 
                 <div class="pedido-item">
 
@@ -313,14 +329,14 @@
                 <p>Clientes na rota: <strong>{{ total_clientes }}</strong></p>
                 <p>Shoppings: <strong>{{ total_shoppings }}</strong></p>
                 <p>Lojas: <strong>{{ total_lojas }}</strong></p>
-                <p>Pedidos planejados: <strong>{{ total_pedidos }}</strong></p>
+                <p>Tarefas planejadas: <strong>{{ total_pedidos }}</strong></p>
 
             </div>
 
             <div class="botoes-resumo acoes">
 
-                <button>Exportar Ordem</button>
-                <button>Exportar Tarefas</button>
+                <button onclick="window.location.href='/viagens/{{ viagem.id }}/exportar_ordem'">Exportar Ordem</button>
+                <button onclick="window.location.href='/viagens/{{ viagem.id }}/exportar_tarefas'">Exportar Tarefas</button>
 
             </div>
 
