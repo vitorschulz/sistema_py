@@ -336,3 +336,22 @@ document.addEventListener("click", function(e){
 
 });
 
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest(".btn-export");
+
+    if(btn){
+
+        const url = btn.dataset.url;
+        const mensagem = btn.dataset.alert;
+
+        if(mensagem){
+            mostrarAlerta(mensagem);
+        }
+
+        // pequeno delay pra deixar o alerta aparecer
+        setTimeout(() => {
+        }, 150);
+    }
+
+});
