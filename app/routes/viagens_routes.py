@@ -1002,6 +1002,19 @@ def exportar_tarefas(id):
     cursor.close()
     conn.close()
 
+    import unicodedata
+
+    def limpar_texto(texto):
+        return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
+
+    local = viagem.get("local") or "viagem"
+    data = viagem.get("data_viagem")
+
+    local_str = limpar_texto(local).replace(" ", "_").lower()
+    data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
+
+    nome_arquivo = f"{local_str}_{data_str}.xlsx"
+
     # organiza mantendo ordem
     estrutura = defaultdict(lambda: defaultdict(list))
     ordem_shoppings = []
@@ -1132,7 +1145,7 @@ def exportar_tarefas(id):
     return send_file(
         file,
         as_attachment=True,
-        download_name=f"viagem_{id}.xlsx",
+        download_name=nome_arquivo,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
@@ -1142,6 +1155,13 @@ def exportar_ordem(id):
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+    SELECT local, data_viagem
+    FROM viagens
+    WHERE id = %s
+""", (id,))
+    viagem = cursor.fetchone()
 
     cursor.execute("""
         SELECT 
@@ -1157,8 +1177,22 @@ def exportar_ordem(id):
 
     clientes = cursor.fetchall()
 
+
     cursor.close()
     conn.close()
+
+    import unicodedata
+
+    def limpar_texto(texto):
+        return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
+
+    local = viagem["local"] if viagem and viagem["local"] else "viagem"
+    data = viagem["data_viagem"] if viagem and viagem["data_viagem"] else None
+    local_str = limpar_texto(local).replace(" ", "_").lower()
+    data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
+
+    nome_arquivo = f"{local_str}_{data_str}.xlsx"
+
 
     wb = Workbook()
     ws = wb.active
@@ -1233,6 +1267,6 @@ def exportar_ordem(id):
     return send_file(
         file,
         as_attachment=True,
-        download_name=f"ordem_clientes_viagem_{id}.xlsx",
+        download_name = f"ordemClientes_{local_str}_{data_str}.xlsx",
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
