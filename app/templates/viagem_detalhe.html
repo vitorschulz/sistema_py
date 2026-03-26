@@ -217,9 +217,11 @@
                     {% endif %}
                 </span>
 
-                <span class="pedido-tipo tipo-{{ pedido.tipo }}">
-                {{ pedido.tipo.replace("_"," / ") }}
-                </span>
+                {% for tipo in pedido.tipo.split(',') %}
+                    <span class="pedido-tipo tipo-{{ tipo }}">
+                        {{ tipo.replace("_"," ") }}
+                    </span>
+                {% endfor %}
 
                 {% if pedido.observacoes %}
                     <span class="pedido-obs">
