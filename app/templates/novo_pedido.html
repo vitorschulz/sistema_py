@@ -75,15 +75,42 @@
 
                 <label>Tipo</label>
 
-                <select name="tipo">
+                <div class="checkbox-group">
 
-                <option value="PEDIDO" {% if pedido and pedido.tipo == "PEDIDO" %}selected{% endif %}>Pedido</option>
-                <option value="ACERTO" {% if pedido and pedido.tipo == "ACERTO" %}selected{% endif %}>Acerto</option>
-                <option value="ACERTO_PEDIDO" {% if pedido and pedido.tipo == "ACERTO_PEDIDO" %}selected{% endif %}>Acerto + Pedido</option>
+                    {% set tipos = pedido.tipo.split(",") if pedido and pedido.tipo else [] %}
 
-                </select>
+                        <label>
+                            <input type="checkbox" name="tipo[]" value="PEDIDO"
+                            {% if "PEDIDO" in tipos %}checked{% endif %}>
+                            Pedido
+                        </label>
 
-            </div>
+                        <label>
+                            <input type="checkbox" name="tipo[]" value="ACERTO"
+                            {% if "ACERTO" in tipos %}checked{% endif %}>
+                            Acerto
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="tipo[]" value="TROCA"
+                            {% if "TROCA" in tipos %}checked{% endif %}>
+                            Troca
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="tipo[]" value="DEFEITO"
+                            {% if "DEFEITO" in tipos %}checked{% endif %}>
+                            Defeito
+                        </label>
+
+                        <label>
+                            <input type="checkbox" name="tipo[]" value="DEVOLUCAO"
+                            {% if "DEVOLUCAO" in tipos %}checked{% endif %}>
+                            Devolução
+                        </label>
+                    </div>
+
+                </div>
 
 
             <div class="form-group">

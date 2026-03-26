@@ -411,7 +411,12 @@ def novo_pedido(id):
 
         loja_id = request.form["loja_id"]
         cliente_id = request.form["cliente_id"]
-        tipo = request.form["tipo"]
+        tipos = request.form.getlist("tipo[]")
+        if not tipos:
+            flash("Selecione pelo menos um tipo.", "error")
+            return redirect(request.url)
+
+        tipo = ",".join(tipos)
         observacoes = request.form.get("observacoes","").strip()
 
         cursor.execute("""
@@ -649,7 +654,13 @@ def editar_pedido(id):
 
         loja_id = request.form["loja_id"]
         cliente_id = request.form["cliente_id"]
-        tipo = request.form["tipo"]
+        tipos = request.form.getlist("tipo[]")
+
+        if not tipos:
+            flash("Selecione pelo menos um tipo.", "error")
+            return redirect(request.url)
+
+        tipo = ",".join(tipos)
         observacoes = request.form.get("observacoes","").strip()
         next_url = request.form.get("next")
 
@@ -1053,20 +1064,28 @@ def exportar_tarefas(id):
     ws.column_dimensions['D'].width = 20  # tipo
     ws.column_dimensions['E'].width = 25  # doc
 
+    max_tipo_len = 0
+
     row = 1
 
     # 🔹 TOPO (LOCAL + DATA)
     local = (viagem.get("local") or "-").upper()
-    data = str(viagem.get("data_viagem") or "-")
+    data_obj = viagem.get("data_viagem")
+    data = data_obj.strftime("%d/%m/%Y") if data_obj else "-"
 
     cell_local = ws.cell(row=row, column=2, value=local)
-    cell_data = ws.cell(row=row, column=3, value=data)
+    cell_data = ws.cell(row=row, column=4, value=data)
 
     cell_local.font = Font(bold=True)
     cell_data.font = Font(bold=True)
 
     cell_local.alignment = Alignment(vertical="center")
-    cell_data.alignment = Alignment(vertical="center")
+    cell_data.alignment = Alignment(horizontal="center", vertical="center")
+
+    fill_cinza = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
+
+    for col in range(1, 6):
+        ws.cell(row=row, column=col).fill = fill_cinza
 
     ws.row_dimensions[row].height = 30
 
@@ -1089,7 +1108,8 @@ def exportar_tarefas(id):
 
                 cliente = (p["cliente_nome"] or "-").title() if p["cliente_nome"] else "-"
                 tipo = (p["tipo"] or "-")
-                tipo = tipo.replace("_", "/").title() if tipo != "-" else "-"
+                tipo = tipo.replace(",", ", ").replace("_", "/").title() if tipo != "-" else "-"
+                max_tipo_len = max(max_tipo_len, len(tipo))
                 doc = p["cpf_cnpj"] or "-"
 
                 check = ws.cell(row=row, column=1, value="☐")
@@ -1132,11 +1152,17 @@ def exportar_tarefas(id):
     row += 1
 
     # linhas pra escrever
-    for i in range(20):
+    for i in range(5):
         ws.cell(row=row, column=1, value="")
         ws.row_dimensions[row].height = 30
         row += 1
 
+    if row <= 60:
+        ws.page_setup.fitToHeight = 1
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToPage = True
+    else:
+        ws.page_setup.scale = 80  # ou nem usar nada
     # salva em memória
     file = io.BytesIO()
     wb.save(file)
@@ -1229,6 +1255,8 @@ def exportar_ordem(id):
 
     ws.row_dimensions[row].height = 25
 
+    max_end_len = 0
+
     row += 1
 
     # conteúdo
@@ -1237,6 +1265,7 @@ def exportar_ordem(id):
         nome = (c["nome"] or "-").title()
         endereco = c["endereco"] or "-"
         telefone = c["telefone"] or "-"
+        max_end_len = max(max_end_len, len(endereco))
 
         # ordem (esquerda)
         cell_ordem = ws.cell(row=row, column=1, value=f"{i}.")
@@ -1260,6 +1289,15 @@ def exportar_ordem(id):
 
         row += 1
 
+    ws.column_dimensions['C'].width = min(max_end_len / 0.7, 60)
+    ws.print_area = f"A1:E{row}"
+    if len(clientes) <= 30:
+        ws.page_setup.fitToHeight = 1
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToPage = True
+    else:
+        ws.page_setup.fitToPage = False
+        ws.page_setup.scale = 80
     file = io.BytesIO()
     wb.save(file)
     file.seek(0)

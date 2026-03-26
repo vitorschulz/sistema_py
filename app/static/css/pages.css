@@ -449,6 +449,46 @@ form {
     background-color: #1d4ed8;
 }
 
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    
+}
+
+/* hover suave igual teu sistema */
+.checkbox-group label:hover {
+    background: #f5f7fa;
+}
+
+.checkbox-group label {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+/* checkbox em si */
+.checkbox-group input[type="checkbox"] {
+    accent-color: #2563eb; /* azul padrão do teu sistema */
+    cursor: pointer;
+}
+
+.checkbox-group label:has(input:checked) {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: #2563eb;
+}
 /*viagens*/
 
 .filtro-viagens {
@@ -740,7 +780,7 @@ form {
     border-radius:6px;
     font-size:13px;
     font-weight:500;
-    margin-right: 100px;
+    margin-right: 50px;
     width:131px;
     text-align:center;
 }
@@ -758,9 +798,19 @@ form {
 }
 
 
-.tipo-ACERTO_PEDIDO{
+.tipo-DEVOLUCAO{
     background:#f3e5f5;
     color:#7b1fa2;
+}
+
+.tipo-DEFEITO{
+    background:#ffebee;
+    color:#c62828;
+}
+
+.tipo-TROCA{
+    background:#e8f5e9;
+    color:#2e7d32;
 }
 
 .pedido-obs{
