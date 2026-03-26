@@ -4,3 +4,5 @@ pip install mysql-connector-python
 pip install openpyxl
 
 CREATE DATABASE gestao;
+
+pra rodar python run.py
