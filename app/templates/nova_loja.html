@@ -9,7 +9,7 @@
     <button 
     data-url="{{ request.args.get('next', '/lojas') }}"
     onclick="window.location.href=this.dataset.url">
-    ← Voltar
+        ← Voltar
     </button>
 
 </section>
@@ -17,61 +17,56 @@
 
 <section class="card">
 
-<form method="POST">
+    <form method="POST">
 
-<div class="form-group">
-    <label>Número / Nome da loja</label>
-    <input type="text" name="nome" required placeholder="Nome da loja..." value="{{ loja.nome if loja }}">
-</div>
+        <div class="form-group">
+            <label>Número / Nome da loja</label>
+            <input type="text" name="nome" required placeholder="Nome da loja..." value="{{ loja.nome if loja }}">
+        </div>
 
+        <div class="form-group">
+            <label>Shopping</label>
 
+            <select name="shopping_id" {% if shopping_preselecionado %}disabled{% endif %} required>
 
+                <option value="">Selecione um shopping</option>
 
-<div class="form-group">
-    <label>Shopping</label>
+                {% for shopping in shoppings %}
 
-    <select name="shopping_id" {% if shopping_preselecionado %}disabled{% endif %} required>
+                <option value="{{ shopping.id }}" 
+                {% if loja and loja.shopping_id == shopping.id %}
+                selected
+                {% elif shopping_preselecionado and shopping_preselecionado|int == shopping.id %}
+                selected
+                {% endif %}>
+                    {{ shopping.nome }}
+                </option>
 
-    <option value="">Selecione um shopping</option>
+                {% endfor %}
 
-    {% for shopping in shoppings %}
+            </select>
 
-    <option value="{{ shopping.id }}" 
-    {% if loja and loja.shopping_id == shopping.id %}
-    selected
-    {% elif shopping_preselecionado and shopping_preselecionado|int == shopping.id %}
-    selected
-    {% endif %}
-    >
-        {{ shopping.nome }}
-    </option>
+            {% if shopping_preselecionado %}
+            <input type="hidden" name="shopping_id" value="{{ shopping_preselecionado }}">
+            {% endif %}
 
-    {% endfor %}
+        </div>
 
-    </select>
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ loja.contato if loja }}" id="telefone">
+        </div>
 
-    {% if shopping_preselecionado %}
-    <input type="hidden" name="shopping_id" value="{{ shopping_preselecionado }}">
-    {% endif %}
+        <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" rows="4">{{ loja.observacoes if loja }}</textarea>
+        </div>
 
-</div>
+        <button type="submit" class="btn-submit">
+            {{ "Salvar loja" if not loja else "Atualizar loja" }}
+        </button>
 
-    <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ loja.contato if loja }}" id="telefone">
-    </div>
-
-<div class="form-group">
-    <label>Observações</label>
-    <textarea name="observacoes" rows="4">{{ loja.observacoes if loja }}</textarea>
-</div>
-
-<button type="submit" class="btn-submit">
-    {{ "Salvar loja" if not loja else "Atualizar loja" }}
-</button>
-
-</form>
-
+    </form>
 
 </section>
 

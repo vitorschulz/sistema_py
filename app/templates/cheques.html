@@ -4,15 +4,15 @@
 
 <h1>Cheques</h1>
 
-<section class="acoes">
+    <section class="acoes">
 
-    <button onclick="window.location.href='/cheques/novo'">
-        + Novo cheque
-    </button>
+        <button onclick="window.location.href='/cheques/novo'">
+            + Novo cheque
+        </button>
 
-    <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
+        <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
 
-</section>
+    </section>
 
 <section class="card">
 
@@ -30,7 +30,9 @@
         {% for c in cheques %}
 
         <tr class="linha-clicavel">
-            <td>{{ c.codigo or "—" }}</td>
+            <td>
+                {{ c.codigo or "—" }}
+            </td>
 
             <td>
                 {{ c.nome_destino or "—" }}
@@ -40,7 +42,9 @@
                 {{ c.data_vencimento.strftime('%d/%m/%Y') if c.data_vencimento else "—" }}
             </td>
 
-            <td>R$ {{ c.valor or "—" }}</td>
+            <td>
+                R$ {{ c.valor or "—" }}
+            </td>
 
             <td>
                 {% if c.status == 'PENDENTE' %}

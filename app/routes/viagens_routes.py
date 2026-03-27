@@ -398,7 +398,6 @@ def subir_loja(id):
     return redirect(f"/viagens/{atual['viagem_id']}")
 
 #descer loja
-
 @viagens.route("/loja/<int:id>/descer", methods=["GET"])
 def descer_loja(id):
 
@@ -637,7 +636,7 @@ def excluir_viagem(id):
     return redirect("/viagens")
 
 
-#seta p cima
+#seta p cima pedido
 @viagens.route("/pedidos/<int:id>/subir", methods=["POST"])
 def subir_pedido(id):
 
@@ -682,7 +681,7 @@ def subir_pedido(id):
 
     return ("", 204)
 
-#botao descer
+#botao descer seta pedido
 @viagens.route("/pedidos/<int:id>/descer", methods=["POST"])
 def descer_pedido(id):
 
@@ -1045,7 +1044,6 @@ def deletar_financeiro(id):
 
 #tabelas export
 import io
-
 @viagens.route("/viagens/<int:id>/exportar_tarefas")
 def exportar_tarefas(id):
 

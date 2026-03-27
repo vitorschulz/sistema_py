@@ -1,3 +1,4 @@
+// Evita envio duplicado de formulários (double submit)
 document.addEventListener("submit", function(e) {
     const form = e.target;
 
@@ -14,6 +15,9 @@ document.addEventListener("submit", function(e) {
     }
 });
 
+
+// Protege botões de ação (excluir, compensar, devolver)
+// evitando múltiplos cliques e confirmando ações críticas
 document.addEventListener('click', function(e) {
     const btn = e.target.closest('.btn-excluir, .btn-compensar, .btn-devolver');
     if (!btn) return;
@@ -38,6 +42,7 @@ document.addEventListener('click', function(e) {
 }
 });
 
+// Proteção simples para botões de exclusão rápida
 document.addEventListener('click', function(e) {
     const btn = e.target.closest('.btn-excluir-rapido');
     if (!btn) return;

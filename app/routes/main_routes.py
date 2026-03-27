@@ -4,6 +4,7 @@ from datetime import date
 
 main = Blueprint("main", __name__)
 
+#dashboard e seus dados
 @main.route("/")
 def dashboard():
 

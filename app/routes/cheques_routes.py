@@ -3,7 +3,7 @@ from app.config import get_db_connection
 
 cheques = Blueprint('cheques', __name__, url_prefix='/cheques')
 
-
+#listagem cheques
 @cheques.route('', strict_slashes=False)
 def listar_cheques():
 

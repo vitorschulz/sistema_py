@@ -5,38 +5,41 @@
 <h1>Menu</h1>
 
 <section class="acoes acoes-linha">
+
     <button onclick="window.location.href='/viagens/nova?next={{ request.path }}'">Registrar viagem</button>
     <button onclick="window.location.href='/cheques/novo?next={{ request.path }}'">Registrar cheque</button>
     <button onclick="window.location.href='/clientes/novo?next={{ request.path }}'">Cadastrar cliente</button>
+
 </section>
 
 <div class="grid-agenda">
-<section class="card">
-    <div class="agenda-header">
-        <a class="btn-seta" onclick="mesAnterior()">←</a>
-
-        <div class="agenda-titulo">
-            <h2 class="titulo-agenda">Agenda de Viagens</h2>
-            <span id="mes-ano"></span>
-        </div>
-
-        <a class="btn-seta" onclick="proximoMes()">→</a>
-    </div>
-
-    <div id="calendario"></div>
-</section>
 
     <section class="card">
-        <h2>Próximas viagens</h2> 
+        <div class="agenda-header">
+            <a class="btn-seta" onclick="mesAnterior()">←</a>
+
+            <div class="agenda-titulo">
+                <h2 class="titulo-agenda">Agenda de Viagens</h2>
+                <span id="mes-ano"></span>
+            </div>
+
+            <a class="btn-seta" onclick="proximoMes()">→</a>
+        </div>
+
+        <div id="calendario"></div>
+    </section>
+
+    <section class="card">
+    <h2>Próximas viagens</h2> 
         <div class="scroll-pequeno">
             <div class="lista-viagens">
+
                 {% for v in proximas_viagens %}
-                    <div class="item-viagem"
-                        onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
+                    <div class="item-viagem" onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
                         
                         <div>
-                            <strong>{{ v.data_viagem.strftime('%d/%m') }}</strong>
-                            —<span class="shopping-local local-{{ v.local.replace(" ", "_") }}"> {{ v.local or "Sem local" }}</span>
+                            <strong>{{ v.data_viagem.strftime('%d/%m') }}</strong> —
+                            <span class="shopping-local local-{{ v.local.replace(" ", "_") }}"> {{ v.local or "Sem local" }}</span>
                         </div>
 
                         <span class="status status-{{ v.status|replace(' ', '-') }}">
@@ -47,6 +50,7 @@
                 {% else %}
                     <p style="color:#777;">Nenhuma viagem futura.</p>
                 {% endfor %}
+                
             </div>
         </div>
     </section>
@@ -71,10 +75,12 @@
         <tr class="linha-clicavel">
 
             <td>
-                    {{ c.codigo }}
+                {{ c.codigo }}
             </td>
 
-            <td>{{ c.nome_destino }}</td>
+            <td>
+                {{ c.nome_destino }}
+            </td>
 
             <td>
                 {% if c.data_vencimento and c.data_vencimento < hoje %}
@@ -86,12 +92,15 @@
                 {% endif %}
             </td>
 
-            <td>R$ {{ c.valor }}</td>
+            <td>
+                R$ {{ c.valor }}
+            </td>
 
         </tr>
+        
         {% else %}
         <tr>
-            <td colspan="3" style="color:#777;">Nenhum cheque pendente.</td>
+            <td colspan="4" style="color:#777;">Nenhum cheque pendente.</td>
         </tr>
         {% endfor %}
 
@@ -140,6 +149,7 @@
 
     </section>
 -->
+
 <script id="datas-viagens" type="application/json">
     {{ datas_viagens | tojson }}
 </script>

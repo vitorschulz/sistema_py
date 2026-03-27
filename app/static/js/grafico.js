@@ -1,12 +1,15 @@
+// Executa quando o DOM estiver carregado
 document.addEventListener("DOMContentLoaded", function () {
 
-    // gráfico (teu código já tá certo)
+    // ===== GRÁFICO =====
+    // Lê os dados vindos do backend (JSON embutido no HTML)
     const dados = JSON.parse(
         document.getElementById("dados-grafico").textContent
     );
 
     const ctx = document.getElementById('graficoFinanceiro');
 
+    // Cria gráfico de linhas com receitas, custos e lucros
     new Chart(ctx, {
         type: "line",
         data: {
@@ -43,11 +46,11 @@ document.addEventListener("DOMContentLoaded", function () {
     verificarAlertasURL();
 
 });
-// ===== ALERTA =====
+// Exibe alertas dinâmicos na tela (sem usar Flask flash)
 function mostrarAlerta(mensagem, tipo = "success") {
 
     let container = document.querySelector(".alerts");
-
+    // Cria container se não existir
     if (!container) {
         container = document.createElement("div");
         container.classList.add("alerts");
@@ -64,7 +67,7 @@ function mostrarAlerta(mensagem, tipo = "success") {
     alerta.textContent = mensagem;
 
     container.appendChild(alerta);
-
+    // Remove automaticamente após 3s
     setTimeout(() => {
         alerta.style.transition = "opacity 0.5s ease";
         alerta.style.opacity = "0";
@@ -76,14 +79,14 @@ function mostrarAlerta(mensagem, tipo = "success") {
 }
 
 
-// ===== VALIDAÇÃO DE FILTRO =====
+// Valida datas do filtro antes de enviar o form
 function validarFiltroData(inicio, fim) {
-
+    // Nenhuma data preenchida
     if (!inicio && !fim) {
         mostrarAlerta("Preencha pelo menos uma data!", "error");
         return false;
     }
-
+    // Data inicial maior que final
     if (inicio && fim && inicio > fim) {
         mostrarAlerta("Data inicial não pode ser maior que a final!", "error");
         return false;
@@ -93,7 +96,7 @@ function validarFiltroData(inicio, fim) {
 }
 
 
-// ===== ALERTAS DA URL =====
+// Exibe alertas com base em parâmetros da URL (?filtrado=1, ?limpo=1)
 function verificarAlertasURL() {
 
     const url = new URL(window.location.href);
@@ -101,7 +104,7 @@ function verificarAlertasURL() {
     if (url.searchParams.get("filtrado") === "1") {
 
         mostrarAlerta("Filtro aplicado!", "success");
-
+        // Remove parâmetro da URL sem recarregar
         url.searchParams.delete("filtrado");
         window.history.replaceState({}, document.title, url.pathname + url.search);
     }

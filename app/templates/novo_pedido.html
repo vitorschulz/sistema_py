@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 
-    {% block content %}
+{% block content %}
 
-        <h1>{{ "Editar tarefa" if pedido else "Nova tarefa" }}</h1>
+<h1>{{ "Editar tarefa" if pedido else "Nova tarefa" }}</h1>
 
-        <section class="acoes">
+    <section class="acoes">
 
-            <button 
-            data-url="{{ request.args.get('next', '/viagens') }}"
-            onclick="window.location.href=this.dataset.url">
-            ← Voltar
-            </button>
+    <button 
+    data-url="{{ request.args.get('next', '/viagens') }}"
+    onclick="window.location.href=this.dataset.url">
+        ← Voltar
+    </button>
 
-        </section>
+</section>
 
-    <section class="card">
+<section class="card">
 
+    <form method="POST"  data-validate-tipo>
 
-
-        <form method="POST"  data-validate-tipo>
-
-            <div class="form-group">
+        <div class="form-group">
 
             <label>Shopping</label>
 
-                <select id="shopping" required>
+            <select id="shopping" required>
+
                 {% for s in shoppings %}
                 <option value="{{ s.id }}">
                 {{ s.nome }}
                 </option>
                 {% endfor %}
-                </select>
 
-            </div>
+            </select>
+
+        </div>
 
 
-            <div class="form-group">
+        <div class="form-group">
 
             <label>Loja</label>
 
-                <select name="loja_id" id="loja" required>
+            <select name="loja_id" id="loja" required>
 
                 {% for l in lojas %}
                 <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
@@ -48,16 +48,16 @@
                 </option>
                 {% endfor %}
 
-                </select>
+            </select>
 
-            </div>
+        </div>
 
 
-            <div class="form-group">
+        <div class="form-group">
 
             <label>Cliente</label>
 
-                <select name="cliente_id" required>
+            <select name="cliente_id" required>
 
                 {% for c in clientes %}
                 <option value="{{ c.id }}"
@@ -66,72 +66,71 @@
                 </option>
                 {% endfor %}
 
-                </select>
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Tipo</label>
+
+            <div class="checkbox-group">
+
+                {% set tipos = pedido.tipo.split(",") if pedido and pedido.tipo else [] %}
+
+                <label>
+                    <input type="checkbox" name="tipo[]" value="PEDIDO"
+                    {% if "PEDIDO" in tipos %}checked{% endif %}>
+                    Pedido
+                </label>
+
+                <label>
+                    <input type="checkbox" name="tipo[]" value="ACERTO"
+                    {% if "ACERTO" in tipos %}checked{% endif %}>
+                    Acerto
+                </label>
+
+                <label>
+                    <input type="checkbox" name="tipo[]" value="TROCA"
+                    {% if "TROCA" in tipos %}checked{% endif %}>
+                    Troca
+                </label>
+
+                <label>
+                    <input type="checkbox" name="tipo[]" value="DEFEITO"
+                    {% if "DEFEITO" in tipos %}checked{% endif %}>
+                    Defeito
+                </label>
+
+                <label>
+                    <input type="checkbox" name="tipo[]" value="DEVOLUCAO"
+                    {% if "DEVOLUCAO" in tipos %}checked{% endif %}>
+                    Devolução
+                </label>
 
             </div>
+        </div>
 
 
-            <div class="form-group">
+        <div class="form-group">
 
-                <label>Tipo</label>
+            <label>Observações</label>
 
-                <div class="checkbox-group">
+            <textarea name="observacoes">{{ pedido.observacoes if pedido and pedido.observacoes else '' }}</textarea>
+            <input type="hidden" name="next" value="{{ request.args.get('next') }}">
 
-                    {% set tipos = pedido.tipo.split(",") if pedido and pedido.tipo else [] %}
+        </div>
 
-                        <label>
-                            <input type="checkbox" name="tipo[]" value="PEDIDO"
-                            {% if "PEDIDO" in tipos %}checked{% endif %}>
-                            Pedido
-                        </label>
+<section class="acoes" style="flex-direction: row;">
 
-                        <label>
-                            <input type="checkbox" name="tipo[]" value="ACERTO"
-                            {% if "ACERTO" in tipos %}checked{% endif %}>
-                            Acerto
-                        </label>
+    <button type="submit">
 
-                        <label>
-                            <input type="checkbox" name="tipo[]" value="TROCA"
-                            {% if "TROCA" in tipos %}checked{% endif %}>
-                            Troca
-                        </label>
+        {{ "Salvar tarefa" if not pedido else "Atualizar tarefa" }}
 
-                        <label>
-                            <input type="checkbox" name="tipo[]" value="DEFEITO"
-                            {% if "DEFEITO" in tipos %}checked{% endif %}>
-                            Defeito
-                        </label>
+    </button>
 
-                        <label>
-                            <input type="checkbox" name="tipo[]" value="DEVOLUCAO"
-                            {% if "DEVOLUCAO" in tipos %}checked{% endif %}>
-                            Devolução
-                        </label>
-                    </div>
-
-                </div>
-
-
-            <div class="form-group">
-
-                <label>Observações</label>
-
-                <textarea name="observacoes">{{ pedido.observacoes if pedido and pedido.observacoes else '' }}</textarea>
-                <input type="hidden" name="next" value="{{ request.args.get('next') }}">
-
-            </div>
-
-            <section class="acoes" style="flex-direction: row;">
-
-                    <button
-                    type="submit">
-
-                    {{ "Salvar tarefa" if not pedido else "Atualizar tarefa" }}
-
-                    </button>
-
-            </section>
+</section>
             
 <script src="{{ url_for('static', filename='js/pedido.js') }}"></script>
 

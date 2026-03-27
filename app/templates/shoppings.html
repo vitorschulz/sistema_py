@@ -7,9 +7,9 @@
 <section class="acoes">
 
 
-<button onclick="window.location.href='/shopping/novo'">
-    + Novo shopping
-</button>
+    <button onclick="window.location.href='/shopping/novo'">
+        + Novo shopping
+    </button>
 
     <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
 
@@ -17,50 +17,53 @@
 
 <section class="card">
 
-<table id="tabela-lista">
+    <table id="tabela-lista">
 
-    <tr class="thead-hover">
-        <th>Nome</th>
-        <th>Local</th>
-        <th>Telefone</th>
-        <th>Endereço</th>
-        <th>Ações</th>
+        <tr class="thead-hover">
+            <th>Nome</th>
+            <th>Local</th>
+            <th>Telefone</th>
+            <th>Endereço</th>
+            <th>Ações</th>
+        </tr>
+
+    {% for shopping in shoppings %}
+
+    <tr class="linha-clicavel">
+
+        <td>
+            <a href="/shopping/{{ shopping.id }}" class="tabela-link">
+                {{ shopping.nome }}
+            </a>
+        </td>
+
+        <td>
+            <span class="shopping-local local-{{ shopping.local.replace(" ", "_") }}">
+            {{ shopping.local }}
+            </span>
+        </td>
+
+        <td>{{ shopping.contato or "—" }}</td>
+
+        <td>{{ shopping.endereco or "—"  }}</td>
+
+        <td class="acoes-tabela">
+
+            <a href="/shopping/{{ shopping.id }}/editar" class="btn-editar">
+                Editar
+            </a>
+
+            <a href="/shopping/{{ shopping.id }}/excluir" class="btn-excluir" data-confirm="Deseja excluir este shopping?">
+                Excluir
+            </a>
+
+        </td>
+
     </tr>
 
-{% for shopping in shoppings %}
+    {% endfor %}
 
-<tr class="linha-clicavel">
-    <td>
-    <a href="/shopping/{{ shopping.id }}" class="tabela-link">
-        {{ shopping.nome }}
-    </a>
-    </td>
-    <td>
-        <span class="shopping-local local-{{ shopping.local.replace(" ", "_") }}">
-        {{ shopping.local }}
-        </span>
-    </td>
-    <td>{{ shopping.contato or "—" }}</td>
-    <td>{{ shopping.endereco or "—"  }}</td>
-
-    <td class="acoes-tabela">
-
-        <a href="/shopping/{{ shopping.id }}/editar" class="btn-editar">
-        Editar
-        </a>
-
-        <a href="/shopping/{{ shopping.id }}/excluir" class="btn-excluir" data-confirm="Deseja excluir este shopping?">
-        Excluir
-        </a>
-
-    </td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
+    </table>
 
 </section>
 

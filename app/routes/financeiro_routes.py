@@ -3,6 +3,7 @@ from app.config import get_db_connection
 
 financeiro = Blueprint("financeiro", __name__)
 
+#listagem do financeiro e tb pegagem de dados necessarios e totais
 @financeiro.route('/financeiro')
 def pagina_financeiro():
 

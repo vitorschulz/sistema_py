@@ -1,3 +1,4 @@
+// Filtra dinamicamente as linhas da tabela com base no texto digitado
 function filtrarTabela() {
 
     let input = document.getElementById("campo-busca");

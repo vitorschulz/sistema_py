@@ -1,3 +1,5 @@
+// Remove automaticamente os alerts (mensagens do Flask)
+// após 3 segundos com efeito de fade-out
 setTimeout(() => {
     const alerts = document.querySelectorAll('.alert');
 

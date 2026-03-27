@@ -2,11 +2,13 @@
 
 {% block content %}
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <h1>Financeiro</h1>
 
 <section class="card">
+    
     <h2>Visão geral</h2>
-
 
     <section class="filtro-viagens">
 
@@ -23,12 +25,11 @@
         </form>
 
         <button class="btn-limpar"
-            onclick="window.location.href='/financeiro?limpo=1'">
+        onclick="window.location.href='/financeiro?limpo=1'">
             Limpar
         </button>
 
     </section>
-
 
     <div class="grafico-container fin-grafico-container">
         <canvas id="graficoFinanceiro"></canvas>
@@ -81,16 +82,21 @@
         </tr>
         {% endfor %}
     </table>
+
 </section>
 
 
 
 <section class="card">
-    <h2><a href="/cheques" class="titulo-link">
+
+    <h2>
+        <a href="/cheques" class="titulo-link">
         Cheques
-    </a></h2>
+        </a>
+    </h2>
 
     <table class="tabela-dashboard">
+        
         <tr class="thead-hover">
             <th>Código</th>
             <th>Destino</th>

@@ -3,7 +3,7 @@ from app.config import get_db_connection
 
 pedidos = Blueprint("pedidos", __name__)
 
-#click do pedido
+#click do pedido detalhes e tals
 @pedidos.route("/pedidos/<int:id>")
 def detalhe_pedido(id):
 
