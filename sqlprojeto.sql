@@ -18,6 +18,8 @@
 --
 -- Table structure for table `cheques`
 --
+CREATE DATABASE IF NOT EXISTS gestao;
+USE gestao;
 
 DROP TABLE IF EXISTS `cheques`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
