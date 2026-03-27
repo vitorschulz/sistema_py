@@ -67,7 +67,7 @@
 
         <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}&next={{ request.path }}"
            class="btn-excluir"
-           onclick="return confirm('Excluir esta loja?')">
+           data-confirm="Deseja excluir esta loja?">
            Excluir
         </a>
 

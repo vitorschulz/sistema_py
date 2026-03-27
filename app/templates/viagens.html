@@ -3,16 +3,27 @@
 {% block content %}
 
 <h1>Viagens</h1>
-
+<div id="filtros-data"
+     data-filtrado="{{ filtrado }}"
+     data-data-invalida="{{ data_invalida }}">
+</div>
 <section class="filtro-viagens">
 
     <form method="GET" action="/viagens" class="filtro-viagens">
 
         <input type="date" name="data_inicio" id="data_inicio"
-        value="{{ request.args.get('data_inicio') or request.args.get('data') }}">
+        value="{{ request.args.get('data_inicio') or request.args.get('data') }}" min="2020-01-01"
+        max="2030-12-31">
 
         <input type="date" name="data_fim" id="data_fim"
-        value="{{ request.args.get('data_fim') or request.args.get('data') }}">
+        value="{{ request.args.get('data_fim') or request.args.get('data') }}" min="2020-01-01"
+        max="2030-12-31">
+
+        <select name="local" class="select-filtro">
+            <option value="">Todos locais</option>
+            <option value="Serra" {% if request.args.get('local') == 'Serra' %}selected{% endif %}>Serra</option>
+            <option value="Santa Catarina" {% if request.args.get('local') == 'Santa Catarina' %}selected{% endif %}>Santa Catarina</option>
+        </select>
 
         <input type="hidden" name="filtrado" value="1">
 
@@ -45,7 +56,7 @@
     <div class="card-viagem"
         onclick="window.location.href='/viagens/{{ viagem.id }}'">
 
-        <div class="menu-card" onclick="event.stopPropagation()">
+        <div class="menu-card">
         ⋮
             <div class="menu-opcoes">
 
@@ -55,10 +66,13 @@
 
                 <a href="/viagens/{{ viagem.id }}/excluir"
                 class="btn-excluir"
-                onclick="return confirm('Deseja excluir esta viagem?')">
+                onclick="event.stopPropagation(); 
+                            if(!confirm('Deseja excluir esta viagem?')) return false;
+                            this.dataset.clicked='true';
+                            this.style.pointerEvents='none';
+                            this.style.opacity='0.6';">
                     Excluir
                 </a>
-
             </div>
         </div>
 
@@ -69,14 +83,13 @@
             <span class="shopping-local local-{{ viagem.local.replace(" ", "_") }}"><strong>{{ viagem.local }}</strong></span>
         </p>
 
-        <p>Status: {{ viagem.status }}</p>
+        <p>Status: <span class="status_viagens-{{ viagem.status|replace(' ', '-') }}">{{ viagem.status }}</span></p>
 
     </div>
 
 {% endfor %}
 
 </section>
-
 <script src="{{ url_for('static', filename='js/card.js') }}"></script>
 
 

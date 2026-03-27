@@ -144,6 +144,7 @@
 }
 
 .item-viagem {
+    margin-top: 2px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -194,6 +195,28 @@
     color: #c62828;
 }
 
+.status_viagens-Planejada {
+    color: #1565c0;
+}
+
+.status_viagens-Em-andamento {
+    color: #ef6c00;
+}
+
+.status_viagens-Finalizada {
+    color: #2e7d32;
+}
+
+.status_viagens-Cancelada {
+    color: #c62828;
+}
+
+.scroll-pequeno {
+    max-height: 259px;
+    overflow-y: auto;
+    padding-right: 5px;
+    margin-top: 5px;
+}
 
 .resumo-dashboard h2 {
     margin-bottom: 20px;
@@ -537,12 +560,32 @@ form {
     background-color: #d1d5db;
 }
 
+.select-filtro {
+    padding: 8px 10px;           
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 150px;
+}
 
+
+.select-filtro:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+/* opcional: muda o texto do option selecionado para azul leve */
+.select-filtro option:checked {
+    color: #2563eb;
+}
 
 .grid-viagens{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,250px);
-    gap:30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
 }
 
 .card-viagem{
@@ -780,7 +823,7 @@ form {
     border-radius:6px;
     font-size:13px;
     font-weight:500;
-    margin-right: 50px;
+    margin-right: 25px;
     width:131px;
     text-align:center;
 }
@@ -819,7 +862,7 @@ form {
     font-size:13px;
     white-space:nowrap;
     overflow:hidden;
-    width:550px;
+    width:225px;
     text-overflow:ellipsis;
 
 }

@@ -242,7 +242,7 @@
 
                     <a href="/pedidos/{{ pedido.id }}/excluir"
                     class="btn-excluir"
-                    onclick="return confirm('Deseja excluir este pedido?')">
+                    data-confirm="Deseja excluir esta tarefa?">
                     Excluir
                     </a>
 
@@ -267,7 +267,7 @@
 
             <h2>Resumo financeiro</h2>
 
-            <form method="POST" action="/viagens/{{ viagem.id }}/financeiro/add" id="form-financeiro" class="acoes financeiro-form">
+            <form method="POST" action="/viagens/{{ viagem.id }}/financeiro/add" id="form-financeiro" class="acoes financeiro-form" data-no-disable>
 
                 <div class="acoes-linha">
 
@@ -303,7 +303,7 @@
                             {% endif %}
                         </span>
 
-                        <button class="menuTarefaItem btn-excluir" data-id="{{ f.id }}">✕</button>
+                        <button class="menuTarefaItem btn-excluir js-excluir-financeiro" data-id="{{ f.id }}">✕</button>
                         </div> 
                     </div>
                 {% endfor %}

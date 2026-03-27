@@ -54,10 +54,10 @@ if (formFiltro) {
         const inicio = document.getElementById("data_inicio").value;
         const fim = document.getElementById("data_fim").value;
 
-        if(!inicio && !fim){
-        e.preventDefault();
-        mostrarAlerta("Preencha pelo menos uma data!", "error");
-        return;
+        if(!inicio && !fim && !local){
+            e.preventDefault();
+            mostrarAlerta("Preencha pelo menos um filtro!", "error");
+            return;
         }
 
         if(inicio && fim && inicio > fim){
@@ -72,22 +72,26 @@ if (formFiltro) {
 
 const url = new URL(window.location.href);
 
-if (url.searchParams.get("filtrado") === "1") {
+const filtrosEl = document.getElementById("filtros-data");
 
-    mostrarAlerta("Filtro aplicado!", "success");
+if (filtrosEl) {
+    const filtroAplicado = filtrosEl.dataset.filtrado === "True";
+    const dataInvalida = filtrosEl.dataset.dataInvalida === "True";
 
-    url.searchParams.delete("filtrado");
-    window.history.replaceState({}, document.title, url.pathname + url.search);
+    if (filtroAplicado) {
+        mostrarAlerta("Filtro aplicado!", "success");
+    }
 
+    if (dataInvalida) {
+        mostrarAlerta("Data inválida!", "error");
+    }
 }
 
 if (url.searchParams.get("limpo") === "1") {
-
     mostrarAlerta("Filtro limpo!", "success");
 
     url.searchParams.delete("limpo");
     window.history.replaceState({}, document.title, url.pathname + url.search);
-
 }
 
 function mostrarAlerta(mensagem, tipo = "success") {

@@ -39,7 +39,7 @@
         <label>Valor</label>
         <input type="number" name="valor" step="0.01" min="0" required
         placeholder="0.00"
-        value="{{ cheque.valor if cheque and cheque.valor else '' }}">
+        value="{{ cheque.valor if cheque and cheque.valor is not none else '' }}">
     </div>
 
     <div class="form-group">

@@ -41,7 +41,8 @@
 
     <div class="form-group">
         <label>Data da viagem</label>
-        <input type="date" name="data_viagem" required value="{{ viagem.data_viagem if viagem }}">
+        <input type="date" name="data_viagem" required value="{{ viagem.data_viagem.strftime('%Y-%m-%d') if viagem and viagem.data_viagem }}" 
+        min="2020-01-01" max="2030-12-31">
     </div>
 
     <div class="form-group">

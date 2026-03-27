@@ -39,12 +39,22 @@ def dashboard():
     saldo_total = resultado['saldo_total'] or 0
 
     cursor.execute("""
-        SELECT id, data_viagem, local, status
-        FROM viagens
-        WHERE data_viagem >= %s AND ativo = 1
-        ORDER BY data_viagem ASC
-        LIMIT 5
-    """, (hoje,))
+    SELECT id, data_viagem, local, status
+    FROM viagens
+    WHERE ativo = 1
+    AND status NOT IN ('Finalizada', 'Cancelada')
+    AND (
+        (data_viagem >= %s AND status = 'Planejada')
+        OR status = 'Em andamento'
+    )
+    ORDER BY 
+        CASE 
+            WHEN status = 'Em andamento' THEN 0
+            ELSE 1
+        END,
+        data_viagem ASC
+    LIMIT 5
+""", (hoje,))
     proximas_viagens = cursor.fetchall()
 
 

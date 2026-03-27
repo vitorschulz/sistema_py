@@ -1,11 +1,19 @@
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, PatternFill
+from datetime import datetime
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from flask import Blueprint, render_template, request, redirect, jsonify, flash, send_file
 from collections import defaultdict
 from app.config import get_db_connection
 
 viagens = Blueprint("viagens", __name__)
-
+def parse_data(data_str):
+    if not data_str:
+        return None
+    try:
+        return datetime.strptime(data_str, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+    
 # listar
 @viagens.route("/viagens")
 def listar_viagens():
@@ -13,9 +21,10 @@ def listar_viagens():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    data = request.args.get("data")
-    data_inicio = request.args.get("data_inicio")
-    data_fim = request.args.get("data_fim")
+    data = parse_data(request.args.get("data"))
+    data_inicio = parse_data(request.args.get("data_inicio"))
+    data_fim = parse_data(request.args.get("data_fim"))
+    local = request.args.get("local")
 
     query = """
         SELECT *
@@ -24,6 +33,10 @@ def listar_viagens():
     """
 
     params = []
+
+    if local:
+        query += " AND local = %s"
+        params.append(local)
 
     if data:
         query += " AND data_viagem = %s"
@@ -36,14 +49,23 @@ def listar_viagens():
         params.append(data_fim)
 
     elif data_inicio:
-        query += " AND data_viagem = %s"
+        query += " AND data_viagem >= %s"
         params.append(data_inicio)
 
     elif data_fim:
-        query += " AND data_viagem = %s"
+        query += " AND data_viagem <= %s"
         params.append(data_fim)
 
-    query += " ORDER BY data_viagem DESC"
+    query += """
+    ORDER BY 
+        CASE 
+            WHEN status = 'Em andamento' THEN 1
+            WHEN status = 'Planejada' THEN 2
+            WHEN status = 'Finalizada' THEN 3
+            ELSE 4
+        END,
+        data_viagem DESC
+    """
 
     cursor.execute(query, tuple(params))
     viagens_lista = cursor.fetchall()
@@ -52,7 +74,20 @@ def listar_viagens():
     cursor.close()
     conn.close()
 
-    return render_template("viagens.html", viagens=viagens_lista)
+    filtrado = bool(data or data_inicio or data_fim or local)
+
+    data_invalida = (
+    (request.args.get("data") and not data) or
+    (request.args.get("data_inicio") and not data_inicio) or
+    (request.args.get("data_fim") and not data_fim)
+    )
+
+    return render_template(
+        "viagens.html",
+        viagens=viagens_lista,
+        filtrado=filtrado,
+        data_invalida=data_invalida
+    )
 
 
 # nova viagem
@@ -62,7 +97,12 @@ def nova_viagem():
     if request.method == "POST":
 
         local = request.form["local"]
-        data_viagem = request.form["data_viagem"]
+        data_str = request.form.get("data_viagem")
+        try:
+            data_viagem = datetime.strptime(data_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            flash("Data inválida!")
+            return redirect(request.url)
         observacoes = request.form["observacoes"].strip()
 
         conn = get_db_connection()
@@ -418,6 +458,52 @@ def novo_pedido(id):
 
         tipo = ",".join(tipos)
         observacoes = request.form.get("observacoes","").strip()
+
+        cursor.execute("""
+            SELECT shopping_id FROM lojas WHERE id = %s
+        """, (loja_id,))
+
+        shopping_id = cursor.fetchone()["shopping_id"]
+
+        cursor.execute("""
+            SELECT id FROM viagem_shopping
+            WHERE viagem_id = %s AND shopping_id = %s
+        """, (id, shopping_id))
+
+        vs = cursor.fetchone()
+
+        if not vs:
+            cursor.execute("""
+                SELECT COALESCE(MAX(ordem),0)+1 AS ordem
+                FROM viagem_shopping
+                WHERE viagem_id = %s
+            """, (id,))
+            ordem_vs = cursor.fetchone()["ordem"]
+
+            cursor.execute("""
+                INSERT INTO viagem_shopping (viagem_id, shopping_id, ordem)
+                VALUES (%s,%s,%s)
+            """, (id, shopping_id, ordem_vs))
+
+        cursor.execute("""
+            SELECT id FROM viagem_loja
+            WHERE viagem_id = %s AND loja_id = %s
+        """, (id, loja_id))
+
+        vl = cursor.fetchone()
+
+        if not vl:
+            cursor.execute("""
+                SELECT COALESCE(MAX(ordem),0)+1 AS ordem
+                FROM viagem_loja
+                WHERE viagem_id = %s AND shopping_id = %s
+            """, (id, shopping_id))
+            ordem_vl = cursor.fetchone()["ordem"]
+
+            cursor.execute("""
+                INSERT INTO viagem_loja (viagem_id, shopping_id, loja_id, ordem)
+                VALUES (%s,%s,%s,%s)
+            """, (id, shopping_id, loja_id, ordem_vl))
 
         cursor.execute("""
             SELECT COALESCE(MAX(ordem),0)+1 AS nova_ordem
@@ -1056,7 +1142,7 @@ def exportar_tarefas(id):
     wb = Workbook()
     ws = wb.active
     ws.title = "Tarefas"
-
+    altura_padrao = 30
     # 🔹 largura das colunas
     ws.column_dimensions['A'].width = 6   # checkbox
     ws.column_dimensions['B'].width = 25  # loja
@@ -1066,7 +1152,11 @@ def exportar_tarefas(id):
 
     max_tipo_len = 0
 
-    row = 1
+    row = 3  # ALTERADO
+
+    # NOVO - garante altura nas 2 primeiras linhas
+    ws.row_dimensions[1].height = altura_padrao
+    ws.row_dimensions[2].height = altura_padrao
 
     # 🔹 TOPO (LOCAL + DATA)
     local = (viagem.get("local") or "-").upper()
@@ -1087,9 +1177,11 @@ def exportar_tarefas(id):
     for col in range(1, 6):
         ws.cell(row=row, column=col).fill = fill_cinza
 
-    ws.row_dimensions[row].height = 30
+    ws.row_dimensions[row].height = altura_padrao
 
-    row += 2  # espaço
+    for i in range(2):  # ALTERADO (antes era row += 4)
+        row += 1
+        ws.row_dimensions[row].height = altura_padrao  # espaço
 
     # 🔹 LOOP DOS SHOPPINGS
     for shopping_id, shopping_nome in ordem_shoppings:
@@ -1097,7 +1189,7 @@ def exportar_tarefas(id):
         # nome do shopping
         cell_shop = ws.cell(row=row, column=2, value=shopping_nome.upper())
         cell_shop.font = Font(bold=True)
-        ws.row_dimensions[row].height = 25
+        ws.row_dimensions[row].height = altura_padrao
 
         row += 1
 
@@ -1136,28 +1228,41 @@ def exportar_tarefas(id):
                 ws.cell(row=row, column=4).alignment = Alignment(horizontal="center", vertical="center")
 
                 # altura da linha
-                ws.row_dimensions[row].height = 22
+                ws.row_dimensions[row].height = altura_padrao
 
                 row += 1
 
         # espaço entre shoppings
-        row += 2
+        for i in range(4):  # ALTERADO (antes era row += 2)
+            ws.row_dimensions[row].height = altura_padrao
+            row += 1
 
     # 🔹 OBSERVAÇÕES
     cell_obs = ws.cell(row=row, column=2, value="Observações:")
     cell_obs.font = Font(bold=True)
     cell_obs.alignment = Alignment(vertical="top")
-    ws.row_dimensions[row].height = 25
+    ws.row_dimensions[row].height = altura_padrao
 
     row += 1
 
     # linhas pra escrever
     for i in range(5):
         ws.cell(row=row, column=1, value="")
-        ws.row_dimensions[row].height = 30
+        ws.row_dimensions[row].height = altura_padrao
         row += 1
 
-    if row <= 60:
+    borda = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    for r in range(1, row):
+        for c in range(1, 6):
+            ws.cell(row=r, column=c).border = borda
+
+    if row <= 35:
         ws.page_setup.fitToHeight = 1
         ws.page_setup.fitToWidth = 1
         ws.page_setup.fitToPage = True
@@ -1218,7 +1323,7 @@ def exportar_ordem(id):
     data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
 
     nome_arquivo = f"{local_str}_{data_str}.xlsx"
-
+    altura_padrao = 30
 
     wb = Workbook()
     ws = wb.active
@@ -1227,24 +1332,27 @@ def exportar_ordem(id):
     # largura das colunas
     ws.column_dimensions['A'].width = 10   # ordem
     ws.column_dimensions['B'].width = 35   # nome
-    ws.column_dimensions['C'].width = 45   # endereço
+    ws.column_dimensions['C'].width = 20   # endereço
     ws.column_dimensions['D'].width = 20  # telefone
-    ws.column_dimensions['E'].width = 6 #checkbx
+    ws.column_dimensions['E'].width = 20 #horario
+    ws.column_dimensions['F'].width = 6 #checkbx
 
-    row = 1
+    ws.row_dimensions[1].height = altura_padrao
+    ws.row_dimensions[2].height = altura_padrao
+
+    row = 3  # ALTERADO - começa na linha 3
+
 
     # título
     titulo = ws.cell(row=row, column=1, value="ORDEM DE CLIENTES")
     titulo.font = Font(bold=True, size=14)
-    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=5)
-
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=6)
     titulo.alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[row].height = altura_padrao
 
-    ws.row_dimensions[row].height = 30
+    row += 1  # vai direto pro cabeçalho
 
-    row += 2
-
-    headers = ["Ordem", "Nome", "Endereço", "Telefone", ""]
+    headers = ["Ordem", "Nome", "Endereço", "Telefone", "Horário", ""]
     fill = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
 
     for col, texto in enumerate(headers, start=1):
@@ -1253,7 +1361,7 @@ def exportar_ordem(id):
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.fill = fill
 
-    ws.row_dimensions[row].height = 25
+    ws.row_dimensions[row].height = altura_padrao
 
     max_end_len = 0
 
@@ -1263,7 +1371,7 @@ def exportar_ordem(id):
     for i, c in enumerate(clientes, start=1):
 
         nome = (c["nome"] or "-").title()
-        endereco = c["endereco"] or "-"
+        endereco = c["endereco"]
         telefone = c["telefone"] or "-"
         max_end_len = max(max_end_len, len(endereco))
 
@@ -1276,22 +1384,30 @@ def exportar_ordem(id):
         cell_nome.alignment = Alignment(vertical="center")
 
         # endereço (direita)
-        cell_end = ws.cell(row=row, column=3, value=endereco)
-        cell_end.alignment = Alignment(wrap_text=True, vertical="center")
+        if not endereco or endereco.strip() == "":
+            cell_end = ws.cell(row=row, column=3, value="-")
+            cell_end.alignment = Alignment(horizontal="center", vertical="center")
+            cell_end.font = Font(bold=True)
+        else:
+            cell_end = ws.cell(row=row, column=3, value=endereco)
+            cell_end.alignment = Alignment(wrap_text=True, vertical="center")
 
         cell_tel = ws.cell(row=row, column=4, value=telefone)
         cell_tel.font = Font(bold=True)
         cell_tel.alignment = Alignment(horizontal="center", vertical="center")
-        ws.cell(row=row, column=5, value="☐").alignment = Alignment(horizontal="center", vertical="center")
+        ws.cell(row=row, column=5, value="")
+        ws.cell(row=row, column=6, value="☐").alignment = Alignment(horizontal="center", vertical="center")
 
         # altura maior pra leitura
-        ws.row_dimensions[row].height = 28
+        ws.row_dimensions[row].height = altura_padrao
 
         row += 1
 
-    ws.column_dimensions['C'].width = min(max_end_len / 0.7, 60)
-    ws.print_area = f"A1:E{row}"
-    if len(clientes) <= 30:
+    largura_endereco = max(max_end_len * 0.9, 20)
+    ws.column_dimensions['C'].width =  min(largura_endereco, 60)
+    ws.row_dimensions[row].height = altura_padrao
+    ws.print_area = f"A1:F{row}"
+    if len(clientes) <= 20:
         ws.page_setup.fitToHeight = 1
         ws.page_setup.fitToWidth = 1
         ws.page_setup.fitToPage = True
@@ -1305,6 +1421,6 @@ def exportar_ordem(id):
     return send_file(
         file,
         as_attachment=True,
-        download_name = f"ordemClientes_{local_str}_{data_str}.xlsx",
+        download_name = nome_arquivo,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

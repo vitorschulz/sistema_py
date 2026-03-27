@@ -18,7 +18,7 @@
 
 
 
-        <form method="POST">
+        <form method="POST"  data-validate-tipo>
 
             <div class="form-group">
 
@@ -117,7 +117,7 @@
 
                 <label>Observações</label>
 
-                <textarea name="observacoes">{{ pedido.observacoes if pedido }}</textarea>
+                <textarea name="observacoes">{{ pedido.observacoes if pedido and pedido.observacoes else '' }}</textarea>
                 <input type="hidden" name="next" value="{{ request.args.get('next') }}">
 
             </div>
