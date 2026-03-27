@@ -25,6 +25,7 @@ document.addEventListener("click", async function(e){
 
     if(subir){
         const id = subir.dataset.id
+        if(!id) return
         await fetch(`/shopping/${id}/subir`)
         location.reload()
     }
@@ -168,6 +169,9 @@ if (formFinanceiro) {
         e.preventDefault();
 
         const form = e.target;
+        const btn = form.querySelector(".btn-add");
+
+        if (!travarBotao(btn)) return;
         const formData = new FormData(form);
 
         fetch(form.action, {
@@ -204,7 +208,7 @@ if (formFinanceiro) {
             valor.textContent = (data.tipo === "CUSTO" ? "- R$ " : "+ R$ ") + valorFormatado;
 
             acoes.classList.add("financeiro-acoes");
-            btnExcluir.classList.add("btn-excluir");
+            btnExcluir.classList.add("btn-excluir", "js-excluir-financeiro");
             btnExcluir.dataset.id = data.id;
             btnExcluir.textContent = "✕";
 
@@ -224,6 +228,9 @@ if (formFinanceiro) {
         })
         .catch(() => {
             alert("Erro ao adicionar lançamento");
+        })
+        .finally(() => {
+        liberarBotao(btn);
         });
 
     });
@@ -258,7 +265,7 @@ function atualizarResumo(tipo, valor, operacao = "add") {
 
 document.addEventListener("click", function(e) {
 
-    if (e.target.classList.contains("btn-excluir")) {
+    if (e.target.classList.contains("js-excluir-financeiro")) {
 
         const btn = e.target;
         const id = btn.dataset.id;
@@ -342,7 +349,6 @@ document.addEventListener("click", function(e){
 
     if(btn){
 
-        const url = btn.dataset.url;
         const mensagem = btn.dataset.alert;
 
         if(mensagem){
@@ -355,3 +361,20 @@ document.addEventListener("click", function(e){
     }
 
 });
+
+function travarBotao(btn){
+    if (!btn) return false;
+    if (btn.dataset.clicked) return false;
+
+    btn.dataset.clicked = "true";
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+    return true;
+}
+
+function liberarBotao(btn){
+    if (!btn) return;
+    btn.dataset.clicked = "";
+    btn.disabled = false;
+    btn.style.opacity = "1";
+}

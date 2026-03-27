@@ -57,15 +57,15 @@
             <td class="acoes-tabela">
 
 
-                    <a href="/cheques/{{ c.id }}/compensar" class="btn-compensar" onclick="return confirm('Confirmar compensação deste cheque?')">
+                    <a href="/cheques/{{ c.id }}/compensar" class="btn-compensar" data-confirm="Deseja compensar este cheque?">
                         Compensar
                     </a>
 
-                    <a href="/cheques/{{ c.id }}/devolver" class="btn-devolver" onclick="return confirm('Deseja sustar este cheque?')">
+                    <a href="/cheques/{{ c.id }}/devolver" class="btn-devolver" data-confirm="Deseja sustar este cheque?">
                         Sustar
                     </a>
 
-                    <a href="/cheques/{{ c.id }}/excluir" class="btn-excluir" onclick="return confirm('Deseja excluir este cheque?')">
+                    <a href="/cheques/{{ c.id }}/excluir" class="btn-excluir" data-confirm="Deseja excluir este cheque?">
                         Excluir
                     </a>
 

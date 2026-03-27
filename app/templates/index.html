@@ -27,26 +27,27 @@
 </section>
 
     <section class="card">
-        <h2>Próximas viagens</h2>
+        <h2>Próximas viagens</h2> 
+        <div class="scroll-pequeno">
+            <div class="lista-viagens">
+                {% for v in proximas_viagens %}
+                    <div class="item-viagem"
+                        onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
+                        
+                        <div>
+                            <strong>{{ v.data_viagem.strftime('%d/%m') }}</strong>
+                            —<span class="shopping-local local-{{ v.local.replace(" ", "_") }}"> {{ v.local or "Sem local" }}</span>
+                        </div>
 
-        <div class="lista-viagens">
-            {% for v in proximas_viagens %}
-                <div class="item-viagem"
-                    onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
+                        <span class="status status-{{ v.status|replace(' ', '-') }}">
+                            {{ v.status }}
+                        </span>
 
-                    <div>
-                        <strong>{{ v.data_viagem.strftime('%d/%m') }}</strong>
-                        — {{ v.local or "Sem local" }}
                     </div>
-
-                    <span class="status status-{{ v.status|replace(' ', '-') }}">
-                        {{ v.status }}
-                    </span>
-
-                </div>
-            {% else %}
-                <p style="color:#777;">Nenhuma viagem futura.</p>
-            {% endfor %}
+                {% else %}
+                    <p style="color:#777;">Nenhuma viagem futura.</p>
+                {% endfor %}
+            </div>
         </div>
     </section>
 </div>
@@ -98,7 +99,7 @@
 
 </section>
 
-
+<!--
     <section class="card resumo-dashboard">
 
         <h2>Resumo geral</h2>
@@ -138,7 +139,7 @@
         </div>
 
     </section>
-
+-->
 <script id="datas-viagens" type="application/json">
     {{ datas_viagens | tojson }}
 </script>

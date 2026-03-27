@@ -4,17 +4,33 @@ const loja = document.getElementById("loja")
 document.addEventListener("DOMContentLoaded", function(){
 
     const form = document.querySelector("form");
-
     if(!form) return;
 
     form.addEventListener("submit", function(e){
 
+        const btn = form.querySelector("button[type='submit']");
+
+        // 🚨 evita múltiplos cliques
+        if (btn && btn.dataset.clicked) {
+            e.preventDefault();
+            return;
+        }
+
+        // 🚨 valida checkbox
         const checkboxes = form.querySelectorAll('input[name="tipo[]"]');
         const algumMarcado = Array.from(checkboxes).some(cb => cb.checked);
 
         if(!algumMarcado){
             e.preventDefault();
             mostrarAlerta("Selecione pelo menos um tipo!", "error");
+            return;
+        }
+
+        // 🚨 só aqui desativa (depois de tudo válido)
+        if (btn) {
+            btn.dataset.clicked = "true";
+            btn.disabled = true;
+            btn.innerText = "Salvando...";
         }
 
     });
