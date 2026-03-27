@@ -16,45 +16,46 @@
 
 <section class="card">
 
-<form method="POST">
+    <form method="POST">
 
-    <div class="form-group">
-        <label>Local</label>
+        <div class="form-group">
+
+            <label>Local</label>
 
             <select name="local" required>
 
-            <option value="">Selecione o local</option>
+                <option value="">Selecione o local</option>
 
-            <option value="Serra"
-            {% if viagem and viagem.local == "Serra" %}selected{% endif %}>
-            Serra
-            </option>
+                <option value="Serra"
+                {% if viagem and viagem.local == "Serra" %}selected{% endif %}>
+                Serra
+                </option>
 
-            <option value="Santa Catarina"
-            {% if viagem and viagem.local == "Santa Catarina" %}selected{% endif %}>
-            Santa Catarina
-            </option>
+                <option value="Santa Catarina"
+                {% if viagem and viagem.local == "Santa Catarina" %}selected{% endif %}>
+                Santa Catarina
+                </option>
 
             </select>
 
-    </div>
+        </div>
 
-    <div class="form-group">
-        <label>Data da viagem</label>
-        <input type="date" name="data_viagem" required value="{{ viagem.data_viagem.strftime('%Y-%m-%d') if viagem and viagem.data_viagem }}" 
-        min="2020-01-01" max="2030-12-31">
-    </div>
+        <div class="form-group">
+            <label>Data da viagem</label>
+            <input type="date" name="data_viagem" required value="{{ viagem.data_viagem.strftime('%Y-%m-%d') if viagem and viagem.data_viagem }}" 
+            min="2020-01-01" max="2030-12-31">
+        </div>
 
-    <div class="form-group">
-        <label>Observações</label>
-        <textarea name="observacoes" rows="4" maxlength="500">{{ viagem.observacoes if viagem }}</textarea>
-    </div>
+        <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" rows="4" maxlength="500">{{ viagem.observacoes if viagem }}</textarea>
+        </div>
 
-    <button type="submit" class="btn-submit">
-        {{ "Criar viagem" if not viagem else "Atualizar viagem" }}
-    </button>
+        <button type="submit" class="btn-submit">
+            {{ "Criar viagem" if not viagem else "Atualizar viagem" }}
+        </button>
 
-</form>
+    </form>
 
 </section>
 

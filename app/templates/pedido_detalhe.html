@@ -2,87 +2,87 @@
 
 {% block content %}
 
-<h1 style="margin-top: -3px;">
-    #{{ numero_cliente }} — {{ pedido.cliente_nome }} 
-    <span style="color:#666; margin-left: 10px; ">
-        ({{ pedido.loja_nome }} • {{ pedido.shopping_nome }})
-    </span>
-
-    <span style="margin-left: 10px; vertical-align: 3px;">
-    {% for tipo in pedido.tipo.split(',') %}
-        <span class="pedido-tipo tipo-{{ tipo }}">
-            {{ tipo.replace("_"," ") }}
+    <h1 style="margin-top: -3px;">
+        #{{ numero_cliente }} — {{ pedido.cliente_nome }} 
+        <span style="color:#666; margin-left: 10px; ">
+            ({{ pedido.loja_nome }} • {{ pedido.shopping_nome }})
         </span>
-    {% endfor %}
-    </span>
-</h1>
 
-    <section class="card">
+        <span style="margin-left: 10px; vertical-align: 3px;">
+        {% for tipo in pedido.tipo.split(',') %}
+            <span class="pedido-tipo tipo-{{ tipo }}">
+                {{ tipo.replace("_"," ") }}
+            </span>
+        {% endfor %}
+        </span>
+    </h1>
+
+<section class="card">
 
     <h2>Informações</h2>
 
-        <p>
+    <p>
         <strong>Cliente:</strong>
         <a href="/clientes/{{ pedido.cliente_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.cliente_nome }}
         </a>
-        </p>
+    </p>
 
-        <p>
+    <p>
         <strong>Tipo:</strong>
         {{ pedido.tipo.replace(",", ", ").replace("_", " / ") }}
-        </p>
+    </p>
 
-        <p>
+    <p>
         <strong>Shopping:</strong>
         <a href="/shopping/{{ pedido.shopping_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.shopping_nome }}
         </a>
-        </p>
+    </p>
 
-        <p>
+    <p>
         <strong>Loja:</strong>
         <a href="/lojas/{{ pedido.loja_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.loja_nome }}
         </a>
-        </p>
+    </p>
 
-        <p>
+    <p>
         <strong>Viagem:</strong>
         <a href="/viagens/{{ pedido.viagem_id }}?next={{ request.path }}" class="tabela-link">
         {{ pedido.viagem_local }}
         </a>
-        </p>
+    </p>
 
-    </section>
+</section>
 
 
-    <section class="card">
+<section class="card">
 
-        <h2>Observações</h2>
+    <h2>Observações</h2>
 
-        <p>
+    <p>
         {{ pedido.observacoes or "Nenhuma observação cadastrada." }}
-        </p>
+    </p>
 
-    </section>
+</section>
 
 
-    <section class="acoes" style="flex-direction: row;">
+<section class="acoes" style="flex-direction: row;">
 
-        <button 
+    <button 
         style="max-width: 75px;" 
         data-url="{{ request.args.get('next', '/viagens/' ~ pedido.viagem_id) }}"
         onclick="window.location.href=this.dataset.url">
-        Voltar
-        </button>
+            Voltar
+    </button>
 
-        <button 
-            style="max-width: 75px;" 
-            onclick="window.location.href='/pedidos/{{ pedido.id }}/editar?next={{ request.path }}'">
+    <button 
+        style="max-width: 75px;" 
+        onclick="window.location.href='/pedidos/{{ pedido.id }}/editar?next={{ request.path }}'">
             Editar
-        </button>
+    </button>
 
-    </section>
+</section>
 
 {% endblock %}

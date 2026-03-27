@@ -1,8 +1,12 @@
+// STATUS DA VIAGEM
+// pega o select de status 
 const select = document.getElementById("status-select")
 const viagemId = select.dataset.viagemId
 
+// quando muda o status
 select.addEventListener("change", function(){
 
+    // envia pro backend o novo status
     fetch(`/viagens/${viagemId}/status`, {
         method: "POST",
         headers: {
@@ -14,10 +18,13 @@ select.addEventListener("change", function(){
     })
     .then(response => response.json())
     .then(data => {
+        mostrarAlerta("Status atualizado")
     })
 
 })
 
+// ORDEM DE SHOPPING
+// setas do shops
 document.addEventListener("click", async function(e){
 
     const subir = e.target.closest(".subir-shopping")
@@ -38,6 +45,9 @@ document.addEventListener("click", async function(e){
 
 })
 
+
+// ORDEM DE LOJA
+// setas da loja
 document.addEventListener("click", async function(e){
 
     const subir = e.target.closest(".subir-loja")
@@ -57,6 +67,8 @@ document.addEventListener("click", async function(e){
 
 })
 
+// ORDEM PEDIDOS
+// setas dos pedidos
 document.addEventListener("click", async function(e){
 
     const btnSubir = e.target.closest(".pedido-acoes .subir")
@@ -96,6 +108,7 @@ document.addEventListener("click", async function(e){
 
 })
 
+// atualiza números dos pedidos
 function atualizarOrdem(container){
 
     const itens = container.querySelectorAll(".pedido-item")
@@ -109,6 +122,9 @@ function atualizarOrdem(container){
 
 }
 
+
+// ORDEM DE CLIENTES
+//setas dos cliente no ordem
 document.addEventListener("click", async function(e){
 
     const subir = e.target.closest(".cliente-acoes .subir")
@@ -148,6 +164,8 @@ document.addEventListener("click", async function(e){
 
 })
 
+
+// atualiza numeração dos clientes
 function atualizarOrdemClientes(container){
 
     const itens = container.querySelectorAll(".cliente-item")
@@ -161,6 +179,7 @@ function atualizarOrdemClientes(container){
 
 }
 
+//  FINANCEIRO (CRUD via JS)
 const formFinanceiro = document.getElementById("form-financeiro");
 
 if (formFinanceiro) {
@@ -171,6 +190,7 @@ if (formFinanceiro) {
         const form = e.target;
         const btn = form.querySelector(".btn-add");
 
+        // trava botão pra evitar duplo envio
         if (!travarBotao(btn)) return;
         const formData = new FormData(form);
 
@@ -189,6 +209,7 @@ if (formFinanceiro) {
                 return;
             }
 
+            // cria item dinamicamente no DOM
             const lista = document.getElementById("lista-financeiro");
             const acoes = document.createElement("div");
             const btnExcluir = document.createElement("button");
@@ -220,6 +241,7 @@ if (formFinanceiro) {
 
             lista.appendChild(item);
 
+            // atualiza totais
             atualizarResumo(data.tipo, data.valor);
 
             form.reset();
@@ -237,6 +259,7 @@ if (formFinanceiro) {
 
 }
 
+// atualiza totais financeiros
 function atualizarResumo(tipo, valor, operacao = "add") {
 
     const ganhoEl = document.getElementById("total-ganho");
@@ -263,6 +286,7 @@ function atualizarResumo(tipo, valor, operacao = "add") {
     saldoEl.textContent = saldo.toFixed(2);
 }
 
+// excluir item financeiro
 document.addEventListener("click", function(e) {
 
     if (e.target.classList.contains("js-excluir-financeiro")) {
@@ -293,6 +317,7 @@ document.addEventListener("click", function(e) {
 
 });
 
+//alertas custom
 function mostrarAlerta(mensagem, tipo = "success") {
 
     let container = document.querySelector(".alerts");
@@ -326,6 +351,7 @@ function mostrarAlerta(mensagem, tipo = "success") {
     }, 3000);
 }
 
+// caso link esteja invallido e o cara clica (cliente apagado)
 document.addEventListener("click", function(e){
 
     const link = e.target.closest(".cliente-link");
@@ -343,6 +369,7 @@ document.addEventListener("click", function(e){
 
 });
 
+// alert pra exports
 document.addEventListener("click", function(e){
 
     const btn = e.target.closest(".btn-export");
@@ -354,14 +381,11 @@ document.addEventListener("click", function(e){
         if(mensagem){
             mostrarAlerta(mensagem);
         }
-
-        // pequeno delay pra deixar o alerta aparecer
-        setTimeout(() => {
-        }, 150);
     }
 
 });
 
+// CONTROLE DE BOTÃO (ANTI DUPLO CLICK)
 function travarBotao(btn){
     if (!btn) return false;
     if (btn.dataset.clicked) return false;

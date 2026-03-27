@@ -9,13 +9,12 @@
     <button 
     data-url="{{ request.args.get('next', '/viagens') }}"
     onclick="window.location.href=this.dataset.url">
-    ← Voltar
+        ← Voltar
     </button>
 
 </section>
 
 <div class="viagem-layout">
-
 
     <div class="viagem-main">
 
@@ -46,9 +45,7 @@
 
             <h2>Observações</h2>
             <div class="conteudo-scroll" style="margin-top: -5px;">
-
                     {{ viagem.observacoes or "Nenhuma observação cadastrada." }}
-
             </div>
 
         </section>
@@ -92,7 +89,7 @@
 
                     <div class="cliente-item">
 
-                    <div class="cliente-info">
+                        <div class="cliente-info">
 
                         <span class="cliente-ordem">
                             {{ cliente.ordem }}.
@@ -107,163 +104,171 @@
                         {% endif %}
 
                         {% if cliente.endereco %}
-                        <span class="cliente-endereco">
-                            {{ cliente.endereco }}
-                        </span>
+                            <span class="cliente-endereco">
+                                {{ cliente.endereco }}
+                            </span>
                         {% endif %}
 
+                        </div>
+
+                        <div class="cliente-acoes">
+
+                            <a data-id="{{ cliente.id }}" class="btn-ordem subir">↑</a>
+                            <a data-id="{{ cliente.id }}" class="btn-ordem descer">↓</a>
+
+                            <a href="/viagem_cliente/{{ cliente.id }}/excluir?next={{ request.path }}"
+                            class="btn-excluir">
+                            ✕
+                            </a>
+
+                        </div>
+
                     </div>
 
-                    <div class="cliente-acoes">
+                {% else %}
 
-                        <a data-id="{{ cliente.id }}" class="btn-ordem subir">↑</a>
-                        <a data-id="{{ cliente.id }}" class="btn-ordem descer">↓</a>
+                <p style="color:#777;">Nenhum cliente na lista.</p>
 
-                        <a href="/viagem_cliente/{{ cliente.id }}/excluir?next={{ request.path }}"
-                        class="btn-excluir">
-                        ✕
-                        </a>
+                {% endfor %}
 
-                    </div>
+            </div>
 
-                </div>
-
-            {% else %}
-
-            <p style="color:#777;">Nenhum cliente na lista.</p>
-
-            {% endfor %}
-
-        </div>
-
-    </section>
+        </section>
 
     </div>
 
-
         <section class="card tarefas">
 
-    <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
+        <h2 style="margin-bottom:25px;">Tarefas da viagem</h2>
 
-    <section class="acoes" style="flex-direction: row;">
-        <button onclick="window.location.href='/viagens/{{ viagem.id }}/novo_pedido?next={{ request.path }}'">
-            + Nova tarefa
-        </button>
-    </section>
+            <section class="acoes" style="flex-direction: row;">
+                <button onclick="window.location.href='/viagens/{{ viagem.id }}/novo_pedido?next={{ request.path }}'">
+                    + Nova tarefa
+                </button>
+            </section>
 
             {% for shopping, dados in estrutura.items() %}
 
                 <div class="shopping-grupo">
 
-                {% set primeira_loja = dados.lojas.values() | list | first %}
-                {% if primeira_loja %}
-                    {% set primeiro_pedido = primeira_loja.pedidos[0] %}
-                {% endif %}
+                    {% set primeira_loja = dados.lojas.values() | list | first %}
 
-                <h3>{% if not shopping or primeiro_pedido.shopping_ativo == 0 %}
-                    <span class="removido">Shopping removido</span>
-                {% else %}
+                    {% if primeira_loja %}
+                        {% set primeiro_pedido = primeira_loja.pedidos[0] %}
+                    {% endif %}
+
+                    <h3>
+                        {% if not shopping or primeiro_pedido.shopping_ativo == 0 %}
+                        <span class="removido">Shopping removido</span>
+                        {% else %}
+
+                        <div class="grupo-acoes">
+                            <a data-id="{{ dados.id }}" class="btn-ordem subir-shopping">↑</a>
+                            <a data-id="{{ dados.id }}" class="btn-ordem descer-shopping">↓</a>
+                        </div> 
+
+                        <a href="/shopping/{{ dados.shopping_id }}?next={{ request.path }}" class="link-titulo">
+                            {{ shopping }}
+                        </a>
+                        {% endif %}
+                    </h3>
+
+                {% for loja, dados_loja in dados.lojas.items() %}
+
+                    <div class="loja-grupo">
+
+                <h4>
+                    {% set pedido_ref = dados_loja.pedidos[0] %}
+
+                    {% if not pedido_ref.loja_nome or pedido_ref.loja_ativo == 0 %}
+                    <span class="removido">Loja removida</span>
+                    {% else %}
 
                     <div class="grupo-acoes">
-                        <a data-id="{{ dados.id }}" class="btn-ordem subir-shopping">↑</a>
-                        <a data-id="{{ dados.id }}" class="btn-ordem descer-shopping">↓</a>
-                </div> 
-                <a href="/shopping/{{ dados.shopping_id }}?next={{ request.path }}" class="link-titulo">
-                    {{ shopping }}
-                </a>
-                {% endif %}</h3>
+                        <a data-id="{{ dados_loja.id }}" class="btn-ordem subir-loja">↑</a>
+                        <a data-id="{{ dados_loja.id }}" class="btn-ordem descer-loja">↓</a>
+                    </div>   
 
-            {% for loja, dados_loja in dados.lojas.items() %}
+                    <a href="/lojas/{{ dados_loja.loja_id }}?next={{ request.path }}" class="link-titulo">
+                        {{ loja }}
+                    </a>
 
-                <div class="loja-grupo">
-
-            <h4>
-                    {% set pedido_ref = dados_loja.pedidos[0] %}
-            {% if not pedido_ref.loja_nome or pedido_ref.loja_ativo == 0 %}
-                <span class="removido">Loja removida</span>
-            {% else %}
-                <div class="grupo-acoes">
-                <a data-id="{{ dados_loja.id }}" class="btn-ordem subir-loja">↑</a>
-                <a data-id="{{ dados_loja.id }}" class="btn-ordem descer-loja">↓</a>
-                </div>     
-                <a href="/lojas/{{ dados_loja.loja_id }}?next={{ request.path }}" class="link-titulo">
-                    {{ loja }}
-                </a>
-            {% endif %}
-
-            </h4>
-
-            {% for pedido in dados_loja.pedidos %}
-
-                <div class="pedido-item">
-
-                <div class="pedido-info">
-
-                <span class="pedido-ordem">
-                {{ pedido.ordem }}.
-                </span>
-
-                <span class="pedido-cliente">
-                    {% if not pedido.cliente_nome or pedido.cliente_ativo == 0 %}
-                        <span class="removido">
-                            Cliente removido
-                        </span>
-                    {% else %}
-                        <a href="/pedidos/{{ pedido.id }}?next={{ request.path }}" 
-                            class="tabela-link cliente-link"
-                            data-invalido="{% if pedido.loja_ativo == 0 or not pedido.shopping_ativo %}1{% else %}0{% endif %}">
-                            {{ pedido.cliente_nome }}
-                        </a>
                     {% endif %}
-                </span>
+                </h4>
 
-                {% for tipo in pedido.tipo.split(',') %}
-                    <span class="pedido-tipo tipo-{{ tipo }}">
-                        {{ tipo.replace("_"," ") }}
-                    </span>
+                {% for pedido in dados_loja.pedidos %}
+
+                    <div class="pedido-item">
+
+                        <div class="pedido-info">
+
+                            <span class="pedido-ordem">
+                            {{ pedido.ordem }}.
+                            </span>
+
+                            <span class="pedido-cliente">
+                                {% if not pedido.cliente_nome or pedido.cliente_ativo == 0 %}
+                                    <span class="removido">
+                                        Cliente removido
+                                    </span>
+                                {% else %}
+                                    <a href="/pedidos/{{ pedido.id }}?next={{ request.path }}" 
+                                        class="tabela-link cliente-link"
+                                        data-invalido="{% if pedido.loja_ativo == 0 or not pedido.shopping_ativo %}1{% else %}0{% endif %}">
+                                        {{ pedido.cliente_nome }}
+                                    </a>
+                                {% endif %}
+                            </span>
+
+                            {% for tipo in pedido.tipo.split(',') %}
+                                <span class="pedido-tipo tipo-{{ tipo }}">
+                                    {{ tipo.replace("_"," ") }}
+                                </span>
+                            {% endfor %}
+
+                            {% if pedido.observacoes %}
+                                <span class="pedido-obs">
+                                    {{ pedido.observacoes }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="pedido-acoes">
+
+                            <a data-id="{{ pedido.id }}" class="btn-ordem subir">↑</a>
+                            <a data-id="{{ pedido.id }}" class="btn-ordem descer">↓</a>
+
+                            <a href="/pedidos/{{ pedido.id }}/editar?next={{ request.path }}" class="btn-editar">
+                                Editar
+                            </a>
+
+                            <a href="/pedidos/{{ pedido.id }}/excluir"
+                            class="btn-excluir"
+                            data-confirm="Deseja excluir esta tarefa?">
+                                Excluir
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                        {% endfor %}
+
+                    </div>
+
                 {% endfor %}
-
-                {% if pedido.observacoes %}
-                    <span class="pedido-obs">
-                    {{ pedido.observacoes }}
-                    </span>
-                {% endif %}
-
-            </div>
-
-                <div class="pedido-acoes">
-
-                    <a data-id="{{ pedido.id }}" class="btn-ordem subir">↑</a>
-                    <a data-id="{{ pedido.id }}" class="btn-ordem descer">↓</a>
-
-                    <a href="/pedidos/{{ pedido.id }}/editar?next={{ request.path }}" class="btn-editar">
-                    Editar
-                    </a>
-
-                    <a href="/pedidos/{{ pedido.id }}/excluir"
-                    class="btn-excluir"
-                    data-confirm="Deseja excluir esta tarefa?">
-                    Excluir
-                    </a>
 
                 </div>
 
-            </div>
-
             {% endfor %}
 
-        </div>
+        </section>
 
-        {% endfor %}
 
-    </div>
-
-    {% endfor %}
-
-    </section>
     <div class="linha-resumos">
 
-            <section class="card resumo-financeiro">
+        <section class="card resumo-financeiro">
 
             <h2>Resumo financeiro</h2>
 
@@ -294,7 +299,9 @@
                         <span class="financeiro-desc">
                             {{ f.descricao or "-" }}
                         </span>
-                        <div class="financeiro-acoes">   
+
+                        <div class="financeiro-acoes"> 
+
                         <span class="financeiro-valor {{ f.tipo|lower }}">
                             {% if f.tipo == "CUSTO" %}
                                 - R$ {{ f.valor }}
@@ -304,6 +311,7 @@
                         </span>
 
                         <button class="menuTarefaItem btn-excluir js-excluir-financeiro" data-id="{{ f.id }}">✕</button>
+                        
                         </div> 
                     </div>
                 {% endfor %}
@@ -318,20 +326,26 @@
 
             </div>
 
-            
-
         </section>
 
-         <section class="card resumo-viagem">
+        <section class="card resumo-viagem">
 
             <h2>Resumo da viagem</h2>
 
             <div class="resumo-grid">
 
-                <p>Clientes na rota: <strong>{{ total_clientes }}</strong></p>
-                <p>Shoppings: <strong>{{ total_shoppings }}</strong></p>
-                <p>Lojas: <strong>{{ total_lojas }}</strong></p>
-                <p>Tarefas planejadas: <strong>{{ total_pedidos }}</strong></p>
+                <p>
+                    Clientes na rota: <strong>{{ total_clientes }}</strong>
+                </p>
+                <p>
+                    Shoppings: <strong>{{ total_shoppings }}</strong>
+                </p>
+                <p>
+                    Lojas: <strong>{{ total_lojas }}</strong>
+                </p>
+                <p>
+                    Tarefas planejadas: <strong>{{ total_pedidos }}</strong>
+                </p>
 
             </div>
 
@@ -341,7 +355,6 @@
                 <button onclick="window.location.href='/viagens/{{ viagem.id }}/exportar_tarefas'" data-alert="Tarefas exportadas com sucesso!" class="btn-export">Exportar Tarefas</button>
 
             </div>
-
         </section>
     </div>
 

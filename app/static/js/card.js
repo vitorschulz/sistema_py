@@ -1,10 +1,11 @@
-    window.addEventListener("pageshow", function(event) {
+// Evento disparado quando a página é mostrada (inclusive ao voltar pelo botão do navegador) serve p problemas de cache
+window.addEventListener("pageshow", function(event) {
     if (event.persisted) {
         window.location.reload();
     }
 });
 
-
+// Seleciona todos os botões de menu (⋮) dentro dos cards e conmtrola a porra toda
 document.querySelectorAll(".menu-card").forEach(menu => {
 
     menu.addEventListener("click", function(e){
@@ -33,33 +34,40 @@ document.querySelectorAll(".menu-card").forEach(menu => {
 
 })
 
+// Evento global de clique na página
 document.addEventListener("click", function(){
 
+    // Fecha todos os menus quando clicar fora
     document.querySelectorAll(".menu-opcoes").forEach(o=>{
         o.style.display = "none"
     })
 
+    // Remove estado visual de todos os cards
     document.querySelectorAll(".card-viagem").forEach(c=>{
         c.classList.remove("menu-aberto")
     })
 
 })
 
+// Seleciona o formulário de filtro
 const formFiltro = document.querySelector(".filtro-viagens form");
 
 if (formFiltro) {
 
+    // Evento disparado ao enviar o formulário
     formFiltro.addEventListener("submit", function(e){
 
         const inicio = document.getElementById("data_inicio").value;
         const fim = document.getElementById("data_fim").value;
 
+        // Validação: nenhum filtro preenchido
         if(!inicio && !fim && !local){
             e.preventDefault();
             mostrarAlerta("Preencha pelo menos um filtro!", "error");
             return;
         }
 
+        // Validação: data inicial maior que final
         if(inicio && fim && inicio > fim){
             e.preventDefault();
 
@@ -70,30 +78,41 @@ if (formFiltro) {
 
 }
 
+// Cria objeto da URL atual
 const url = new URL(window.location.href);
 
+// Pega elemento com dados de filtro vindos do backend
 const filtrosEl = document.getElementById("filtros-data");
 
 if (filtrosEl) {
+    // Verifica se filtro foi aplicado (string "True" do Flask)
     const filtroAplicado = filtrosEl.dataset.filtrado === "True";
+     // Verifica se houve erro de data
     const dataInvalida = filtrosEl.dataset.dataInvalida === "True";
 
+    // Se filtro aplicado, mostra alerta de sucesso
     if (filtroAplicado) {
         mostrarAlerta("Filtro aplicado!", "success");
     }
 
+    // Se data inválida, mostra erro
     if (dataInvalida) {
         mostrarAlerta("Data inválida!", "error");
     }
 }
 
+// Verifica se URL contém ?limpo=1
 if (url.searchParams.get("limpo") === "1") {
     mostrarAlerta("Filtro limpo!", "success");
 
+    // Remove o parâmetro da URL (sem recarregar a página)
     url.searchParams.delete("limpo");
+    // Atualiza a URL no navegador
     window.history.replaceState({}, document.title, url.pathname + url.search);
 }
 
+
+// Função para criar alertas dinâmicos na tela
 function mostrarAlerta(mensagem, tipo = "success") {
 
     let container = document.querySelector(".alerts");

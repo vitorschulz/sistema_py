@@ -3,10 +3,12 @@
 {% block content %}
 
 <h1>Viagens</h1>
-<div id="filtros-data"
-     data-filtrado="{{ filtrado }}"
-     data-data-invalida="{{ data_invalida }}">
-</div>
+
+    <div id="filtros-data"
+        data-filtrado="{{ filtrado }}"
+        data-data-invalida="{{ data_invalida }}">
+    </div>
+
 <section class="filtro-viagens">
 
     <form method="GET" action="/viagens" class="filtro-viagens">
@@ -37,8 +39,8 @@
 
 </section>
 
-<section class="grid-viagens">
 
+<section class="grid-viagens">
 
     <div class="card-viagem nova-viagem" onclick="window.location.href='/viagens/nova'">
 
@@ -46,7 +48,7 @@
             +
         </div>
 
-        <p>Nova viagem</p>
+    <p>Nova viagem</p>
 
     </div>
 
@@ -83,14 +85,16 @@
             <span class="shopping-local local-{{ viagem.local.replace(" ", "_") }}"><strong>{{ viagem.local }}</strong></span>
         </p>
 
-        <p>Status: <span class="status_viagens-{{ viagem.status|replace(' ', '-') }}">{{ viagem.status }}</span></p>
+        <p>
+            Status: <span class="status_viagens-{{ viagem.status|replace(' ', '-') }}">{{ viagem.status }}</span>
+        </p>
 
     </div>
 
 {% endfor %}
 
 </section>
-<script src="{{ url_for('static', filename='js/card.js') }}"></script>
 
+<script src="{{ url_for('static', filename='js/card.js') }}"></script>
 
 {% endblock %}

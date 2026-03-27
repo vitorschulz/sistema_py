@@ -6,66 +6,64 @@
 
 <section class="acoes">
 
-<button data-url="{{ request.args.get('next', '/shopping') }}" onclick="window.location.href=this.dataset.url">
-    ← Voltar
-</button>
-
+    <button data-url="{{ request.args.get('next', '/shopping') }}" onclick="window.location.href=this.dataset.url">
+        ← Voltar
+    </button>
 
 </section>
 
+
 <section class="card">
 
-<form method="POST">
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Nome do shopping</label>
+            <input type="text" name="nome" placeholder="Iguatemi..." required maxlength="120" value="{{ shopping.nome if shopping else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Local</label>
+
+            <select name="local" required>
+
+                <option value="">Selecione o local</option>
+
+                <option value="Serra"
+                {% if shopping and shopping.local == "Serra" %}selected{% endif %}>
+                Serra
+                </option>
+
+                <option value="Santa Catarina"
+                {% if shopping and shopping.local == "Santa Catarina" %}selected{% endif %}>
+                Santa Catarina
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ shopping.contato if shopping else '' }}" id="telefone">
+        </div>
+
+        <div class="form-group">
+            <label>Endereço</label>
+            <input type="text" name="endereco" maxlength="200" placeholder="Rua, número, cidade..." value="{{ shopping.endereco if shopping else '' }}">
+        </div>
 
 
-<div class="form-group">
-    <label>Nome do shopping</label>
-    <input type="text" name="nome" placeholder="Iguatemi..." required maxlength="120" value="{{ shopping.nome if shopping else '' }}">
-</div>
+        <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" rows="4" maxlength="500">{{ shopping.observacoes if shopping else '' }}</textarea>
+        </div>
 
-<div class="form-group">
-    <label>Local</label>
+        <button type="submit" class="btn-submit">
+            {{ "Editar" if shopping else "Salvar" }}
+        </button>
 
-    <select name="local" required>
-
-    <option value="">Selecione o local</option>
-
-    <option value="Serra"
-    {% if shopping and shopping.local == "Serra" %}selected{% endif %}>
-    Serra
-    </option>
-
-    <option value="Santa Catarina"
-    {% if shopping and shopping.local == "Santa Catarina" %}selected{% endif %}>
-    Santa Catarina
-    </option>
-
-    </select>
-
-</div>
-
-    <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ shopping.contato if shopping else '' }}" id="telefone">
-    </div>
-
-    <div class="form-group">
-        <label>Endereço</label>
-        <input type="text" name="endereco" maxlength="200" placeholder="Rua, número, cidade..." value="{{ shopping.endereco if shopping else '' }}">
-    </div>
-
-
-<div class="form-group">
-    <label>Observações</label>
-    <textarea name="observacoes" rows="4" maxlength="500">{{ shopping.observacoes if shopping else '' }}</textarea>
-</div>
-
-<button type="submit" class="btn-submit">
-    {{ "Editar" if shopping else "Salvar" }}
-</button>
-
-
-</form>
+    </form>
 
 </section>
 

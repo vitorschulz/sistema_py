@@ -16,41 +16,40 @@
 
 <section class="card">
 
-<form method="POST">
+    <form method="POST">
 
-    <div class="form-group">
-        <label>Nome</label>
-        <input type="text" name="nome" required minlength="3" placeholder="Vitor Schulz..." maxlength="120" value="{{ cliente.nome if cliente }}">
-    </div>
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" name="nome" required minlength="3" placeholder="Vitor Schulz..." maxlength="120" value="{{ cliente.nome if cliente }}">
+        </div>
 
-    <div class="form-group">
-        <label>CPF / CNPJ</label>
-        <input type="text" name="cpf_cnpj" id="cpf_cnpj" maxlength="18" placeholder="CPF ou CNPJ" pattern="[0-9./-]*" value="{{ cliente.cpf_cnpj if cliente }}">
-    </div>
+        <div class="form-group">
+            <label>CPF / CNPJ</label>
+            <input type="text" name="cpf_cnpj" id="cpf_cnpj" maxlength="18" placeholder="CPF ou CNPJ" pattern="[0-9./-]*" value="{{ cliente.cpf_cnpj if cliente }}">
+        </div>
 
-    <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15" value="{{ cliente.telefone if cliente }}">
-    </div>
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15" value="{{ cliente.telefone if cliente }}">
+        </div>
 
-    <div class="form-group">
-        <label>Endereço</label>
-        <input type="text" name="endereco" maxlength="200"
-        placeholder="Rua, número, cidade..."
-        value="{{ cliente.endereco if cliente }}">
-    </div>
+        <div class="form-group">
+            <label>Endereço</label>
+            <input type="text" name="endereco" maxlength="200"
+            placeholder="Rua, número, cidade..."
+            value="{{ cliente.endereco if cliente }}">
+        </div>
 
-    <div class="form-group">
-        <label>Observações</label>
-        <textarea name="observacoes" rows="4" maxlength="500">{{ cliente.observacoes if cliente }}</textarea>
-    </div>
+        <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" rows="4" maxlength="500">{{ cliente.observacoes if cliente }}</textarea>
+        </div>
 
-    <button type="submit" class="btn-submit">
-        {{ "Salvar cliente" if not cliente else "Atualizar cliente" }}
-    </button>
+        <button type="submit" class="btn-submit">
+            {{ "Salvar cliente" if not cliente else "Atualizar cliente" }}
+        </button>
 
-</form>
-
+    </form>
 
 </section>
 

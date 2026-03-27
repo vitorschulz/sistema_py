@@ -26,14 +26,17 @@
             <th>Telefone</th>
             <th>Endereço</th>
             <th>Ações</th>
-            
+        </tr>
+
         {% for cliente in clientes %}
 
         <tr class="linha-clicavel">
+
             <td>
                 <a href="/clientes/{{ cliente.id }}" class="tabela-link">
                     {{ cliente.nome }}
-                </a></td>
+                </a>
+            </td>
             <td>{{ cliente.cpf_cnpj or "—" }}</td>
             <td>{{ cliente.telefone or "—" }}</td>
             <td>{{ cliente.endereco or "—" }}</td>
@@ -45,7 +48,8 @@
                 </a>
 
                 <a href="/clientes/{{ cliente.id }}/excluir"
-                class="btn-excluir" data-confirm="Deseja excluir este cliente?">
+                class="btn-excluir" 
+                data-confirm="Deseja excluir este cliente?">
                 Excluir
                 </a>
 
