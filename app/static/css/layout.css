@@ -81,6 +81,9 @@
     font-weight: 600;
 }
 
+.menu-toggle {
+    display: none;
+}
 
 /* CONTEÚDO */
 
@@ -93,4 +96,102 @@
     margin-bottom: 30px;
     border-bottom: 1px solid #4e5257;
     padding-bottom: 10px;
+}
+
+
+/* cCELOLAR */
+@media (max-width: 768px) {
+
+.container {
+    flex-direction: column;
+}
+
+.sidebar {
+    width: 100%;
+    padding: 10px;
+}
+
+.logo {
+    font-size: 18px;
+}
+
+.logo::after {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+.menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.menu-item {
+    font-size: 16px;
+    padding: 10px;
+}
+
+.menu-item:hover {
+    padding-left: 10px;
+}
+
+.menu-item.ativo {
+    padding-left: 10px;
+}
+
+.content {
+    padding: 15px;
+}
+
+.content h1 {
+    font-size: 20px;
+}
+
+.sidebar {
+    border-bottom: 1px solid #334155;
+}
+
+.sidebar ul {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.sidebar.open ul {
+    max-height: 500px;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.menu-item {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    background-color: #273449;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: #334155;
+}
+
+.menu-item.ativo {
+    background-color: #38bdf8;
+    color: #0f172a;
+    font-weight: 600;
+}
+
 }

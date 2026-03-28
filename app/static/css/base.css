@@ -69,3 +69,27 @@ td {
         opacity:1;
     }
 }
+
+
+/* CELOLAR */
+@media (max-width: 768px) {
+
+  /* permite scroll horizontal em tabelas */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .alerts {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+  }
+
+  .alert {
+    width: 100%;
+    font-size: 14px;
+  }
+  
+}

@@ -7,12 +7,6 @@
     align-items: start;
 }
 
-@media (max-width: 900px) {
-    .grid-agenda {
-        grid-template-columns: 1fr;
-    }
-}
-
 .agenda-header {
     display: flex;
     align-items: center;
@@ -1264,4 +1258,148 @@ background-color: rgba(46, 125, 50, 0.08);
 
 .fin-saldo {
     border-left: 4px solid #2563eb;
+}
+
+
+@media (max-width: 768px) {
+/* DASHBOARD */
+    /* GRID */
+    .grid-agenda {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* TITULOS */
+    .card h2 {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .titulo-agenda {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    /* AGENDA */
+    .agenda-header {
+        justify-content: center;
+        position: relative;
+    }
+
+    .btn-seta:first-child {
+        left: 5px;
+    }
+
+    .btn-seta:last-child {
+        right: 5px;
+    }
+
+    /* CALENDARIO */
+    #calendario {
+        gap: 5px;
+    }
+
+    .dia {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    /* VIAGENS */
+    .item-viagem {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+    }
+
+    .item-viagem strong {
+        font-size: 16px;
+    }
+
+    .shopping-local {
+        font-size: 14px;
+    }
+
+    .status {
+        font-size: 13px;
+    }
+
+    /* BOTÕES */
+    .acoes-linha {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    }
+
+    .acoes button {
+    flex: 1;
+    min-width: 110px;
+    max-width: 140px;
+    padding: 8px;
+    font-size: 13px;
+    }
+    
+    /*VIAGENS*/
+
+    .filtro-viagens {
+        display: flex;
+        justify-content: center;
+    }
+
+    .filtro-viagens form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+        max-width: 400px;
+    }  
+
+    .filtro-viagens input {
+        width: 100%;
+    }
+
+    .select-filtro {
+        grid-column: span 1;
+    }
+
+    .filtro-viagens button {
+        width: 100%;
+    }
+
+    .filtro-viagens input,
+    .filtro-viagens select,
+    .filtro-viagens button {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .btn-limpar {
+        grid-column: 1 / -1;
+        margin-top: 5px;
+        max-width: 200px;
+        justify-self: center;
+    }
+
+    .grid-viagens {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-opcoes {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: none;
+    flex-direction: column;
+    min-width: 120px;
+    }
+
+    .card-viagem {
+    overflow: visible;
+    }
 }
