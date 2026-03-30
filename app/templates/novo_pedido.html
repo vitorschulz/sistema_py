@@ -19,15 +19,28 @@
     <form method="POST"  data-validate-tipo>
 
         <div class="form-group">
-
+            
             <label>Shopping</label>
 
             <select id="shopping" required>
+                <option value="" disabled {% if not ultimo_shopping_id %}selected{% endif %}>
+                    Selecione um shopping
+                </option>
 
                 {% for s in shoppings %}
-                <option value="{{ s.id }}">
-                {{ s.nome }}
-                </option>
+                    <option value="{{ s.id }}"
+                        {% if pedido %}
+                            {% for l in lojas %}
+                                {% if l.id == pedido.loja_id and l.shopping_id == s.id %}
+                                    selected
+                                {% endif %}
+                            {% endfor %}
+                        {% elif ultimo_shopping_id and ultimo_shopping_id == s.id %}
+                            selected
+                        {% endif %}
+                    >
+                    {{ s.nome }}
+                    </option>
                 {% endfor %}
 
             </select>
@@ -40,12 +53,17 @@
             <label>Loja</label>
 
             <select name="loja_id" id="loja" required>
+                <option value="" selected disabled>Selecione uma loja</option>
 
                 {% for l in lojas %}
-                <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
-                {% if pedido and pedido.loja_id == l.id %}selected{% endif %}>
-                {{ l.nome }}
-                </option>
+                    <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
+                        {% if pedido and pedido.loja_id == l.id %}
+                            selected
+                        {% elif ultimo_loja_id and ultimo_loja_id == l.id %}
+                            selected
+                        {% endif %}>
+                        {{ l.nome }}
+                    </option>
                 {% endfor %}
 
             </select>
@@ -58,12 +76,17 @@
             <label>Cliente</label>
 
             <select name="cliente_id" required>
+                <option value="" disabled>Selecione um cliente</option>
 
                 {% for c in clientes %}
-                <option value="{{ c.id }}"
-                {% if pedido and pedido.cliente_id == c.id %}selected{% endif %}>
-                {{ c.nome }}
-                </option>
+                    <option value="{{ c.id }}"
+                        {% if pedido and pedido.cliente_id == c.id %}
+                            selected
+                        {% elif ultimo_cliente_id and ultimo_cliente_id == c.id %}
+                            selected
+                        {% endif %}>
+                        {{ c.nome }}
+                    </option>
                 {% endfor %}
 
             </select>

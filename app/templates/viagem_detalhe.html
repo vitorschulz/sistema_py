@@ -60,7 +60,7 @@
 
                 <section class="status-form acoes acoes-linha"  style="margin-bottom:10px; justify-content:flex-start;">
 
-                    <form method="POST"
+                    <form method="POST" class="form-add-cliente"
                         action="/viagens/{{ viagem.id }}/add_cliente"
                         style="display:flex; gap:8px; align-items:center; margin:0;">
 
@@ -71,7 +71,7 @@
                             <option value="">Selecionar cliente</option>
 
                             {% for c in clientes %}
-                                <option value="{{ c.id }}">{{ c.nome }}</option>
+                                <option value="{{ c.id }}">{{ c.nome[:25] }}{% if c.nome|length > 25 %}...{% endif %}</option>
                             {% endfor %}
                         </select>
 
@@ -99,7 +99,7 @@
                             <span class="removido">Cliente removido</span>
                         {% else %}
                             <a href="/clientes/{{ cliente.cliente_id }}?next={{ request.path }}" class="tabela-link">
-                                {{ cliente.nome }}
+                                {{ cliente.nome[:30] }}{% if cliente.nome|length > 30 %}...{% endif %}
                             </a>
                         {% endif %}
 

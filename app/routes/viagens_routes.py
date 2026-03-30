@@ -1,7 +1,10 @@
 from openpyxl import Workbook
 from datetime import datetime
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
-from flask import Blueprint, render_template, request, redirect, jsonify, flash, send_file
+from openpyxl.worksheet.pagebreak import Break
+import math
+from openpyxl.worksheet.page import PageMargins
+from flask import Blueprint, render_template, request, redirect, jsonify, flash, send_file, session
 from collections import defaultdict
 from app.config import get_db_connection
 
@@ -464,6 +467,10 @@ def novo_pedido(id):
 
         shopping_id = cursor.fetchone()["shopping_id"]
 
+        session["ultimo_loja_id"] = int(loja_id)
+        session["ultimo_cliente_id"] = int(cliente_id)
+        session["ultimo_shopping_id"] = int(shopping_id)
+
         cursor.execute("""
             SELECT id FROM viagem_shopping
             WHERE viagem_id = %s AND shopping_id = %s
@@ -537,6 +544,10 @@ def novo_pedido(id):
     cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1")
     clientes = cursor.fetchall()
 
+    ultimo_loja_id = session.get("ultimo_loja_id")
+    ultimo_cliente_id = session.get("ultimo_cliente_id")
+    ultimo_shopping_id = session.get("ultimo_shopping_id")
+
     cursor.close()
     conn.close()
 
@@ -545,8 +556,11 @@ def novo_pedido(id):
         viagem_id=id,
         shoppings=shoppings,
         lojas=lojas,
-        clientes=clientes
-    )
+        clientes=clientes,
+        ultimo_loja_id=ultimo_loja_id,
+        ultimo_cliente_id=ultimo_cliente_id,
+        ultimo_shopping_id=ultimo_shopping_id
+        )
 
 #status viagem
 @viagens.route("/viagens/<int:id>/status", methods=["POST"])
@@ -1108,7 +1122,7 @@ def exportar_tarefas(id):
     local_str = limpar_texto(local).replace(" ", "_").lower()
     data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
 
-    nome_arquivo = f"{local_str}_{data_str}.xlsx"
+    nome_arquivo = f"Viagem_{local_str}_{data_str}.xlsx"
 
     # organiza mantendo ordem
     estrutura = defaultdict(lambda: defaultdict(list))
@@ -1140,13 +1154,67 @@ def exportar_tarefas(id):
     wb = Workbook()
     ws = wb.active
     ws.title = "Tarefas"
-    altura_padrao = 30
+    altura_padrao = 15
+    LINHAS_POR_PAGINA = 36
+    ALTURA_MAX_PAGINA = LINHAS_POR_PAGINA * altura_padrao
+    altura_na_pagina = 3 * altura_padrao
+    fonte_padrao = Font(size=12)
+    fonte_titulo = Font(size=14, bold=True)
+    linhas_sem_borda = set()
+
+
+    def calcular_altura_linha(textos, larguras, altura_base):
+        maior_linhas = 1
+
+        for texto, largura in zip(textos, larguras):
+            if not texto:
+                continue
+
+            texto = str(texto)
+            linhas = math.ceil(len(texto) / largura)
+
+            if linhas > maior_linhas:
+                maior_linhas = linhas
+
+        return altura_base * max(1, maior_linhas)
+
+    def adicionar_espaco_inicio_pagina():
+        nonlocal row, altura_na_pagina
+
+        for _ in range(2):
+            ws.row_dimensions[row].height = altura_padrao
+            linhas_sem_borda.add(row)
+            row += 1
+            altura_na_pagina += altura_padrao
+
+    #funcao altura variavel
+    def calcular_tamanho_shopping(shopping_id):
+        total_altura = altura_padrao  # linha do nome do shopping
+
+        for loja_id, loja_nome in ordem_lojas[shopping_id]:
+            for p in estrutura[shopping_id][loja_id]:
+
+                cliente = (p["cliente_nome"] or "-").title() if p["cliente_nome"] else "-"
+                tipo = (p["tipo"] or "-")
+                tipo = tipo.replace(",", ", ").replace("_", "/").title() if tipo != "-" else "-"
+                doc = p["cpf_cnpj"] or "-"
+
+                altura = calcular_altura_linha(
+                    [loja_nome, cliente, tipo, doc],
+                    [24, 32, 20, 22],
+                    altura_padrao
+                )
+
+                total_altura += altura
+
+        total_altura += 4 * altura_padrao  # espaço entre shoppings
+        return total_altura
+
     # 🔹 largura das colunas
-    ws.column_dimensions['A'].width = 6   # checkbox
-    ws.column_dimensions['B'].width = 25  # loja
-    ws.column_dimensions['C'].width = 35  # cliente
-    ws.column_dimensions['D'].width = 20  # tipo
-    ws.column_dimensions['E'].width = 25  # doc
+    ws.column_dimensions['A'].width = 24  # loja
+    ws.column_dimensions['B'].width = 32  # cliente
+    ws.column_dimensions['C'].width = 20  # tipo
+    ws.column_dimensions['D'].width = 22  # doc
 
     max_tipo_len = 0
 
@@ -1155,41 +1223,84 @@ def exportar_tarefas(id):
     # NOVO - garante altura nas 2 primeiras linhas
     ws.row_dimensions[1].height = altura_padrao
     ws.row_dimensions[2].height = altura_padrao
+    linhas_sem_borda.add(1)
+    linhas_sem_borda.add(2)
 
     # 🔹 TOPO (LOCAL + DATA)
     local = (viagem.get("local") or "-").upper()
     data_obj = viagem.get("data_viagem")
     data = data_obj.strftime("%d/%m/%Y") if data_obj else "-"
 
-    cell_local = ws.cell(row=row, column=2, value=local)
-    cell_data = ws.cell(row=row, column=4, value=data)
+    cell_local = ws.cell(row=row, column=1, value=local)
+    cell_data = ws.cell(row=row, column=3, value=data)
 
-    cell_local.font = Font(bold=True)
-    cell_data.font = Font(bold=True)
+    cell_local.font = fonte_titulo
+    cell_data.font = fonte_titulo
 
     cell_local.alignment = Alignment(vertical="center")
     cell_data.alignment = Alignment(horizontal="center", vertical="center")
 
     fill_cinza = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
 
-    for col in range(1, 6):
+    for col in range(1, 5):
         ws.cell(row=row, column=col).fill = fill_cinza
 
     ws.row_dimensions[row].height = altura_padrao
 
     for i in range(2):  # ALTERADO (antes era row += 4)
         row += 1
+        altura_na_pagina += altura_padrao
         ws.row_dimensions[row].height = altura_padrao  # espaço
+        
 
     # 🔹 LOOP DOS SHOPPINGS
     for shopping_id, shopping_nome in ordem_shoppings:
 
+        tamanho_shopping = calcular_tamanho_shopping(shopping_id)
+
+        # QUEBRA DE PÁGINA BASEADA NA ALTURA
+        altura_restante = ALTURA_MAX_PAGINA - altura_na_pagina
+
+        MIN_LINHAS_RESTANTES = 5
+        ALTURA_MIN_RESTANTE = MIN_LINHAS_RESTANTES * altura_padrao
+
+        if altura_restante <= ALTURA_MIN_RESTANTE:
+            ws.row_breaks.append(Break(id=row - 1))
+            altura_na_pagina = 0
+
+            adicionar_espaco_inicio_pagina()
+
+            altura_restante = ALTURA_MAX_PAGINA
+
+        # margem mínima pra não deixar "resto feio"
+        MARGEM_SEGURANCA = altura_padrao * 2  # 2 linhas
+
+        precisa_quebrar = False
+
+        # 1️⃣ não cabe inteiro
+        if tamanho_shopping > altura_restante:
+            precisa_quebrar = True
+
+        # 2️⃣ cabe, mas vai deixar resto feio (tipo 1 linha sobrando)
+        elif altura_restante - tamanho_shopping < MARGEM_SEGURANCA:
+            precisa_quebrar = True
+
+
+        if precisa_quebrar:
+            ws.row_breaks.append(Break(id=row - 1))
+            altura_na_pagina = 0
+
+            adicionar_espaco_inicio_pagina()
+
+        
         # nome do shopping
-        cell_shop = ws.cell(row=row, column=2, value=shopping_nome.upper())
-        cell_shop.font = Font(bold=True)
+        cell_shop = ws.cell(row=row, column=1, value=shopping_nome.upper())
+        cell_shop.alignment = Alignment(wrap_text=True, vertical="center")
+        cell_shop.font = Font(size=13, bold=True)
         ws.row_dimensions[row].height = altura_padrao
 
         row += 1
+        altura_na_pagina += altura_padrao
 
         # lojas e clientes
         for loja_id, loja_nome in ordem_lojas[shopping_id]:
@@ -1202,52 +1313,63 @@ def exportar_tarefas(id):
                 max_tipo_len = max(max_tipo_len, len(tipo))
                 doc = p["cpf_cnpj"] or "-"
 
-                check = ws.cell(row=row, column=1, value="☐")
-                check.alignment = Alignment(horizontal="center", vertical="center")
+                # loja (coluna A)
+                cell_loja = ws.cell(row=row, column=1, value=loja_nome.title())
+                cell_loja.alignment = Alignment(wrap_text=True, vertical="center")
+                cell_loja.font = fonte_padrao
 
-                # loja (coluna B)
-                cell_loja = ws.cell(row=row, column=2, value=loja_nome.title())
-                cell_loja.alignment = Alignment(vertical="center")
-
-                # cliente (coluna C)
-                cell_cliente = ws.cell(row=row, column=3, value=cliente)
+                # cliente (coluna B)
+                cell_cliente = ws.cell(row=row, column=2, value=cliente)
                 cell_cliente.alignment = Alignment(wrap_text=True, vertical="center")
+                cell_cliente.font = fonte_padrao
 
-                # tipo (coluna D)
-                cell_tipo = ws.cell(row=row, column=4, value=tipo)
-                cell_tipo.alignment = Alignment(horizontal="center", vertical="center")
+                # tipo (coluna C)
+                cell_tipo = ws.cell(row=row, column=3, value=tipo)
+                cell_tipo.alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
+                cell_tipo.font = fonte_padrao
 
-                # doc (coluna E)
-                cell_doc = ws.cell(row=row, column=5, value=doc)
-                cell_doc.alignment = Alignment(horizontal="center", vertical="center")
+                # doc (coluna D)
+                cell_doc = ws.cell(row=row, column=4, value=doc)
+                cell_doc.alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
+                cell_doc.font = fonte_padrao
 
                 # alinhamento
-                ws.cell(row=row, column=3).alignment = Alignment(horizontal="center", vertical="center")
-                ws.cell(row=row, column=4).alignment = Alignment(horizontal="center", vertical="center")
+                ws.cell(row=row, column=3).alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
+                ws.cell(row=row, column=4).alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
 
                 # altura da linha
-                ws.row_dimensions[row].height = altura_padrao
+                altura = calcular_altura_linha(
+                    [loja_nome, cliente, tipo, doc],
+                    [24, 32, 20, 22],
+                    altura_padrao
+                )
+
+                ws.row_dimensions[row].height = altura
 
                 row += 1
+                altura_na_pagina += altura
 
         # espaço entre shoppings
-        for i in range(4):  # ALTERADO (antes era row += 2)
+        for i in range(4):
             ws.row_dimensions[row].height = altura_padrao
             row += 1
-
+            altura_na_pagina += altura_padrao
+        
     # 🔹 OBSERVAÇÕES
-    cell_obs = ws.cell(row=row, column=2, value="Observações:")
-    cell_obs.font = Font(bold=True)
+    cell_obs = ws.cell(row=row, column=1, value="Observações:")
+    cell_obs.font = Font(size=13, bold=True)
     cell_obs.alignment = Alignment(vertical="top")
     ws.row_dimensions[row].height = altura_padrao
 
     row += 1
+    altura_na_pagina += altura_padrao
 
     # linhas pra escrever
     for i in range(5):
         ws.cell(row=row, column=1, value="")
         ws.row_dimensions[row].height = altura_padrao
         row += 1
+        altura_na_pagina += altura_padrao
 
     borda = Border(
         left=Side(style='thin'),
@@ -1257,15 +1379,26 @@ def exportar_tarefas(id):
     )
 
     for r in range(1, row):
-        for c in range(1, 6):
+        if r in linhas_sem_borda:
+            continue
+
+        for c in range(1, 5):
             ws.cell(row=r, column=c).border = borda
 
-    if row <= 35:
-        ws.page_setup.fitToHeight = 1
-        ws.page_setup.fitToWidth = 1
-        ws.page_setup.fitToPage = True
-    else:
-        ws.page_setup.scale = 80  # ou nem usar nada
+    ws.print_options.horizontalCentered = True
+    ws.print_options.verticalCentered = False
+    ws.page_setup.fitToHeight = False
+    ws.page_setup.fitToWidth = False
+    ws.page_setup.fitToPage = False
+    ws.page_setup.scale = 100
+    ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
+    ws.print_area = f"A1:D{row}"
+    ws.page_margins = PageMargins(
+    left=0.10,
+    right=0.10,
+    top=0.15,
+    bottom=0.15
+    )
     # salva em memória
     file = io.BytesIO()
     wb.save(file)
@@ -1277,6 +1410,11 @@ def exportar_tarefas(id):
         download_name=nome_arquivo,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+
+
+
+
 
 #exportar ordem
 @viagens.route("/viagens/<int:id>/exportar_ordem")
@@ -1320,7 +1458,7 @@ def exportar_ordem(id):
     local_str = limpar_texto(local).replace(" ", "_").lower()
     data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
 
-    nome_arquivo = f"{local_str}_{data_str}.xlsx"
+    nome_arquivo = f"OrdemClientes_{local_str}_{data_str}.xlsx"
     altura_padrao = 30
 
     wb = Workbook()
@@ -1333,7 +1471,6 @@ def exportar_ordem(id):
     ws.column_dimensions['C'].width = 20   # endereço
     ws.column_dimensions['D'].width = 20  # telefone
     ws.column_dimensions['E'].width = 20 #horario
-    ws.column_dimensions['F'].width = 6 #checkbx
 
     ws.row_dimensions[1].height = altura_padrao
     ws.row_dimensions[2].height = altura_padrao
@@ -1344,13 +1481,13 @@ def exportar_ordem(id):
     # título
     titulo = ws.cell(row=row, column=1, value="ORDEM DE CLIENTES")
     titulo.font = Font(bold=True, size=14)
-    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=6)
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=5)
     titulo.alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[row].height = altura_padrao
 
     row += 1  # vai direto pro cabeçalho
 
-    headers = ["Ordem", "Nome", "Endereço", "Telefone", "Horário", ""]
+    headers = ["Ordem", "Nome", "Endereço", "Telefone", "Horário"]
     fill = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
 
     for col, texto in enumerate(headers, start=1):
@@ -1379,7 +1516,7 @@ def exportar_ordem(id):
 
         # nome (meio)
         cell_nome = ws.cell(row=row, column=2, value=nome)
-        cell_nome.alignment = Alignment(vertical="center")
+        cell_nome.alignment = Alignment(wrap_text=True, vertical="center")
 
         # endereço (direita)
         if not endereco or endereco.strip() == "":
@@ -1394,17 +1531,38 @@ def exportar_ordem(id):
         cell_tel.font = Font(bold=True)
         cell_tel.alignment = Alignment(horizontal="center", vertical="center")
         ws.cell(row=row, column=5, value="")
-        ws.cell(row=row, column=6, value="☐").alignment = Alignment(horizontal="center", vertical="center")
 
         # altura maior pra leitura
         ws.row_dimensions[row].height = altura_padrao
 
         row += 1
+        
 
     largura_endereco = max(max_end_len * 0.9, 20)
     ws.column_dimensions['C'].width =  min(largura_endereco, 60)
     ws.row_dimensions[row].height = altura_padrao
-    ws.print_area = f"A1:F{row}"
+    ws.print_area = f"A1:E{row}"
+    borda = Border(
+    left=Side(style='thin'),
+    right=Side(style='thin'),
+    top=Side(style='thin'),
+    bottom=Side(style='thin')
+    )
+
+    linhas_sem_borda = {1, 2}
+
+    for r in range(1, row):
+        if r in linhas_sem_borda:
+            continue
+
+        for c in range(1, 6):  # até coluna E
+            ws.cell(row=r, column=c).border = borda
+    ws.page_margins = PageMargins(
+    left=0.10,
+    right=0.10,
+    top=0.15,
+    bottom=0.15
+    )
     if len(clientes) <= 20:
         ws.page_setup.fitToHeight = 1
         ws.page_setup.fitToWidth = 1

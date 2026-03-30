@@ -954,6 +954,23 @@ form {
 
 /* ordem clientes pagina viagem */
 
+.form-add-cliente {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.form-add-cliente select {
+    max-width: 200px;
+    flex-shrink: 0;
+}
+
+.form-add-cliente button {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 .cliente-item {
     display: flex;
     justify-content: space-between;
@@ -986,21 +1003,27 @@ form {
     font-weight: 500;
 }
 
+.cliente-link {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .cliente-acoes {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
+
 .cliente-endereco {
     color: #666;
     font-size: 13px;
     margin-left: 50px;
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
     max-width: 250px;
 }
 
