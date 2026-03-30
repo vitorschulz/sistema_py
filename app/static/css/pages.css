@@ -296,6 +296,10 @@
     box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
 }
 
+.card p {
+    margin-bottom: 5px;
+}
+
 .card h2 {
     margin-bottom: 15px;
 }
@@ -515,6 +519,12 @@ form {
     flex-wrap: wrap;
 }
 
+.filtro-viagens form {
+    max-width: none;
+    width: 100%;
+    
+}
+
 .filtro-viagens input {
     padding: 8px 10px;
     border: 1px solid #ccc;
@@ -546,7 +556,6 @@ form {
 .btn-limpar {
     background-color: #e5e7eb;
     color: #333;
-    margin-bottom: 15px;
 }
 
 .btn-limpar:hover {
@@ -880,6 +889,11 @@ form {
     font-size:13px;
 }
 
+.pedido-tipos{
+        display: block;
+        margin-left: 0 !important;
+        margin-top: 4px;
+    }
 
 /* agrupamento tarefas */
 
@@ -1425,4 +1439,338 @@ background-color: rgba(46, 125, 50, 0.08);
     .card-viagem {
     overflow: visible;
     }
+
+    /*shoppings detalh*/
+    .acoes-shopping{
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        margin-left: 10px;
+    }
+
+    .acoes-shopping button{
+        flex: 0 0 1 !important;
+        width: 90px !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        padding: 10px 0px;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    /* GERAL */
+
+    .card p {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin-bottom: 5px;
+    }
+
+    /* shopping detalhe */
+
+    .filtro-viagens-pagina form {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .filtro-viagens-pagina input[type="date"] {
+        grid-column: span 2;
+    }
+
+    .filtro-viagens-pagina select {
+        grid-column: span 2;
+    }
+
+    .filtro-viagens-pagina button[type="submit"] {
+        grid-column: span 1;
+    }
+
+    .filtro-viagens-pagina .btn-limpar {
+        grid-column: span 1;
+        margin-top: 0;
+    }
+    
+
+    /* destalhes viagem*/
+    
+    
+    .viagem-layout{
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .ordem-clientes{
+        grid-column: auto;
+    }
+
+    .tarefas{
+        grid-column: auto;
+    }
+
+    .cliente-item{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .cliente-info{
+        flex-wrap: wrap;
+    }
+
+    .cliente-endereco{
+        margin-left: 0;
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .cliente-acoes{
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+     .pedido-item{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-left: 0;
+    }
+
+    .pedido-info{
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 6px;
+        width: 100%;
+    }
+    
+    .pedido-tipo,
+    .pedido-obs{
+        width: 100%;
+    }
+
+    .pedido-cliente{
+        min-width: unset;
+        width: auto;
+        display: inline;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        max-width: 180px;
+    }
+
+    .pedido-ordem{
+        width: auto;
+    }
+
+    .pedido-tipo{
+        width: auto;
+        margin-right: 0;
+        font-size: 12px;
+        padding: 2px 6px;
+        flex-basis: 100%;
+        max-width: 140px;
+    }
+
+    .pedido-obs{
+        width: 100%;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow-wrap: anywhere;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        font-size: 13px;
+    }
+
+    .pedido-acoes{
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .shopping-grupo{
+        padding: 12px;
+    }
+
+    .loja-grupo{
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .linha-resumos{
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .financeiro-form .acoes-linha{
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .form-add-cliente {
+        flex-wrap: wrap;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .form-add-cliente select {
+        flex: 6;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-add-cliente button {
+         flex: 4;
+        flex-shrink: 0;
+    }
+
+
+
+    .financeiro-form select{
+        width: 103%;
+        min-width: 0;
+    }
+
+
+    .financeiro-form input[type="number"],
+    .financeiro-form input[type="text"]{
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .financeiro-form .btn-add{
+        display: block;
+        margin: 5px auto 0 auto; /* centraliza */
+        width: 40px;
+        height: 40px;
+        font-size: 20px; /* aumenta o + */
+        border-radius: 12px;
+        margin-bottom: -10px;
+    }
+
+    .financeiro-item{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .financeiro-acoes{
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .financeiro-valor.custo,
+    .financeiro-valor.ganho{
+        margin-left: 0;
+    }
+
+    .tarefas .acoes{
+        justify-content: center;
+    }
+
+    .tarefas .acoes button{
+        max-width: 200px;
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .financeiro-desc {
+        max-width: 150px !important;
+    }
+
+    /* pedidos detalhes */
+
+    .pedido-header{
+        display: block;
+        
+    }
+
+    .pedido-subinfo{
+        display: block;
+        margin-left: 0 !important;
+        margin-top: 4px;
+
+        font-size: 14px;
+        color: #666;
+    }
+
+
+    .pedido-tipos{
+        display: block;
+        margin-left: 0 !important;
+        margin-top: 4px;
+    }
+
+    .pedido-tipo{
+        display: inline-block;
+        font-size: 12px;
+        padding: 2px 6px;
+        margin-right: 4px;
+        margin-top: 2px;
+    }
+
+    .botoes-resumo{
+        margin-left: 9px;
+        margin-top: auto;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        justify-content: center;
+        }
+
+    /*financeiro*/
+
+    .fin-resumo-financeiro {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fin-grafico-container {
+        height: 470px;
+    }
+
+
+    .btn-limpar {
+        width: 100%;
+        max-width: none;
+    }
+
+     .filtro-financeiro{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .filtro-financeiro form{
+        display: contents;
+    }
+
+    .filtro-financeiro input,
+    .filtro-financeiro button{
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .filtro-financeiro button[type="submit"]{
+        grid-column: 1;
+    }
+
+    .filtro-financeiro .btn-limpar{
+        grid-column: 2;
+        margin-top: 0;
+    }
+        
+    
 }

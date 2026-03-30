@@ -59,9 +59,11 @@ if (formFiltro) {
 
         const inicio = document.getElementById("data_inicio").value;
         const fim = document.getElementById("data_fim").value;
+        const local = document.querySelector("select[name='local']").value;
+        const semFiltroLocal = !local || local === "";
 
         // Validação: nenhum filtro preenchido
-        if(!inicio && !fim && !local){
+        if (!inicio && !fim && semFiltroLocal) {
             e.preventDefault();
             mostrarAlerta("Preencha pelo menos um filtro!", "error");
             return;

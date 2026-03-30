@@ -10,7 +10,7 @@
     
     <h2>Visão geral</h2>
 
-    <section class="filtro-viagens">
+    <section class="filtro-viagens filtro-financeiro">
 
         <form method="GET" action="/financeiro" class="filtro-viagens">
 
@@ -22,12 +22,12 @@
 
             <button type="submit">Filtrar</button>
 
-        </form>
+            <button class="btn-limpar"
+            onclick="window.location.href='/financeiro?limpo=1'">
+                Limpar
+            </button>
 
-        <button class="btn-limpar"
-        onclick="window.location.href='/financeiro?limpo=1'">
-            Limpar
-        </button>
+        </form>
 
     </section>
 
@@ -63,7 +63,7 @@
 <section class="card">
     <h2>Movimentações Viagens</h2>
 
-    <table class="tabela-dashboard">
+    <table class="tabela-dashboard movimentacoes">
         <tr class="thead-hover">
             <th>Data</th>
             <th>Local</th>
@@ -95,7 +95,7 @@
         </a>
     </h2>
 
-    <table class="tabela-dashboard">
+    <table class="tabela-dashboard cheques">
         
         <tr class="thead-hover">
             <th>Código</th>

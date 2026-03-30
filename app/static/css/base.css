@@ -84,12 +84,37 @@ td {
   .alerts {
     right: 10px;
     left: 10px;
-    top: 10px;
+    top: 50px;
   }
 
   .alert {
     width: 100%;
     font-size: 14px;
+    
   }
+
+  td {
+    max-width: 180px; /* limita geral */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    td a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#tabela-lista.tabela-cheques th:last-child,
+    #tabela-lista.tabela-cheques td.acoes-tabela {
+        min-width: 340px;
+    }
+
+    #tabela-lista.tabela-cheques .acoes-tabela {
+        display: flex;
+    }
+    
   
 }
