@@ -9,7 +9,7 @@
         data-data-invalida="{{ data_invalida }}">
     </div>
 
-<section class="filtro-viagens">
+<section class="filtro-viagens filtro-viagens-pagina">
 
     <form method="GET" action="/viagens" class="filtro-viagens">
 
@@ -31,11 +31,11 @@
 
         <button type="submit">Filtrar</button>
 
-    </form>
+        <button type="button" class="btn-limpar" onclick="window.location.href='/viagens?limpo=1'">
+            Limpar
+        </button>
 
-    <button class="btn-limpar" onclick="window.location.href='/viagens?limpo=1'">
-        Limpar
-    </button>
+    </form>
 
 </section>
 

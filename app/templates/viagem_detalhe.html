@@ -201,7 +201,7 @@
                     <div class="pedido-item">
 
                         <div class="pedido-info">
-
+                            
                             <span class="pedido-ordem">
                             {{ pedido.ordem }}.
                             </span>
@@ -349,7 +349,7 @@
 
             </div>
 
-            <div class="botoes-resumo acoes">
+            <div class="botoes-resumo acoes" style="margin-top: -10px;">
 
                 <button onclick="window.location.href='/viagens/{{ viagem.id }}/exportar_ordem'" data-alert="Ordem exportada com sucesso!" class="btn-export">Exportar Ordem</button>
                 <button onclick="window.location.href='/viagens/{{ viagem.id }}/exportar_tarefas'" data-alert="Tarefas exportadas com sucesso!" class="btn-export">Exportar Tarefas</button>

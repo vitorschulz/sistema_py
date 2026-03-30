@@ -2,13 +2,13 @@
 
 {% block content %}
 
-    <h1 style="margin-top: -3px;">
+    <h1 class="pedido-header" style="margin-top: 0px;">
         #{{ numero_cliente }} — {{ pedido.cliente_nome }} 
-        <span style="color:#666; margin-left: 10px; ">
+        <span class="pedido-subinfo" style="color:#666; margin-left: 10px; ">
             ({{ pedido.loja_nome }} • {{ pedido.shopping_nome }})
         </span>
 
-        <span style="margin-left: 10px; vertical-align: 3px;">
+        <span class="pedido-tipos" style="margin-left: 10px; vertical-align: 3px;">
         {% for tipo in pedido.tipo.split(',') %}
             <span class="pedido-tipo tipo-{{ tipo }}">
                 {{ tipo.replace("_"," ") }}
