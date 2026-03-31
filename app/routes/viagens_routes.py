@@ -5,6 +5,7 @@ from openpyxl.worksheet.pagebreak import Break
 import math
 from openpyxl.worksheet.page import PageMargins
 from flask import Blueprint, render_template, request, redirect, jsonify, flash, send_file, session
+from app.routes.main_routes import login_required
 from collections import defaultdict
 from app.config import get_db_connection
 
@@ -19,6 +20,7 @@ def parse_data(data_str):
     
 # listar
 @viagens.route("/viagens")
+@login_required
 def listar_viagens():
 
     conn = get_db_connection()
@@ -95,6 +97,7 @@ def listar_viagens():
 
 # nova viagem
 @viagens.route("/viagens/nova", methods=["GET","POST"])
+@login_required
 def nova_viagem():
 
     if request.method == "POST":
@@ -130,6 +133,7 @@ def nova_viagem():
 
 # detalhes da viagem
 @viagens.route("/viagens/<int:id>")
+@login_required
 def detalhe_viagem(id):
 
     conn = get_db_connection()
@@ -278,6 +282,7 @@ def detalhe_viagem(id):
 
 #botao subir shop
 @viagens.route("/shopping/<int:id>/subir", methods=["GET"])
+@login_required
 def subir_shopping(id):
 
     conn = get_db_connection()
@@ -319,6 +324,7 @@ def subir_shopping(id):
 
 #descer shop
 @viagens.route("/shopping/<int:id>/descer", methods=["GET"])
+@login_required
 def descer_shopping(id):
 
     conn = get_db_connection()
@@ -360,6 +366,7 @@ def descer_shopping(id):
 
 #subir botao loja
 @viagens.route("/loja/<int:id>/subir", methods=["GET"])
+@login_required
 def subir_loja(id):
 
     conn = get_db_connection()
@@ -402,6 +409,7 @@ def subir_loja(id):
 
 #descer loja
 @viagens.route("/loja/<int:id>/descer", methods=["GET"])
+@login_required
 def descer_loja(id):
 
     conn = get_db_connection()
@@ -444,6 +452,7 @@ def descer_loja(id):
 
 #registrar pedido na viagem
 @viagens.route("/viagens/<int:id>/novo_pedido", methods=["GET","POST"])
+@login_required
 def novo_pedido(id):
 
     conn = get_db_connection()
@@ -564,6 +573,7 @@ def novo_pedido(id):
 
 #status viagem
 @viagens.route("/viagens/<int:id>/status", methods=["POST"])
+@login_required
 def atualizar_status_viagem(id):
 
     data = request.get_json()
@@ -587,6 +597,7 @@ def atualizar_status_viagem(id):
 
 #editar viagem
 @viagens.route("/viagens/<int:id>/editar", methods=["GET","POST"])
+@login_required
 def editar_viagem(id):
 
     conn = get_db_connection()
@@ -629,6 +640,7 @@ def editar_viagem(id):
 
 #excluir viagem
 @viagens.route("/viagens/<int:id>/excluir")
+@login_required
 def excluir_viagem(id):
 
     conn = get_db_connection()
@@ -652,6 +664,7 @@ def excluir_viagem(id):
 
 #seta p cima pedido
 @viagens.route("/pedidos/<int:id>/subir", methods=["POST"])
+@login_required
 def subir_pedido(id):
 
     conn = get_db_connection()
@@ -697,6 +710,7 @@ def subir_pedido(id):
 
 #botao descer seta pedido
 @viagens.route("/pedidos/<int:id>/descer", methods=["POST"])
+@login_required
 def descer_pedido(id):
 
     conn = get_db_connection()
@@ -744,6 +758,7 @@ def descer_pedido(id):
 
 #editar pedido
 @viagens.route("/pedidos/<int:id>/editar", methods=["GET","POST"])
+@login_required
 def editar_pedido(id):
 
     conn = get_db_connection()
@@ -816,6 +831,7 @@ def editar_pedido(id):
 
 #botao apagar pedido
 @viagens.route("/pedidos/<int:id>/excluir")
+@login_required
 def excluir_pedido(id):
 
     conn = get_db_connection()
@@ -850,6 +866,7 @@ def excluir_pedido(id):
 
 #add cliente pra ordem
 @viagens.route("/viagens/<int:id>/add_cliente", methods=["POST"])
+@login_required
 def add_cliente(id):
 
     conn = get_db_connection()
@@ -895,6 +912,7 @@ def add_cliente(id):
 
 #exccluir da lista
 @viagens.route("/viagem_cliente/<int:id>/excluir")
+@login_required
 def excluir_cliente_viagem(id):
 
     conn = get_db_connection()
@@ -931,6 +949,7 @@ def excluir_cliente_viagem(id):
 
 #seta subir cliente ordem
 @viagens.route("/viagem_cliente/<int:id>/subir")
+@login_required
 def subir_cliente(id):
 
     conn = get_db_connection()
@@ -964,6 +983,7 @@ def subir_cliente(id):
 
 #descer ordem
 @viagens.route("/viagem_cliente/<int:id>/descer")
+@login_required
 def descer_cliente(id):
 
     conn = get_db_connection()
@@ -996,6 +1016,7 @@ def descer_cliente(id):
 
 #add financeiro
 @viagens.route("/viagens/<int:id>/financeiro/add", methods=["POST"])
+@login_required
 def add_financeiro(id):
 
     tipo = request.form["tipo"]
@@ -1033,6 +1054,7 @@ def add_financeiro(id):
 
 #deletar financeiro
 @viagens.route("/financeiro/<int:id>/delete", methods=["POST"])
+@login_required
 def deletar_financeiro(id):
 
     conn = get_db_connection()
@@ -1059,6 +1081,7 @@ def deletar_financeiro(id):
 #tabelas export
 import io
 @viagens.route("/viagens/<int:id>/exportar_tarefas")
+@login_required
 def exportar_tarefas(id):
 
     conn = get_db_connection()
@@ -1418,6 +1441,7 @@ def exportar_tarefas(id):
 
 #exportar ordem
 @viagens.route("/viagens/<int:id>/exportar_ordem")
+@login_required
 def exportar_ordem(id):
 
     conn = get_db_connection()

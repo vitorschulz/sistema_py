@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, flash
+from app.routes.main_routes import login_required
 from app.config import get_db_connection
 
 lojas = Blueprint("lojas", __name__)
 
 #listagem lojas tela normal
 @lojas.route("/lojas")
+@login_required
 def listar_lojas():
 
     conn = get_db_connection()
@@ -37,6 +39,7 @@ def listar_lojas():
 
 #dropdown form e post form
 @lojas.route("/lojas/novo", methods=["GET","POST"])
+@login_required
 def nova_loja():
 
     shopping_preselecionado = request.args.get("shopping")
@@ -116,6 +119,7 @@ def nova_loja():
 
 #editar botao
 @lojas.route("/lojas/<int:id>/editar", methods=["GET","POST"])
+@login_required
 def editar_loja(id):
 
     shopping_origem = request.args.get("shopping")
@@ -176,6 +180,7 @@ def editar_loja(id):
 
 #excluir pelo botao
 @lojas.route("/lojas/<int:id>/excluir")
+@login_required
 def excluir_loja(id):
 
     conn = get_db_connection()
@@ -203,6 +208,7 @@ def excluir_loja(id):
 
 #get pra ir pros detalhes
 @lojas.route("/lojas/<int:id>")
+@login_required
 def ver_loja(id):
 
     shopping_id = request.args.get("shopping")

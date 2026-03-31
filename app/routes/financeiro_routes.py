@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, flash
+from app.routes.main_routes import login_required
 from app.config import get_db_connection
 
 financeiro = Blueprint("financeiro", __name__)
 
 #listagem do financeiro e tb pegagem de dados necessarios e totais
 @financeiro.route('/financeiro')
+@login_required
 def pagina_financeiro():
 
     conn = get_db_connection()

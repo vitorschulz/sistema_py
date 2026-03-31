@@ -70,6 +70,61 @@ td {
     }
 }
 
+/* LOGIN */
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.login-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-box input {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.login-box input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.login-box button {
+    padding: 10px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.login-box button:hover {
+    background-color: #1d4ed8;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* ocupa tela toda */
+}
+
 
 /* CELOLAR */
 @media (max-width: 768px) {

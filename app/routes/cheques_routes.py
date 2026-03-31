@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, flash
 from app.config import get_db_connection
+from app.routes.main_routes import login_required
 
 cheques = Blueprint('cheques', __name__, url_prefix='/cheques')
 
 #listagem cheques
 @cheques.route('', strict_slashes=False)
+@login_required
 def listar_cheques():
 
 
@@ -28,6 +30,7 @@ def listar_cheques():
 
 #form cheque
 @cheques.route('/novo', methods=['GET', 'POST'])
+@login_required
 def novo_cheque():
 
     conn = get_db_connection()
@@ -76,6 +79,7 @@ def novo_cheque():
 
 #botao compensar
 @cheques.route('/<int:id>/compensar')
+@login_required
 def compensar_cheque(id):
 
     conn = get_db_connection()
@@ -96,6 +100,7 @@ def compensar_cheque(id):
 
 #botao sustar no cheque
 @cheques.route('/<int:id>/devolver')
+@login_required
 def devolver_cheque(id):
 
     conn = get_db_connection()
@@ -118,6 +123,7 @@ def devolver_cheque(id):
 
 #apagar botao
 @cheques.route('/<int:id>/excluir')
+@login_required
 def excluir_cheque(id):
 
     conn = get_db_connection()
@@ -140,6 +146,7 @@ def excluir_cheque(id):
 
 #editrar
 @cheques.route('/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_cheque(id):
 
     conn = get_db_connection()
