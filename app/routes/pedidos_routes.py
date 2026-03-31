@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template
+from app.routes.main_routes import login_required
 from app.config import get_db_connection
 
 pedidos = Blueprint("pedidos", __name__)
 
 #click do pedido detalhes e tals
 @pedidos.route("/pedidos/<int:id>")
+@login_required
 def detalhe_pedido(id):
 
     conn = get_db_connection()

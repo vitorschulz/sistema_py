@@ -1,12 +1,52 @@
-from flask import Blueprint, render_template
+from flask import request, Blueprint, render_template, redirect, session, flash
 from app.config import get_db_connection
 from datetime import date
+from functools import wraps
+from werkzeug.security import check_password_hash
 
 main = Blueprint("main", __name__)
 
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return wrapper
+
+
+#autorizacao
+@main.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        senha = request.form["senha"]
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if user and check_password_hash(user["password_hash"], senha):
+            session["user_id"] = user["id"]
+            return redirect("/")
+
+        flash("Usuário ou senha inválidos!", "error")
+        return redirect("/login")
+
+    return render_template("login.html")
+
 #dashboard e seus dados
 @main.route("/")
+@login_required
 def dashboard():
+
+    if "user_id" not in session:
+        return redirect("/login")
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

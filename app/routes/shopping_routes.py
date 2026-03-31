@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, flash
+from app.routes.main_routes import login_required
 from app.config import get_db_connection
 
 shopping = Blueprint("shopping", __name__)
 
 #listagem
 @shopping.route("/shopping")
+@login_required
 def listar_shopping():
     
     conn = get_db_connection()
@@ -37,6 +39,7 @@ def listar_shopping():
 
 #get pra ir pra pag especifica do shop
 @shopping.route("/shopping/<int:id>")
+@login_required
 def ver_shopping(id):
 
     conn = get_db_connection()
@@ -70,6 +73,7 @@ def ver_shopping(id):
 
 #funcao pra criar shopping post form
 @shopping.route("/shopping/novo", methods=["GET","POST"])
+@login_required
 def novo_shopping():
 
     if request.method == "POST":
@@ -103,6 +107,7 @@ def novo_shopping():
 
 # editar botao do shopping
 @shopping.route("/shopping/<int:id>/editar", methods=["GET","POST"])
+@login_required
 def editar_shopping(id):
 
     conn = get_db_connection()
@@ -151,6 +156,7 @@ def editar_shopping(id):
 
 # botao excluir shopping
 @shopping.route("/shopping/<int:id>/excluir")
+@login_required
 def excluir_shopping(id):
 
     conn = get_db_connection()
