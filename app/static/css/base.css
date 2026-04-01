@@ -171,5 +171,29 @@ td {
         display: flex;
     }
     
-  
+  .login-container {
+    padding: 20px;
+    height: 100vh;
+    align-items: center;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 380px;
+        padding: 25px;
+    }
+
+    .login-box h2 {
+        font-size: 22px;
+    }
+
+    .login-box input {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .login-box button {
+        padding: 12px;
+        font-size: 16px;
+    }
 }

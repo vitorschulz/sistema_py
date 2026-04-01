@@ -249,6 +249,24 @@
 
 /* AÇÕES botoes e cards*/
 
+.vr-esquerda {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vr-linha1 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap; /* evita quebrar layout */
+}
+
+.vr-linha2 {
+    font-size: 14px;
+    color: #666;
+}
+
 .acoes {
     margin-bottom: 30px;
     display: flex;
@@ -318,7 +336,6 @@
     border-radius:6px;
     font-size:14px;
 }
-
 
 /* listas */
 
@@ -1464,6 +1481,31 @@ background-color: rgba(46, 125, 50, 0.08);
     word-break: break-word;
     overflow-wrap: break-word;
     margin-bottom: 5px;
+    }
+
+    /*cliente detalhe*/
+
+    .vr-item {
+        gap: 8px;
+    }
+
+    .vr-esquerda {
+        gap: 6px;
+    }
+    .vr-linha1 strong {
+    font-size: 15px; /* data menor */
+    }
+    .vr-linha1 {
+        font-size: 16px; /* aumenta data + local */
+    }
+
+    .vr-linha2 {
+        font-size: 15px; /* aumenta tarefas */
+    }
+
+    .vr-item {
+        font-size: 16px;
+        padding: 5px 10px;
     }
 
     /* shopping detalhe */
