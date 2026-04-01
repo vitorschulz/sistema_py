@@ -24,7 +24,38 @@
 
 <section class="card">
 
-    <h2 style="margin-bottom: 25px;">Viagens anteriores</h2>
+    <h2 style="margin-bottom: 25px;">Viagens relacionadas</h2>
+
+    <div class="lista-viagens">
+
+        {% for v in viagens %}
+        <div class="item-viagem"
+             onclick="window.location.href='/viagens/{{ v.id }}?next={{ request.path }}'">
+
+            <div class="vr-esquerda">
+                <div class="vr-linha1">
+                    <strong>{{ v.data_viagem.strftime('%d/%m/%Y') }}</strong> —
+                    <span class="shopping-local local-{{ v.local.replace(' ', '_') }}">
+                        {{ v.local or "Sem local" }}
+                    </span>
+                </div>
+
+                <div class="vr-linha2">
+                    {{ v.total_tarefas }} tarefa{% if v.total_tarefas != 1 %}s{% endif %}
+                </div>
+            </div>
+
+            <span class="status status-{{ v.status|replace(' ', '-') }}">
+                {{ v.status }}
+            </span>
+
+        </div>
+    {% else %}
+        <p style="color:#777;">Nenhuma viagem encontrada.</p>
+    {% endfor %}
+
+    </div>
+
 
 </section>
 

@@ -15,8 +15,33 @@ def ver_cliente(id):
     cursor.execute("SELECT * FROM clientes WHERE id = %s", (id,))
     cliente = cursor.fetchone()
     
+    cursor.execute("""
+        SELECT 
+            v.id,
+            v.local,
+            v.data_viagem,
+            v.status,
+            COUNT(p.id) AS total_tarefas
+        FROM viagens v
 
-    return render_template("cliente_detalhe.html", cliente=cliente)
+        LEFT JOIN pedidos p 
+            ON p.viagem_id = v.id
+            AND p.cliente_id = %s
+
+        LEFT JOIN viagem_clientes vc
+            ON vc.viagem_id = v.id
+            AND vc.cliente_id = %s
+
+        WHERE vc.cliente_id IS NOT NULL
+        OR p.cliente_id IS NOT NULL
+
+        GROUP BY v.id, v.local, v.data_viagem, v.status
+        ORDER BY v.data_viagem DESC
+    """, (id, id))
+
+    viagens = cursor.fetchall()
+
+    return render_template("cliente_detalhe.html", cliente=cliente, viagens=viagens)
 
 #listagem de cliente
 @clientes.route("/clientes")
