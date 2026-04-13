@@ -1,4 +1,3 @@
-
 services:
   web:
     build: .
@@ -14,7 +13,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: gestao
-      SECRET_KEY: "3fK9!xP2@vL8#qR1$zM7nW4*YtA6bC0D"
+      SECRET_KEY: "3fK9!xP2@vL8#qR1$$zM7nW4*YtA6bC0D"
 
   db:
     image: mysql:8
@@ -24,13 +23,16 @@ services:
     command:
       - --bind-address=0.0.0.0
       - --mysqlx=0
-      - --innodb-buffer-pool-size=64M
-      - --max-connections=20
-      - --innodb-log-file-size=32M
+      - --innodb-buffer-pool-size=32M
+      - --max-connections=10
+      - --innodb-log-file-size=16M
+      - --table-open-cache=64
+      - --performance-schema=OFF
 
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestao
+
     volumes:
       - mysql_data:/var/lib/mysql
 
