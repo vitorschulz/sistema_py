@@ -3,7 +3,7 @@ import mysql.connector
 import time
 
 def get_db_connection():
-    for i in range(10):
+    for i in range(20):
         try:
             conn = mysql.connector.connect(
                 host=os.getenv("DB_HOST") or "localhost",
