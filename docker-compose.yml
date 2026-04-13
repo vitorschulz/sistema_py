@@ -14,7 +14,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root
       DB_NAME: gestao
-      SECRET_KEY: '3fK9!xP2@vL8#qR1$zM7nW4*YtA6bC0D'
+      SECRET_KEY: "3fK9!xP2@vL8#qR1$zM7nW4*YtA6bC0D"
 
   db:
     image: mysql:8
