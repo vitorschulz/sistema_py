@@ -22,6 +22,8 @@ services:
     restart: always
 
     command:
+      - --bind-address=0.0.0.0
+      - --mysqlx=0
       - --innodb-buffer-pool-size=64M
       - --max-connections=20
       - --innodb-log-file-size=32M
