@@ -3,10 +3,12 @@ services:
   web:
     build: .
     container_name: sistema_mae
+    restart: always
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DB_HOST: db
       DB_USER: root
@@ -18,11 +20,24 @@ services:
     image: mysql:8
     container_name: meu_mysql
     restart: always
+
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --max-connections=20
+      - --innodb-log-file-size=32M
+
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestao
     volumes:
       - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   mysql_data:
