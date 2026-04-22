@@ -12,29 +12,68 @@ def listar_shopping():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    colunas_permitidas = {
+        "nome": "shopping.nome",
+        "local": "shopping.local",
+        "contato": "shopping.contato",
+        "endereco": "shopping.endereco"
+    }
+
+    sort_col = colunas_permitidas.get(sort)
+
+    if order is None:
+        sort_col = None
+
+    query = """
         SELECT 
-        shopping.id,
-        shopping.nome,
-        shopping.local,
-        shopping.endereco,
-        shopping.contato,
-        COUNT(lojas.id) AS total_lojas
+            shopping.id,
+            shopping.nome,
+            shopping.local,
+            shopping.endereco,
+            shopping.contato,
+            COUNT(lojas.id) AS total_lojas
         FROM shopping
         LEFT JOIN lojas 
             ON lojas.shopping_id = shopping.id 
             AND lojas.ativo = TRUE
         WHERE shopping.ativo = TRUE
         GROUP BY shopping.id
-        ORDER BY shopping.local, shopping.nome
-    """)
+    """
 
+    if sort_col and order:
+        query += f" ORDER BY {sort_col} {order.upper()}"
+    else:
+        query += " ORDER BY shopping.local ASC, shopping.nome ASC"
+
+    cursor.execute(query)
     shoppings = cursor.fetchall()
+
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
 
-    return render_template("shoppings.html", shoppings=shoppings)
+    return render_template(
+        "shoppings.html",
+        shoppings=shoppings,
+        proxima_ordem_nome=proxima_ordem("nome"),
+        proxima_ordem_local=proxima_ordem("local"),
+        proxima_ordem_contato=proxima_ordem("contato"),
+        proxima_ordem_endereco=proxima_ordem("endereco"),
+    )
 
 
 #get pra ir pra pag especifica do shop
@@ -52,14 +91,46 @@ def ver_shopping(id):
     
     shopping_dados = cursor.fetchone()
 
-    cursor.execute("""
-        SELECT * FROM lojas
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    colunas_permitidas = {
+        "nome": "nome",
+        "contato": "contato",
+        "observacoes": "observacoes"
+    }
+
+    sort_col = colunas_permitidas.get(sort)
+
+    if order is None:
+        sort_col = None
+
+    query = """
+        SELECT *
+        FROM lojas
         WHERE shopping_id = %s
         AND ativo = TRUE
-        ORDER BY nome
-    """, (id,))
+    """
 
+    if sort_col and order:
+        query += f" ORDER BY {sort_col} {order.upper()}"
+    else:
+        query += " ORDER BY nome ASC"
+
+    cursor.execute(query, (id,))
     lojas = cursor.fetchall()
+
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
@@ -67,7 +138,11 @@ def ver_shopping(id):
     return render_template(
         "shopping_detalhe.html",
         shopping=shopping_dados,
-        lojas=lojas
+        lojas=lojas,
+
+        proxima_ordem_nome=proxima_ordem("nome"),
+        proxima_ordem_contato=proxima_ordem("contato"),
+        proxima_ordem_observacao=proxima_ordem("observacoes"),
     )
 
 

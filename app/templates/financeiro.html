@@ -22,7 +22,7 @@
 
             <button type="submit">Filtrar</button>
 
-            <button class="btn-limpar"
+            <button type="button" class="btn-limpar"
             onclick="window.location.href='/financeiro?limpo=1'">
                 Limpar
             </button>
@@ -65,11 +65,42 @@
 
     <table class="tabela-dashboard movimentacoes">
         <tr class="thead-hover">
-            <th>Data</th>
-            <th>Local</th>
-            <th>Receita</th>
-            <th>Custo</th>
-            <th>Lucro</th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='mov_data', order=proxima_ordem_data) }}">
+                    <strong>Data</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='mov_local', order=proxima_ordem_local) }}">
+                    <strong>Local</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='mov_receita', order=proxima_ordem_receita) }}">
+                    <strong>Receita</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='mov_custo', order=proxima_ordem_custo) }}">
+                    <strong>Custo</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='mov_lucro', order=proxima_ordem_lucro) }}">
+                    <strong>Lucro</strong>
+                </a>
+            </th>
+
         </tr>
 
         {% for item in movimentacoes %}
@@ -98,10 +129,33 @@
     <table class="tabela-dashboard cheques">
         
         <tr class="thead-hover">
-            <th>Código</th>
-            <th>Destino</th>
-            <th>Valor</th>
-            <th>Status</th>
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='chq_codigo', order=proxima_ordem_codigo) }}">
+                    <strong>Código</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='chq_nome_destino', order=proxima_ordem_destino) }}">
+                    <strong>Destino</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='chq_valor', order=proxima_ordem_valor) }}">
+                    <strong>Valor</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('financeiro.pagina_financeiro', sort='chq_status', order=proxima_ordem_status) }}">
+                    <strong>Status</strong>
+                </a>
+            </th>
         </tr>
 
         {% for c in cheques %}

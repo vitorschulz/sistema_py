@@ -20,11 +20,37 @@
     <table id="tabela-lista">
 
         <tr class="thead-hover">
-            <th>Nome</th>
-            <th>Local</th>
-            <th>Telefone</th>
-            <th>Endereço</th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('shopping.listar_shopping', sort='nome', order=proxima_ordem_nome) }}">
+                    <strong>Nome</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('shopping.listar_shopping', sort='local', order=proxima_ordem_local) }}">
+                    <strong>Local</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('shopping.listar_shopping', sort='contato', order=proxima_ordem_contato) }}">
+                    <strong>Telefone</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('shopping.listar_shopping', sort='endereco', order=proxima_ordem_endereco) }}">
+                    <strong>Endereço</strong>
+                </a>
+            </th>
+
             <th>Ações</th>
+
         </tr>
 
     {% for shopping in shoppings %}

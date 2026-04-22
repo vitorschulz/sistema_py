@@ -9,23 +9,64 @@ cheques = Blueprint('cheques', __name__, url_prefix='/cheques')
 @login_required
 def listar_cheques():
 
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-    SELECT *
-    FROM cheques
-    WHERE ativo = TRUE
-    ORDER BY criado_em DESC
-""")
+    sort = request.args.get("sort")
+    order = request.args.get("order")
 
+    colunas_permitidas = [
+        "codigo",
+        "nome_destino",
+        "data_vencimento",
+        "valor",
+        "status"
+    ]
+
+    if sort not in colunas_permitidas:
+        sort = None
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    if order is None:
+        sort = None
+
+    query = """
+        SELECT *
+        FROM cheques
+        WHERE ativo = TRUE
+    """
+
+    if sort and order:
+        query += f" ORDER BY {sort} {order.upper()}"
+    else:
+        query += " ORDER BY criado_em DESC"
+
+    cursor.execute(query)
     lista = cursor.fetchall()
+
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
 
-    return render_template("cheques.html", cheques=lista)
+    return render_template(
+        "cheques.html",
+        cheques=lista,
+        proxima_ordem_codigo=proxima_ordem("codigo"),
+        proxima_ordem_destino=proxima_ordem("nome_destino"),
+        proxima_ordem_vencimento=proxima_ordem("data_vencimento"),
+        proxima_ordem_valor=proxima_ordem("valor"),
+        proxima_ordem_status=proxima_ordem("status"),
+    )
 
 
 #form cheque
