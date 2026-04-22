@@ -54,7 +54,7 @@
 
         <div class="form-group">
             <label>Telefone</label>
-            <input type="text" name="contato" placeholder="(00) 00000-0000" maxlength="15" value="{{ loja.contato if loja }}" id="telefone">
+            <input type="text" name="contato" placeholder="(00) 00000-0000" pattern=".{14,15}" title="Digite um telefone fixo ou celular completo" maxlength="15" value="{{ loja.contato if loja }}" id="telefone">
         </div>
 
         <div class="form-group">

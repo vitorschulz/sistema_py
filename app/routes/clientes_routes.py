@@ -51,18 +51,50 @@ def listar_clientes():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    colunas_permitidas = ["nome", "cpf_cnpj", "telefone", "endereco"]
+
+    if sort not in colunas_permitidas:
+        sort = None
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    query = """
         SELECT * FROM clientes
         WHERE ativo = TRUE
-        ORDER BY nome
-    """)
+    """
 
+    if sort and order:
+        query += f" ORDER BY {sort} {order.upper()}"
+    elif sort and order is None:
+        query += " ORDER BY nome ASC"
+    else:
+        query += " ORDER BY nome ASC"
+
+    cursor.execute(query)
     clientes_lista = cursor.fetchall()
 
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"   
+        elif order == "asc":
+            return "desc"       
+        elif order == "desc":
+            return None        
+        return "asc"
+    
     cursor.close()
     conn.close()
 
-    return render_template("clientes.html", clientes=clientes_lista)
+    return render_template("clientes.html",
+    clientes=clientes_lista,
+    proxima_ordem_nome=proxima_ordem("nome"),
+    proxima_ordem_cpf=proxima_ordem("cpf_cnpj"),
+    proxima_ordem_telefone=proxima_ordem("telefone"),
+    proxima_ordem_endereco=proxima_ordem("endereco"),)
 
 
 #funcao pro post do form

@@ -21,11 +21,37 @@
     <table id="tabela-lista">
 
         <tr class="thead-hover">
-            <th >Nome</th>
-            <th>CPF/CNPJ</th>
-            <th>Telefone</th>
-            <th>Endereço</th>
+
+           <th>
+                <a class="tabela-link"
+                href="{{ url_for('clientes.listar_clientes', sort='nome', order=proxima_ordem_nome) }}">
+                    <strong>Nome</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('clientes.listar_clientes', sort='cpf_cnpj', order=proxima_ordem_cpf) }}">
+                    <strong>CPF/CNPJ</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('clientes.listar_clientes', sort='telefone', order=proxima_ordem_telefone) }}">
+                    <strong>Telefone</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('clientes.listar_clientes', sort='endereco', order=proxima_ordem_endereco) }}">
+                    <strong>Endereço</strong>
+                </a>
+            </th>
+
             <th>Ações</th>
+
         </tr>
 
         {% for cliente in clientes %}

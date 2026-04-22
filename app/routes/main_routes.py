@@ -45,15 +45,10 @@ def login():
 @login_required
 def dashboard():
 
-    if "user_id" not in session:
-        return redirect("/login")
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
 
     hoje = date.today()
-
 
     cursor.execute("""
         SELECT data_viagem 
@@ -62,7 +57,10 @@ def dashboard():
     """)
     viagens = cursor.fetchall()
 
-    datas_viagens = [v["data_viagem"].strftime("%Y-%m-%d") for v in viagens]
+    datas_viagens = [
+        v["data_viagem"].strftime("%Y-%m-%d")
+        for v in viagens if v["data_viagem"]
+    ]
 
     cursor.execute("""
     SELECT 
@@ -95,14 +93,11 @@ def dashboard():
         END,
         data_viagem ASC
     LIMIT 5
-""", (hoje,))
+    """, (hoje,))
     proximas_viagens = cursor.fetchall()
-
-
 
     cursor.execute("SELECT COUNT(*) as total FROM clientes WHERE ativo = 1")
     total_clientes = cursor.fetchone()["total"]
-
 
     cursor.execute("""
         SELECT COUNT(*) as total 
@@ -111,25 +106,45 @@ def dashboard():
     """, (hoje,))
     total_viagens = cursor.fetchone()["total"]
 
-
-
     cursor.execute("SELECT COUNT(*) as total FROM shopping WHERE ativo = 1")
     total_shoppings = cursor.fetchone()["total"]
-
-
 
     cursor.execute("SELECT COUNT(*) as total FROM lojas WHERE ativo = 1")
     total_lojas = cursor.fetchone()["total"]
 
-    cursor.execute("""
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    colunas_permitidas = {
+        "codigo": "codigo",
+        "nome_destino": "nome_destino",
+        "data_vencimento": "data_vencimento",
+        "valor": "valor"
+    }
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    sort_col = colunas_permitidas.get(sort)
+
+    if order is None:
+        sort_col = None
+
+    query_cheques = """
     SELECT id, codigo, nome_destino, valor, data_vencimento
     FROM cheques
     WHERE status = 'PENDENTE' AND ativo = 1
-    ORDER BY data_vencimento ASC
-    LIMIT 5
-    """)
-    cheques_pendentes = cursor.fetchall()
+    """
 
+    if sort_col and order:
+        query_cheques += f" ORDER BY {sort_col} {order.upper()}"
+    else:
+        query_cheques += " ORDER BY data_vencimento ASC"
+
+    query_cheques += " LIMIT 5"
+
+    cursor.execute(query_cheques)
+    cheques_pendentes = cursor.fetchall()
 
     cursor.execute("""
     SELECT COUNT(*) as total
@@ -138,15 +153,17 @@ def dashboard():
     """)
     total_cheques_pendentes = cursor.fetchone()["total"]
 
-    hoje = date.today()
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
-
-    datas_viagens = [
-        v["data_viagem"].strftime("%Y-%m-%d")
-        for v in viagens if v["data_viagem"]
-    ]
 
     return render_template(
         "index.html",
@@ -159,5 +176,11 @@ def dashboard():
         cheques_pendentes=cheques_pendentes,
         total_cheques_pendentes=total_cheques_pendentes,
         hoje=hoje,
-        saldo_total=saldo_total
+        saldo_total=saldo_total,
+
+        # ordenação
+        proxima_ordem_codigo=proxima_ordem("codigo"),
+        proxima_ordem_destino=proxima_ordem("nome_destino"),
+        proxima_ordem_vencimento=proxima_ordem("data_vencimento"),
+        proxima_ordem_valor=proxima_ordem("valor"),
     )

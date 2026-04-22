@@ -15,6 +15,33 @@ def pagina_financeiro():
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
 
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    colunas_mov = {
+        "mov_data": "v.data_viagem",
+        "mov_local": "v.local",
+        "mov_receita": "receita",
+        "mov_custo": "custo",
+        "mov_lucro": "lucro"
+    }
+
+    colunas_cheques = {
+        "chq_codigo": "codigo",
+        "chq_nome_destino": "nome_destino",
+        "chq_valor": "valor",
+        "chq_status": "status"
+    }
+
+    sort_mov = colunas_mov.get(sort)
+    sort_cheque = colunas_cheques.get(sort)
+
+    if order is None:
+        sort_mov = None
+        sort_cheque = None
 
     query = """
     SELECT 
@@ -44,7 +71,7 @@ def pagina_financeiro():
             ON vf.viagem_id = v.id
 
         WHERE v.ativo = 1
-        """
+    """
 
     params = []
 
@@ -56,43 +83,53 @@ def pagina_financeiro():
         query += " AND v.data_viagem <= %s"
         params.append(data_fim)
 
-    query += """
-        GROUP BY v.id
-        ORDER BY v.data_viagem ASC
-    """
+    query += " GROUP BY v.id"
+
+    if sort_mov and order:
+        query += f" ORDER BY {sort_mov} {order.upper()}"
+    else:
+        query += " ORDER BY v.data_viagem ASC"
 
     cursor.execute(query, tuple(params))
     movimentacoes = cursor.fetchall()
+
+    query_cheques = """
+        SELECT *
+        FROM cheques
+        WHERE ativo = 1
+    """
+
+    if sort_cheque and order:
+        query_cheques += f" ORDER BY {sort_cheque} {order.upper()}"
+    else:
+        query_cheques += " ORDER BY criado_em DESC"
+
+    cursor.execute(query_cheques)
+    cheques = cursor.fetchall()
 
     receita_total = sum(item['receita'] or 0 for item in movimentacoes)
     custo_total = sum(item['custo'] or 0 for item in movimentacoes)
     saldo_total = sum(item['lucro'] or 0 for item in movimentacoes)
 
-    cursor.execute("""
-        SELECT *
-        FROM cheques
-        WHERE ativo = 1
-        ORDER BY criado_em DESC
-    """)
-
-    cheques = cursor.fetchall()
-
-
     total_compensado = sum(c['valor'] for c in cheques if c['status'] == 'COMPENSADO')
     total_pendente = sum(c['valor'] for c in cheques if c['status'] == 'PENDENTE')
 
-    labels = []
-    receitas = []
-    custos = []
-    lucros = []
-
+    labels, receitas, custos, lucros = [], [], [], []
 
     for item in movimentacoes:
         labels.append(item['data'].strftime('%d/%m') if item['data'] else '')
         receitas.append(float(item['receita'] or 0))
         custos.append(float(item['custo'] or 0))
         lucros.append(float(item['lucro'] or 0))
-        print(item['custo'], item['receita'], item['lucro'])
+
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
@@ -101,13 +138,26 @@ def pagina_financeiro():
         "financeiro.html",
         movimentacoes=movimentacoes,
         cheques=cheques,
-        total_compensado=total_compensado,
-        total_pendente=total_pendente,
+
+        proxima_ordem_data=proxima_ordem("mov_data"),
+        proxima_ordem_local=proxima_ordem("mov_local"),
+        proxima_ordem_receita=proxima_ordem("mov_receita"),
+        proxima_ordem_custo=proxima_ordem("mov_custo"),
+        proxima_ordem_lucro=proxima_ordem("mov_lucro"),
+
+        proxima_ordem_codigo=proxima_ordem("chq_codigo"),
+        proxima_ordem_destino=proxima_ordem("chq_nome_destino"),
+        proxima_ordem_valor=proxima_ordem("chq_valor"),
+        proxima_ordem_status=proxima_ordem("chq_status"),
+
         receita_total=receita_total,
         custo_total=custo_total,
         saldo_total=saldo_total,
+        total_compensado=total_compensado,
+        total_pendente=total_pendente,
+
         labels=labels,
         receitas=receitas,
         custos=custos,
         lucros=lucros
-        )
+    )

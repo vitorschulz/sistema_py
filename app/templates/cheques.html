@@ -19,13 +19,45 @@
     <table id="tabela-lista" class="tabela-cheques">
 
         <tr class="thead-hover">
-            <th>Código</th>
-            <th>Destino</th>
-            <th>Vencimento</th>
-            <th>Valor</th>
-            <th>Status</th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('cheques.listar_cheques', sort='codigo', order=proxima_ordem_codigo) }}">
+                    <strong>Código</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('cheques.listar_cheques', sort='nome_destino', order=proxima_ordem_destino) }}">
+                    <strong>Destino</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('cheques.listar_cheques', sort='data_vencimento', order=proxima_ordem_vencimento) }}">
+                    <strong>Vencimento</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('cheques.listar_cheques', sort='valor', order=proxima_ordem_valor) }}">
+                    <strong>Valor</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('cheques.listar_cheques', sort='status', order=proxima_ordem_status) }}">
+                    <strong>Status</strong>
+                </a>
+            </th>
+
             <th style="width: 340px;">Ações</th>
-        </tr>
+
+    </tr>
 
         {% for c in cheques %}
 

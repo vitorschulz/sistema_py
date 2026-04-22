@@ -12,7 +12,25 @@ def listar_lojas():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    if order not in ["asc", "desc"]:
+        order = None
+
+    colunas_permitidas = {
+        "nome": "lojas.nome",
+        "shopping_nome": "shopping.nome",
+        "contato": "lojas.contato",
+        "observacoes": "lojas.observacoes"
+    }
+
+    sort_col = colunas_permitidas.get(sort)
+
+    if order is None:
+        sort_col = None
+
+    query = """
         SELECT 
             lojas.id,
             lojas.nome,
@@ -24,17 +42,35 @@ def listar_lojas():
             ON lojas.shopping_id = shopping.id
             AND shopping.ativo = TRUE
         WHERE lojas.ativo = TRUE
-        ORDER BY shopping_nome
-    """)
+    """
 
+    if sort_col and order:
+        query += f" ORDER BY {sort_col} {order.upper()}"
+    else:
+        query += " ORDER BY shopping.nome ASC"
+
+    cursor.execute(query)
     lojas_lista = cursor.fetchall()
+
+    def proxima_ordem(coluna):
+        if sort != coluna:
+            return "asc"
+        elif order == "asc":
+            return "desc"
+        elif order == "desc":
+            return None
+        return "asc"
 
     cursor.close()
     conn.close()
 
     return render_template(
         "lojas.html",
-        lojas=lojas_lista
+        lojas=lojas_lista,
+        proxima_ordem_nome=proxima_ordem("nome"),
+        proxima_ordem_shopping=proxima_ordem("shopping_nome"),
+        proxima_ordem_contato=proxima_ordem("contato"),
+        proxima_ordem_observacao=proxima_ordem("observacoes"),
     )
 
 #dropdown form e post form
@@ -52,7 +88,7 @@ def nova_loja():
         SELECT id, nome
         FROM shopping
         WHERE ativo = TRUE
-        ORDER BY nome
+        ORDER BY LOWER(nome) ASC
     """)
 
     shoppings = cursor.fetchall()

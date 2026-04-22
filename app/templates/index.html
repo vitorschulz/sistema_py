@@ -64,11 +64,36 @@
     <div class="table-container">
         <table class="tabela-dashboard">
 
-        <tr class="thead-hover">
-            <th>Código</th>
-            <th>Destino</th>
-            <th>Vencimento</th>
-            <th>Valor</th>
+       <tr class="thead-hover">
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('main.dashboard', sort='codigo', order=proxima_ordem_codigo) }}">
+                    <strong>Código</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('main.dashboard', sort='nome_destino', order=proxima_ordem_destino) }}">
+                    <strong>Destino</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('main.dashboard', sort='data_vencimento', order=proxima_ordem_vencimento) }}">
+                    <strong>Vencimento</strong>
+                </a>
+            </th>
+
+            <th>
+                <a class="tabela-link"
+                href="{{ url_for('main.dashboard', sort='valor', order=proxima_ordem_valor) }}">
+                    <strong>Valor</strong>
+                </a>
+            </th>
+
         </tr>
 
         {% for c in cheques_pendentes %}

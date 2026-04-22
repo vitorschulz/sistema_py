@@ -232,6 +232,7 @@ def detalhe_viagem(id):
     SELECT id, nome 
     FROM clientes 
     WHERE ativo = 1
+    ORDER BY LOWER(nome) ASC
     """)
 
     clientes = cursor.fetchall()
@@ -544,13 +545,13 @@ def novo_pedido(id):
 
         return redirect(f"/viagens/{id}")
 
-    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1")
+    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     shoppings = cursor.fetchall()
 
-    cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1")
+    cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1 ORDER BY shopping_id, LOWER(nome) ASC")
     lojas = cursor.fetchall()
 
-    cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1")
+    cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     clientes = cursor.fetchall()
 
     ultimo_loja_id = session.get("ultimo_loja_id")
@@ -808,13 +809,13 @@ def editar_pedido(id):
 
     viagem_id = pedido["viagem_id"]
 
-    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1")
+    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     shoppings = cursor.fetchall()
 
-    cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1")
+    cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1 ORDER BY shopping_id, LOWER(nome) ASC")
     lojas = cursor.fetchall()
 
-    cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1")
+    cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     clientes = cursor.fetchall()
 
     cursor.close()
@@ -1178,7 +1179,7 @@ def exportar_tarefas(id):
     ws = wb.active
     ws.title = "Tarefas"
     altura_padrao = 15
-    LINHAS_POR_PAGINA = 36
+    LINHAS_POR_PAGINA = 45
     ALTURA_MAX_PAGINA = LINHAS_POR_PAGINA * altura_padrao
     altura_na_pagina = 3 * altura_padrao
     fonte_padrao = Font(size=12)

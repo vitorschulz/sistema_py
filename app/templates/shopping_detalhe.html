@@ -42,11 +42,34 @@
     <table id="tabela-lista">
 
     <tr class="thead-hover">
-        <th>Loja</th>
-        <th>Shopping</th>
-        <th>Telefone</th>
-        <th>Observação</th>
+
+        <th>
+            <a class="tabela-link"
+            href="{{ url_for('shopping.ver_shopping', id=shopping.id, sort='nome', order=proxima_ordem_nome) }}">
+                <strong>Loja</strong>
+            </a>
+        </th>
+
+        <th>
+            Shopping
+        </th>
+
+        <th>
+            <a class="tabela-link"
+            href="{{ url_for('shopping.ver_shopping', id=shopping.id, sort='contato', order=proxima_ordem_contato) }}">
+                <strong>Telefone</strong>
+            </a>
+        </th>
+
+        <th>
+            <a class="tabela-link"
+            href="{{ url_for('shopping.ver_shopping', id=shopping.id, sort='observacoes', order=proxima_ordem_observacao) }}">
+                <strong>Observação</strong>
+            </a>
+        </th>
+
         <th>Ações</th>
+
     </tr>
 
     {% if lojas %}
