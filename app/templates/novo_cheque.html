@@ -21,7 +21,7 @@
 
         <div class="form-group">
             <label>Código do cheque</label>
-            <input type="text" name="codigo" maxlength="50" required
+            <input type="text" name="codigo" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="\d+" required
             placeholder="Ex: 123456"
             value="{{ cheque.codigo if cheque and cheque.codigo else '' }}">
         </div>

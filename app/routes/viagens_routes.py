@@ -122,12 +122,14 @@ def nova_viagem():
 
         conn.commit()
 
+        viagem_id = cursor.lastrowid
+
         cursor.close()
         conn.close()
 
         flash("Viagem criada com sucesso!", "success")
 
-        return redirect("/viagens")
+        return redirect(f"/viagens/{viagem_id}")
 
     return render_template("nova_viagem.html")
 
