@@ -79,6 +79,11 @@ def novo_cheque():
 
     if request.method == 'POST':
 
+        data_vencimento = request.form.get('data_vencimento')
+
+        if not data_vencimento:
+            data_vencimento = None
+
         cursor.execute("""
             INSERT INTO cheques
             (codigo, valor, nome_destino, data_vencimento, status, ativo)
@@ -87,7 +92,7 @@ def novo_cheque():
             request.form['codigo'],
             request.form['valor'],
             request.form.get('nome_destino'),
-            request.form.get('data_vencimento'),
+            data_vencimento,
             'PENDENTE',
             1
         ))
