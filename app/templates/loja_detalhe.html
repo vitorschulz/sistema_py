@@ -29,7 +29,9 @@
         Voltar
     </button>
 
-    <button onclick="window.location.href='/lojas/{{ loja.id }}/editar?next={{ request.path }}'">
+    <button 
+    data-url="/lojas/{{ loja.id }}/editar?next={{ (request.args.get('next') or request.full_path) | urlencode }}"
+    onclick="window.location.href=this.dataset.url">
         Editar
     </button>
 

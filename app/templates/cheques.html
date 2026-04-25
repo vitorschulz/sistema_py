@@ -93,19 +93,19 @@
             <td class="acoes-tabela">
 
 
-                    <a href="/cheques/{{ c.id }}/compensar" class="btn-compensar" data-confirm="Deseja compensar este cheque?">
+                    <a href="/cheques/{{ c.id }}/compensar?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-compensar" data-confirm="Deseja compensar este cheque?">
                         Compensar
                     </a>
 
-                    <a href="/cheques/{{ c.id }}/devolver" class="btn-devolver" data-confirm="Deseja sustar este cheque?">
+                    <a href="/cheques/{{ c.id }}/devolver?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-devolver" data-confirm="Deseja sustar este cheque?">
                         Sustar
                     </a>
 
-                    <a href="/cheques/{{ c.id }}/excluir" class="btn-excluir" data-confirm="Deseja excluir este cheque?">
+                    <a href="/cheques/{{ c.id }}/excluir?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-excluir" data-confirm="Deseja excluir este cheque?">
                         Excluir
                     </a>
 
-                    <a href="/cheques/{{ c.id }}/editar" class="btn-editar">
+                    <a href="/cheques/{{ c.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
                         Editar
                     </a>
 

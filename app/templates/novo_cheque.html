@@ -26,6 +26,7 @@
             value="{{ cheque.codigo if cheque and cheque.codigo else '' }}">
         </div>
 
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}">
 
         <div class="form-group">
             <label>Nome</label>

@@ -115,7 +115,7 @@ def nova_loja():
     
         cursor.execute("""
         SELECT id FROM lojas
-        WHERE nome=%s AND shopping_id=%s
+        WHERE nome=%s AND shopping_id=%s AND ativo = TRUE
         """, (nome, shopping_id))
 
         existe = cursor.fetchone()
@@ -199,6 +199,11 @@ def editar_loja(id):
 
         flash("Loja atualizada com sucesso!", "success")
 
+        next_url = request.form.get("next") or request.args.get("next")
+
+        if next_url:
+            return redirect(next_url)
+
         if shopping_origem:
             return redirect(f"/shopping/{shopping_origem}")
 
@@ -234,6 +239,11 @@ def excluir_loja(id):
     conn.close()
 
     flash("Loja excluída com sucesso!", "success")
+
+    next_url = request.args.get("next")
+
+    if next_url:
+        return redirect(next_url)
 
     shopping_origem = request.args.get("shopping")
 

@@ -40,6 +40,8 @@
             value="{{ cliente.endereco if cliente }}">
         </div>
 
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+
         <div class="form-group">
             <label>Observações</label>
             <textarea name="observacoes" rows="4" maxlength="500">{{ cliente.observacoes if cliente }}</textarea>

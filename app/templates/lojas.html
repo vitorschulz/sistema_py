@@ -59,7 +59,7 @@
         <tr class="linha-clicavel">
 
             <td> 
-                <a href="/lojas/{{ loja.id }}" class="tabela-link">
+                <a href="/lojas/{{ loja.id }}?next={{ request.full_path | urlencode }}" class="tabela-link">
                 {{ loja.nome }}
                 </a>
             </td>
@@ -72,11 +72,11 @@
 
             <td class="acoes-tabela">
 
-            <a href="/lojas/{{ loja.id }}/editar" class="btn-editar">
+            <a href="/lojas/{{ loja.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
             Editar
             </a>
 
-            <a href="/lojas/{{ loja.id }}/excluir"
+            <a href="/lojas/{{ loja.id }}/excluir?next={{ request.full_path | urlencode }}"
             class="btn-excluir" data-confirm="Deseja excluir esta loja?">
             Excluir
             </a>

@@ -165,7 +165,8 @@ def editar_cliente(id):
 
         flash("Cliente atualizado com sucesso!", "success")
 
-        return redirect("/clientes")
+        next_url = request.form.get("next") or request.args.get("next") or "/clientes"
+        return redirect(next_url)
 
     cursor.close()
     conn.close()
@@ -196,4 +197,7 @@ def excluir_cliente(id):
 
     flash("Cliente excluído com sucesso!", "success")
 
-    return redirect("/clientes")
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    return redirect(f"/clientes?sort={sort}&order={order}")
