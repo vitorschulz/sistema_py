@@ -63,6 +63,8 @@
             {{ "Editar" if shopping else "Salvar" }}
         </button>
 
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+
     </form>
 
 </section>

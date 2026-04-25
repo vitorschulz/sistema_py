@@ -59,7 +59,7 @@
         <tr class="linha-clicavel">
 
             <td>
-                <a href="/clientes/{{ cliente.id }}" class="tabela-link">
+                <a href="/clientes/{{ cliente.id }}?next={{ request.full_path | urlencode }}" class="tabela-link">
                     {{ cliente.nome }}
                 </a>
             </td>
@@ -69,11 +69,11 @@
 
             <td class="acoes-tabela">
 
-                <a href="/clientes/{{ cliente.id }}/editar" class="btn-editar">
+                <a href="/clientes/{{ cliente.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
                 Editar
                 </a>
 
-                <a href="/clientes/{{ cliente.id }}/excluir"
+                <a href="/clientes/{{ cliente.id }}/excluir?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}"
                 class="btn-excluir" 
                 data-confirm="Deseja excluir este cliente?">
                 Excluir

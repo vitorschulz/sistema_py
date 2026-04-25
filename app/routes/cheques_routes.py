@@ -100,7 +100,10 @@ def novo_cheque():
         cursor.close()
         conn.close()
 
-        return redirect('/cheques')
+        sort = request.args.get("sort")
+        order = request.args.get("order")
+
+        return redirect(f'/cheques?sort={sort}&order={order}')
 
 
     cursor.execute("""
@@ -137,7 +140,10 @@ def compensar_cheque(id):
     conn.close()
 
     flash('Cheque compensado com sucesso!', 'success')
-    return redirect('/cheques')
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    return redirect(f'/cheques?sort={sort}&order={order}')
 
 #botao sustar no cheque
 @cheques.route('/<int:id>/devolver')
@@ -160,7 +166,10 @@ def devolver_cheque(id):
     cursor.close()
     conn.close()
 
-    return redirect('/cheques')
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    return redirect(f'/cheques?sort={sort}&order={order}')
 
 #apagar botao
 @cheques.route('/<int:id>/excluir')
@@ -182,7 +191,10 @@ def excluir_cheque(id):
     cursor.close()
     conn.close()
 
-    return redirect('/cheques')
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    return redirect(f'/cheques?sort={sort}&order={order}')
 
 
 #editrar
@@ -216,7 +228,8 @@ def editar_cheque(id):
         cursor.close()
         conn.close()
 
-        return redirect('/cheques')
+        next_url = request.form.get("next") or request.args.get("next") or "/cheques"
+        return redirect(next_url)
 
     cursor.execute("SELECT * FROM cheques WHERE id = %s", (id,))
     cheque = cursor.fetchone()

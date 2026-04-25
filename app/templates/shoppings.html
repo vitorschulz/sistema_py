@@ -58,7 +58,7 @@
     <tr class="linha-clicavel">
 
         <td>
-            <a href="/shopping/{{ shopping.id }}" class="tabela-link">
+            <a href="/shopping/{{ shopping.id }}?next={{ request.full_path | urlencode }}" class="tabela-link">
                 {{ shopping.nome }}
             </a>
         </td>
@@ -75,11 +75,11 @@
 
         <td class="acoes-tabela">
 
-            <a href="/shopping/{{ shopping.id }}/editar" class="btn-editar">
+            <a href="/shopping/{{ shopping.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
                 Editar
             </a>
 
-            <a href="/shopping/{{ shopping.id }}/excluir" class="btn-excluir" data-confirm="Deseja excluir este shopping?">
+            <a href="/shopping/{{ shopping.id }}/excluir?next={{ request.full_path | urlencode }}" class="btn-excluir" data-confirm="Deseja excluir este shopping?">
                 Excluir
             </a>
 

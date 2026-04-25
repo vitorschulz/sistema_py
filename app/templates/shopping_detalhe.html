@@ -79,7 +79,7 @@
     <tr class="linha-clicavel">
 
         <td>
-            <a href="/lojas/{{ loja.id }}?next={{ request.path }}" class="tabela-link">
+            <a href="/lojas/{{ loja.id }}?next={{ request.full_path | urlencode }}" class="tabela-link">
                 {{ loja.nome }}
             </a>
         </td>
@@ -92,11 +92,11 @@
 
         <td class="acoes-tabela">
 
-            <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}&next={{ request.path }}" class="btn-editar">
+            <a href="/lojas/{{ loja.id }}/editar?shopping={{ shopping.id }}&next={{ request.full_path | urlencode }}" class="btn-editar">
                 Editar
             </a>
 
-            <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}&next={{ request.path }}"
+            <a href="/lojas/{{ loja.id }}/excluir?shopping={{ shopping.id }}&next={{ request.full_path | urlencode }}"
             class="btn-excluir"
             data-confirm="Deseja excluir esta loja?">
                 Excluir
@@ -131,7 +131,7 @@
         Voltar
     </button>
 
-    <button onclick="window.location.href='/shopping/{{ shopping.id }}/editar?next={{ request.path }}'">
+    <button onclick="window.location.href='/shopping/{{ shopping.id }}/editar?next={{ request.full_path | urlencode }}'">
         Editar
     </button>
 

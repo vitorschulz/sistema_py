@@ -219,7 +219,8 @@ def editar_shopping(id):
 
         flash("Shopping atualizado com sucesso!", "success")
 
-        return redirect("/shopping")
+        next_url = request.form.get("next") or request.args.get("next") or "/shopping"
+        return redirect(next_url)
 
     cursor.close()
     conn.close()
@@ -256,4 +257,5 @@ def excluir_shopping(id):
 
     flash("Shopping excluído com sucesso!", "success")
 
-    return redirect("/shopping")
+    next_url = request.args.get("next") or "/shopping"
+    return redirect(next_url)

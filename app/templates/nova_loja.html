@@ -66,6 +66,8 @@
             {{ "Salvar loja" if not loja else "Atualizar loja" }}
         </button>
 
+        <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+
     </form>
 
 </section>
