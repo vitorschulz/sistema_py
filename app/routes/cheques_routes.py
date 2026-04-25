@@ -216,7 +216,7 @@ def editar_cheque(id):
         """, (
             request.form['codigo'],
             request.form['valor'],
-            request.form['nome_destino'],
+            request.form.get('nome_destino'),
             request.form.get('data_vencimento'),
             id
         ))
