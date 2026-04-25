@@ -1158,8 +1158,13 @@ def exportar_tarefas(id):
         shopping_id = p.get("shopping_id") or 0
         loja_id = p.get("loja_id") or 0
 
-        shopping_nome = p["shopping_nome"] or "-"
-        loja_nome = p["loja_nome"] or "-"
+        shopping_nome = p["shopping_nome"]
+        shopping_nome = shopping_nome.strip() if shopping_nome else "-"
+        shopping_nome = shopping_nome if shopping_nome else "-"
+
+        loja_nome = p["loja_nome"]
+        loja_nome = loja_nome.strip() if loja_nome else "-"
+        loja_nome = loja_nome if loja_nome else "-"
 
         # shopping
         if shopping_id not in estrutura:
@@ -1178,11 +1183,11 @@ def exportar_tarefas(id):
     wb = Workbook()
     ws = wb.active
     ws.title = "Tarefas"
-    altura_padrao = 15
+    altura_padrao = 16
     LINHAS_POR_PAGINA = 45
     ALTURA_MAX_PAGINA = LINHAS_POR_PAGINA * altura_padrao
     altura_na_pagina = 3 * altura_padrao
-    fonte_padrao = Font(size=12)
+    fonte_padrao = Font(size=13)
     fonte_titulo = Font(size=14, bold=True)
     linhas_sem_borda = set()
 
@@ -1331,14 +1336,14 @@ def exportar_tarefas(id):
 
             for p in estrutura[shopping_id][loja_id]:
 
-                cliente = (p["cliente_nome"] or "-").title() if p["cliente_nome"] else "-"
+                cliente = (p["cliente_nome"] or "-").upper() if p["cliente_nome"] else "-"
                 tipo = (p["tipo"] or "-")
-                tipo = tipo.replace(",", ", ").replace("_", "/").title() if tipo != "-" else "-"
+                tipo = tipo.replace(",", ", ").replace("_", "/").upper() if tipo != "-" else "-"
                 max_tipo_len = max(max_tipo_len, len(tipo))
                 doc = p["cpf_cnpj"] or "-"
 
                 # loja (coluna A)
-                cell_loja = ws.cell(row=row, column=1, value=loja_nome.title())
+                cell_loja = ws.cell(row=row, column=1, value=(loja_nome or "-").upper())
                 cell_loja.alignment = Alignment(wrap_text=True, vertical="center")
                 cell_loja.font = fonte_padrao
 
@@ -1380,7 +1385,7 @@ def exportar_tarefas(id):
             altura_na_pagina += altura_padrao
         
     # 🔹 OBSERVAÇÕES
-    cell_obs = ws.cell(row=row, column=1, value="Observações:")
+    cell_obs = ws.cell(row=row, column=1, value="OBSERVAÇÕES:")
     cell_obs.font = Font(size=13, bold=True)
     cell_obs.alignment = Alignment(vertical="top")
     ws.row_dimensions[row].height = altura_padrao
@@ -1418,10 +1423,10 @@ def exportar_tarefas(id):
     ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
     ws.print_area = f"A1:D{row}"
     ws.page_margins = PageMargins(
-    left=0.10,
-    right=0.10,
-    top=0.15,
-    bottom=0.15
+    left=0.05,
+    right=0.05,
+    top=0.05,
+    bottom=0.05
     )
     # salva em memória
     file = io.BytesIO()
@@ -1505,7 +1510,7 @@ def exportar_ordem(id):
 
     # título
     titulo = ws.cell(row=row, column=1, value="ORDEM DE CLIENTES")
-    titulo.font = Font(bold=True, size=14)
+    titulo.font = Font(bold=True, size=16)
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=5)
     titulo.alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[row].height = altura_padrao
@@ -1517,7 +1522,7 @@ def exportar_ordem(id):
 
     for col, texto in enumerate(headers, start=1):
         cell = ws.cell(row=row, column=col, value=texto)
-        cell.font = Font(bold=True)
+        cell.font = Font(bold=True, size=13)
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.fill = fill
 
@@ -1530,17 +1535,19 @@ def exportar_ordem(id):
     # conteúdo
     for i, c in enumerate(clientes, start=1):
 
-        nome = (c["nome"] or "-").title()
+        nome = (c["nome"] or "-").upper()
         endereco = c["endereco"]
         telefone = c["telefone"] or "-"
         max_end_len = max(max_end_len, len(endereco))
 
         # ordem (esquerda)
         cell_ordem = ws.cell(row=row, column=1, value=f"{i}.")
+        cell_ordem.font = Font(size=12)
         cell_ordem.alignment = Alignment(horizontal="center", vertical="center")
 
         # nome (meio)
         cell_nome = ws.cell(row=row, column=2, value=nome)
+        cell_nome.font = Font(size=12)
         cell_nome.alignment = Alignment(wrap_text=True, vertical="center")
 
         # endereço (direita)
@@ -1551,9 +1558,10 @@ def exportar_ordem(id):
         else:
             cell_end = ws.cell(row=row, column=3, value=endereco)
             cell_end.alignment = Alignment(wrap_text=True, vertical="center")
+            cell_end.font = Font(size=13)
 
         cell_tel = ws.cell(row=row, column=4, value=telefone)
-        cell_tel.font = Font(bold=True)
+        cell_tel.font = Font(size=12, bold=True)
         cell_tel.alignment = Alignment(horizontal="center", vertical="center")
         ws.cell(row=row, column=5, value="")
 
@@ -1594,7 +1602,7 @@ def exportar_ordem(id):
         ws.page_setup.fitToPage = True
     else:
         ws.page_setup.fitToPage = False
-        ws.page_setup.scale = 80
+        ws.page_setup.scale = 100
     file = io.BytesIO()
     wb.save(file)
     file.seek(0)
