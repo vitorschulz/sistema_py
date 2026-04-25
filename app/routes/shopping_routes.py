@@ -171,12 +171,14 @@ def novo_shopping():
 
         conn.commit()
 
+        shopping_id = cursor.lastrowid
+
         cursor.close()
         conn.close()
 
         flash("Shopping criado com sucesso!", "success")
 
-        return redirect("/shopping")
+        return redirect(f"/shopping/{shopping_id}")
 
     return render_template("novo_shopping.html")
 
