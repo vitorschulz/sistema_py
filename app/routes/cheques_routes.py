@@ -86,7 +86,7 @@ def novo_cheque():
         """, (
             request.form['codigo'],
             request.form['valor'],
-            request.form['nome_destino'],
+            request.form.get('nome_destino'),
             request.form.get('data_vencimento'),
             'PENDENTE',
             1
