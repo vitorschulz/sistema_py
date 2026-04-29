@@ -1,124 +1,124 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block content %}
+    {% block content %}
 
-<h1>Cheques</h1>
+    <h1>Cheques</h1>
 
-    <section class="acoes">
+        <section class="acoes">
 
-        <button onclick="window.location.href='/cheques/novo'">
-            + Novo cheque
-        </button>
+            <button onclick="window.location.href='/cheques/novo'">
+                + Novo cheque
+            </button>
 
-        <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
+            <input type="text" id="campo-busca" placeholder="Buscar..." onkeyup="filtrarTabela()" >
 
-    </section>
+        </section>
 
-<section class="card">
+    <section class="card">
 
-    <table id="tabela-lista" class="tabela-cheques">
+        <table id="tabela-lista" class="tabela-cheques">
 
-        <tr class="thead-hover">
+            <tr class="thead-hover">
 
-            <th>
-                <a class="tabela-link"
-                href="{{ url_for('cheques.listar_cheques', sort='codigo', order=proxima_ordem_codigo) }}">
-                    <strong>Código</strong>
-                </a>
-            </th>
-
-            <th>
-                <a class="tabela-link"
-                href="{{ url_for('cheques.listar_cheques', sort='nome_destino', order=proxima_ordem_destino) }}">
-                    <strong>Destino</strong>
-                </a>
-            </th>
-
-            <th>
-                <a class="tabela-link"
-                href="{{ url_for('cheques.listar_cheques', sort='data_vencimento', order=proxima_ordem_vencimento) }}">
-                    <strong>Vencimento</strong>
-                </a>
-            </th>
-
-            <th>
-                <a class="tabela-link"
-                href="{{ url_for('cheques.listar_cheques', sort='valor', order=proxima_ordem_valor) }}">
-                    <strong>Valor</strong>
-                </a>
-            </th>
-
-            <th>
-                <a class="tabela-link"
-                href="{{ url_for('cheques.listar_cheques', sort='status', order=proxima_ordem_status) }}">
-                    <strong>Status</strong>
-                </a>
-            </th>
-
-            <th style="width: 340px;">Ações</th>
-
-    </tr>
-
-        {% for c in cheques %}
-
-        <tr class="linha-clicavel">
-            <td>
-                {{ c.codigo or "—" }}
-            </td>
-
-            <td>
-                {{ c.nome_destino or "—" }}
-            </td>
-
-            <td>
-                {{ c.data_vencimento.strftime('%d/%m/%Y') if c.data_vencimento else "—" }}
-            </td>
-
-            <td>
-                R$ {{ c.valor or "—" }}
-            </td>
-
-            <td>
-                {% if c.status == 'PENDENTE' %}
-                    <span class="status-pendente">Pendente</span>
-                {% elif c.status == 'COMPENSADO' %}
-                    <span class="status-ok">Compensado</span>
-                {% elif c.status == 'SUSTADO' %}
-                    <span class="status-sustado">Sustado</span>
-                {% else %}
-                    {{ c.status  or "—" }}
-                {% endif %}
-            </td>
-
-            <td class="acoes-tabela">
-
-
-                    <a href="/cheques/{{ c.id }}/compensar?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-compensar" data-confirm="Deseja compensar este cheque?">
-                        Compensar
+                <th>
+                    <a class="tabela-link"
+                    href="{{ url_for('cheques.listar_cheques', sort='codigo', order=proxima_ordem_codigo) }}">
+                        <strong>Código</strong>
                     </a>
+                </th>
 
-                    <a href="/cheques/{{ c.id }}/devolver?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-devolver" data-confirm="Deseja sustar este cheque?">
-                        Sustar
+                <th>
+                    <a class="tabela-link"
+                    href="{{ url_for('cheques.listar_cheques', sort='nome_destino', order=proxima_ordem_destino) }}">
+                        <strong>Destino</strong>
                     </a>
+                </th>
 
-                    <a href="/cheques/{{ c.id }}/excluir?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-excluir" data-confirm="Deseja excluir este cheque?">
-                        Excluir
+                <th>
+                    <a class="tabela-link"
+                    href="{{ url_for('cheques.listar_cheques', sort='data_vencimento', order=proxima_ordem_vencimento) }}">
+                        <strong>Vencimento</strong>
                     </a>
+                </th>
 
-                    <a href="/cheques/{{ c.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
-                        Editar
+                <th>
+                    <a class="tabela-link"
+                    href="{{ url_for('cheques.listar_cheques', sort='valor', order=proxima_ordem_valor) }}">
+                        <strong>Valor</strong>
                     </a>
+                </th>
 
-            </td>
+                <th>
+                    <a class="tabela-link"
+                    href="{{ url_for('cheques.listar_cheques', sort='status', order=proxima_ordem_status) }}">
+                        <strong>Status</strong>
+                    </a>
+                </th>
+
+                <th style="width: 340px;">Ações</th>
 
         </tr>
 
-        {% endfor %}
+            {% for c in cheques %}
 
-    </table>
+            <tr class="linha-clicavel">
+                <td>
+                    {{ c.codigo or "—" }}
+                </td>
 
-</section>
+                <td>
+                    {{ c.nome_destino or "—" }}
+                </td>
 
-<script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+                <td>
+                    {{ c.data_vencimento.strftime('%d/%m/%Y') if c.data_vencimento else "—" }}
+                </td>
 
-{% endblock %}
+                <td>
+                    R$ {{ c.valor or "—" }}
+                </td>
+
+                <td>
+                    {% if c.status == 'PENDENTE' %}
+                        <span class="status-pendente">Pendente</span>
+                    {% elif c.status == 'COMPENSADO' %}
+                        <span class="status-ok">Compensado</span>
+                    {% elif c.status == 'SUSTADO' %}
+                        <span class="status-sustado">Sustado</span>
+                    {% else %}
+                        {{ c.status  or "—" }}
+                    {% endif %}
+                </td>
+
+                <td class="acoes-tabela">
+
+
+                        <a href="/cheques/{{ c.id }}/compensar?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-compensar" data-confirm="Deseja compensar este cheque?">
+                            Compensar
+                        </a>
+
+                        <a href="/cheques/{{ c.id }}/devolver?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-devolver" data-confirm="Deseja sustar este cheque?">
+                            Sustar
+                        </a>
+
+                        <a href="/cheques/{{ c.id }}/excluir?sort={{ request.args.get('sort') }}&order={{ request.args.get('order') }}" class="btn-excluir" data-confirm="Deseja excluir este cheque?">
+                            Excluir
+                        </a>
+
+                        <a href="/cheques/{{ c.id }}/editar?next={{ request.full_path | urlencode }}" class="btn-editar">
+                            Editar
+                        </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </section>
+
+    <script src="{{ url_for('static', filename='js/busca.js') }}"></script>
+
+    {% endblock %}

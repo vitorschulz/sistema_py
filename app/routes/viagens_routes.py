@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, request, redirect, jsonify, flash,
 from app.routes.main_routes import login_required
 from collections import defaultdict
 from app.config import get_db_connection
+import unicodedata
 
 viagens = Blueprint("viagens", __name__)
 def parse_data(data_str):
@@ -1082,6 +1083,7 @@ def deletar_financeiro(id):
     })
 
 #tabelas export
+
 import io
 @viagens.route("/viagens/<int:id>/exportar_tarefas")
 @login_required
@@ -1090,13 +1092,11 @@ def exportar_tarefas(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # viagem
     cursor.execute("SELECT * FROM viagens WHERE id=%s", (id,))
     viagem = cursor.fetchone()
 
-    # pedidos (ordem do site)
     cursor.execute("""
-        SELECT 
+        SELECT
             pedidos.ordem,
             pedidos.tipo,
             clientes.nome AS cliente_nome,
@@ -1106,73 +1106,61 @@ def exportar_tarefas(id):
             lojas.id AS loja_id,
             shopping.id AS shopping_id
         FROM pedidos
-
-        LEFT JOIN clientes 
-            ON pedidos.cliente_id = clientes.id
-
-        LEFT JOIN lojas 
-            ON pedidos.loja_id = lojas.id
-
-        LEFT JOIN shopping 
-            ON lojas.shopping_id = shopping.id
-
-        LEFT JOIN viagem_loja vl 
-            ON vl.loja_id = lojas.id 
-            AND vl.viagem_id = pedidos.viagem_id   
-
-        LEFT JOIN viagem_shopping vs 
-            ON vs.shopping_id = shopping.id 
-            AND vs.viagem_id = pedidos.viagem_id        
-
+        LEFT JOIN clientes   ON pedidos.cliente_id  = clientes.id
+        LEFT JOIN lojas      ON pedidos.loja_id     = lojas.id
+        LEFT JOIN shopping   ON lojas.shopping_id   = shopping.id
+        LEFT JOIN viagem_loja vl
+            ON vl.loja_id    = lojas.id
+            AND vl.viagem_id = pedidos.viagem_id
+        LEFT JOIN viagem_shopping vs
+            ON vs.shopping_id = shopping.id
+            AND vs.viagem_id  = pedidos.viagem_id
         WHERE pedidos.viagem_id = %s
-
-        ORDER BY 
+        ORDER BY
             COALESCE(vs.ordem, 9999),
             COALESCE(vl.ordem, 9999),
             pedidos.ordem
     """, (id,))
 
     pedidos = cursor.fetchall()
-
     cursor.close()
     conn.close()
 
+    if viagem.get("local") == "Santa Catarina":
+        return _exportar_santa_catarina(viagem, pedidos)
+    else:
+        return _exportar_serra(viagem, pedidos)
+
+
+# ── UTILITÁRIOS ───────────────────────────────────────────────────────────────
+
+def _limpar_texto(texto):
     import unicodedata
+    return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
 
-    def limpar_texto(texto):
-        return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
 
+def _nome_arquivo(viagem):
     local = viagem.get("local") or "viagem"
-    data = viagem.get("data_viagem")
+    data  = viagem.get("data_viagem")
+    local_str = _limpar_texto(local).replace(" ", "_").lower()
+    data_str  = data.strftime("%d-%m-%Y") if data else "sem_data"
+    return f"Viagem_{local_str}_{data_str}.xlsx"
 
-    local_str = limpar_texto(local).replace(" ", "_").lower()
-    data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
 
-    nome_arquivo = f"Viagem_{local_str}_{data_str}.xlsx"
-
-    # organiza mantendo ordem
-    estrutura = defaultdict(lambda: defaultdict(list))
+def _organizar_estrutura(pedidos):
+    estrutura       = defaultdict(lambda: defaultdict(list))
     ordem_shoppings = []
-    ordem_lojas = {}
+    ordem_lojas     = {}
 
     for p in pedidos:
+        shopping_id   = p.get("shopping_id") or 0
+        loja_id       = p.get("loja_id") or 0
+        shopping_nome = (p["shopping_nome"] or "-").strip() or "-"
+        loja_nome     = (p["loja_nome"] or "-").strip() or "-"
 
-        shopping_id = p.get("shopping_id") or 0
-        loja_id = p.get("loja_id") or 0
-
-        shopping_nome = p["shopping_nome"]
-        shopping_nome = shopping_nome.strip() if shopping_nome else "-"
-        shopping_nome = shopping_nome if shopping_nome else "-"
-
-        loja_nome = p["loja_nome"]
-        loja_nome = loja_nome.strip() if loja_nome else "-"
-        loja_nome = loja_nome if loja_nome else "-"
-
-        # shopping
         if shopping_id not in estrutura:
             ordem_shoppings.append((shopping_id, shopping_nome))
 
-        # loja
         if shopping_id not in ordem_lojas:
             ordem_lojas[shopping_id] = []
 
@@ -1181,270 +1169,410 @@ def exportar_tarefas(id):
 
         estrutura[shopping_id][loja_id].append(p)
 
-    # cria excel
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Tarefas"
-    altura_padrao = 16
-    LINHAS_POR_PAGINA = 45
-    ALTURA_MAX_PAGINA = LINHAS_POR_PAGINA * altura_padrao
-    altura_na_pagina = 3 * altura_padrao
-    fonte_padrao = Font(size=13)
-    fonte_titulo = Font(size=14, bold=True)
-    linhas_sem_borda = set()
+    return estrutura, ordem_shoppings, ordem_lojas
 
 
-    def calcular_altura_linha(textos, larguras, altura_base):
-        maior_linhas = 1
+def _configurar_colunas(ws):
+    ws.column_dimensions['A'].width = 26
+    ws.column_dimensions['B'].width = 34
+    ws.column_dimensions['C'].width = 22
+    ws.column_dimensions['D'].width = 24
 
-        for texto, largura in zip(textos, larguras):
-            if not texto:
-                continue
 
-            texto = str(texto)
-            linhas = math.ceil(len(texto) / largura)
+def _configurar_impressao(ws, ultima_linha):
+    ws.print_options.horizontalCentered = True
+    ws.print_options.verticalCentered   = False
+    ws.page_setup.fitToHeight  = False
+    ws.page_setup.fitToWidth   = False
+    ws.page_setup.fitToPage    = False
+    ws.page_setup.scale        = 100
+    ws.page_setup.orientation  = ws.ORIENTATION_PORTRAIT
+    ws.print_area = f"A1:D{ultima_linha}"
+    ws.page_margins = PageMargins(
+    left=0.10, right=0.10, top=0.10, bottom=0.10,
+    header=0, footer=0
+    )
+    ws.oddHeader.center.text = ""
+    ws.oddFooter.center.text = ""
 
-            if linhas > maior_linhas:
-                maior_linhas = linhas
 
-        return altura_base * max(1, maior_linhas)
+def _calcular_altura_linha(textos, larguras, altura_base):
+    maior = 1
+    for texto, larg in zip(textos, larguras):
+        if not texto:
+            continue
+        linhas = math.ceil(len(str(texto)) / larg)
+        if linhas > maior:
+            maior = linhas
+    return altura_base * max(1, maior)
 
-    def adicionar_espaco_inicio_pagina():
-        nonlocal row, altura_na_pagina
 
-        for _ in range(2):
-            ws.row_dimensions[row].height = altura_padrao
-            linhas_sem_borda.add(row)
-            row += 1
-            altura_na_pagina += altura_padrao
+def _escrever_linha_pedido(ws, row, loja_nome, p, fonte_padrao, altura_base):
+    cliente = (p["cliente_nome"] or "-").upper()
+    tipo    = (p["tipo"] or "-")
+    tipo    = tipo.replace(",", ", ").replace("_", "/").upper() if tipo != "-" else "-"
+    doc     = p["cpf_cnpj"] or "-"
 
-    #funcao altura variavel
-    def calcular_tamanho_shopping(shopping_id):
-        total_altura = altura_padrao  # linha do nome do shopping
+    cel_loja    = ws.cell(row=row, column=1, value=(loja_nome or "-").upper())
+    cel_cliente = ws.cell(row=row, column=2, value=cliente)
+    cel_tipo    = ws.cell(row=row, column=3, value=tipo)
+    cel_doc     = ws.cell(row=row, column=4, value=doc)
 
-        for loja_id, loja_nome in ordem_lojas[shopping_id]:
-            for p in estrutura[shopping_id][loja_id]:
+    for cel, hor in [(cel_loja, "left"), (cel_cliente, "left"),
+                     (cel_tipo, "center"), (cel_doc, "center")]:
+        cel.alignment = Alignment(wrap_text=True, horizontal=hor, vertical="center")
+        cel.font = fonte_padrao
 
-                cliente = (p["cliente_nome"] or "-").title() if p["cliente_nome"] else "-"
-                tipo = (p["tipo"] or "-")
-                tipo = tipo.replace(",", ", ").replace("_", "/").title() if tipo != "-" else "-"
-                doc = p["cpf_cnpj"] or "-"
+    altura = _calcular_altura_linha(
+        [loja_nome, cliente, tipo, doc],
+        [24, 32, 20, 22],
+        altura_base
+    )
+    ws.row_dimensions[row].height = altura
+    return altura
 
-                altura = calcular_altura_linha(
-                    [loja_nome, cliente, tipo, doc],
-                    [24, 32, 20, 22],
-                    altura_padrao
-                )
 
-                total_altura += altura
-
-        total_altura += 4 * altura_padrao  # espaço entre shoppings
-        return total_altura
-
-    # 🔹 largura das colunas
-    ws.column_dimensions['A'].width = 24  # loja
-    ws.column_dimensions['B'].width = 32  # cliente
-    ws.column_dimensions['C'].width = 20  # tipo
-    ws.column_dimensions['D'].width = 22  # doc
-
-    max_tipo_len = 0
-
-    row = 3  # ALTERADO
-
-    # NOVO - garante altura nas 2 primeiras linhas
-    ws.row_dimensions[1].height = altura_padrao
-    ws.row_dimensions[2].height = altura_padrao
-    linhas_sem_borda.add(1)
-    linhas_sem_borda.add(2)
-
-    # 🔹 TOPO (LOCAL + DATA)
-    local = (viagem.get("local") or "-").upper()
+def _escrever_header(ws, row, viagem, altura_base):
+    local    = (viagem.get("local") or "-").upper()
     data_obj = viagem.get("data_viagem")
-    data = data_obj.strftime("%d/%m/%Y") if data_obj else "-"
+    data     = data_obj.strftime("%d/%m/%Y") if data_obj else "-"
 
-    cell_local = ws.cell(row=row, column=1, value=local)
-    cell_data = ws.cell(row=row, column=3, value=data)
+    fonte_titulo = Font(size=14, bold=True)
+    fill_cinza   = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
 
-    cell_local.font = fonte_titulo
-    cell_data.font = fonte_titulo
-
-    cell_local.alignment = Alignment(vertical="center")
-    cell_data.alignment = Alignment(horizontal="center", vertical="center")
-
-    fill_cinza = PatternFill(start_color="EEEEEE", end_color="EEEEEE", fill_type="solid")
+    ws.cell(row=row, column=1, value=local).font = fonte_titulo
+    ws.cell(row=row, column=1).alignment = Alignment(vertical="center")
+    ws.cell(row=row, column=3, value=data).font = fonte_titulo
+    ws.cell(row=row, column=3).alignment = Alignment(horizontal="center", vertical="center")
 
     for col in range(1, 5):
         ws.cell(row=row, column=col).fill = fill_cinza
 
-    ws.row_dimensions[row].height = altura_padrao
-
-    for i in range(2):  # ALTERADO (antes era row += 4)
-        row += 1
-        altura_na_pagina += altura_padrao
-        ws.row_dimensions[row].height = altura_padrao  # espaço
-        
-
-    # 🔹 LOOP DOS SHOPPINGS
-    for shopping_id, shopping_nome in ordem_shoppings:
-
-        tamanho_shopping = calcular_tamanho_shopping(shopping_id)
-
-        # QUEBRA DE PÁGINA BASEADA NA ALTURA
-        altura_restante = ALTURA_MAX_PAGINA - altura_na_pagina
-
-        MIN_LINHAS_RESTANTES = 5
-        ALTURA_MIN_RESTANTE = MIN_LINHAS_RESTANTES * altura_padrao
-
-        if altura_restante <= ALTURA_MIN_RESTANTE:
-            ws.row_breaks.append(Break(id=row - 1))
-            altura_na_pagina = 0
-
-            adicionar_espaco_inicio_pagina()
-
-            altura_restante = ALTURA_MAX_PAGINA
-
-        # margem mínima pra não deixar "resto feio"
-        MARGEM_SEGURANCA = altura_padrao * 2  # 2 linhas
-
-        precisa_quebrar = False
-
-        # 1️⃣ não cabe inteiro
-        if tamanho_shopping > altura_restante:
-            precisa_quebrar = True
-
-        # 2️⃣ cabe, mas vai deixar resto feio (tipo 1 linha sobrando)
-        elif altura_restante - tamanho_shopping < MARGEM_SEGURANCA:
-            precisa_quebrar = True
+    ws.row_dimensions[row].height = altura_base
+    return row + 1
 
 
-        if precisa_quebrar:
-            ws.row_breaks.append(Break(id=row - 1))
-            altura_na_pagina = 0
-
-            adicionar_espaco_inicio_pagina()
-
-        
-        # nome do shopping
-        cell_shop = ws.cell(row=row, column=1, value=shopping_nome.upper())
-        cell_shop.alignment = Alignment(wrap_text=True, vertical="center")
-        cell_shop.font = Font(size=13, bold=True)
-        ws.row_dimensions[row].height = altura_padrao
-
-        row += 1
-        altura_na_pagina += altura_padrao
-
-        # lojas e clientes
-        for loja_id, loja_nome in ordem_lojas[shopping_id]:
-
-            for p in estrutura[shopping_id][loja_id]:
-
-                cliente = (p["cliente_nome"] or "-").upper() if p["cliente_nome"] else "-"
-                tipo = (p["tipo"] or "-")
-                tipo = tipo.replace(",", ", ").replace("_", "/").upper() if tipo != "-" else "-"
-                max_tipo_len = max(max_tipo_len, len(tipo))
-                doc = p["cpf_cnpj"] or "-"
-
-                # loja (coluna A)
-                cell_loja = ws.cell(row=row, column=1, value=(loja_nome or "-").upper())
-                cell_loja.alignment = Alignment(wrap_text=True, vertical="center")
-                cell_loja.font = fonte_padrao
-
-                # cliente (coluna B)
-                cell_cliente = ws.cell(row=row, column=2, value=cliente)
-                cell_cliente.alignment = Alignment(wrap_text=True, vertical="center")
-                cell_cliente.font = fonte_padrao
-
-                # tipo (coluna C)
-                cell_tipo = ws.cell(row=row, column=3, value=tipo)
-                cell_tipo.alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
-                cell_tipo.font = fonte_padrao
-
-                # doc (coluna D)
-                cell_doc = ws.cell(row=row, column=4, value=doc)
-                cell_doc.alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
-                cell_doc.font = fonte_padrao
-
-                # alinhamento
-                ws.cell(row=row, column=3).alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
-                ws.cell(row=row, column=4).alignment = Alignment(wrap_text=True, horizontal="center", vertical="center")
-
-                # altura da linha
-                altura = calcular_altura_linha(
-                    [loja_nome, cliente, tipo, doc],
-                    [24, 32, 20, 22],
-                    altura_padrao
-                )
-
-                ws.row_dimensions[row].height = altura
-
-                row += 1
-                altura_na_pagina += altura
-
-        # espaço entre shoppings
-        for i in range(4):
-            ws.row_dimensions[row].height = altura_padrao
-            row += 1
-            altura_na_pagina += altura_padrao
-        
-    # 🔹 OBSERVAÇÕES
-    cell_obs = ws.cell(row=row, column=1, value="OBSERVAÇÕES:")
-    cell_obs.font = Font(size=13, bold=True)
-    cell_obs.alignment = Alignment(vertical="top")
-    ws.row_dimensions[row].height = altura_padrao
-
-    row += 1
-    altura_na_pagina += altura_padrao
-
-    # linhas pra escrever
-    for i in range(5):
-        ws.cell(row=row, column=1, value="")
-        ws.row_dimensions[row].height = altura_padrao
-        row += 1
-        altura_na_pagina += altura_padrao
-
+def _aplicar_bordas_pagina(ws, linha_inicio, linha_fim, linhas_sem_borda=None):
     borda = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'),  bottom=Side(style='thin')
     )
-
-    for r in range(1, row):
+    linhas_sem_borda = linhas_sem_borda or set()
+    for r in range(linha_inicio, linha_fim + 1):
         if r in linhas_sem_borda:
             continue
-
         for c in range(1, 5):
             ws.cell(row=r, column=c).border = borda
 
+
+def _preencher_ate_fim_pagina(ws, row, linha_inicio_pagina, linhas_pagina, altura_base):
+    """Adiciona linhas vazias até completar a página inteira."""
+    linhas_usadas = row - linha_inicio_pagina
+    linhas_faltam = linhas_pagina - linhas_usadas
+    for _ in range(max(0, linhas_faltam)):
+        ws.row_dimensions[row].height = altura_base
+        row += 1
+    return row
+
+
+# ── SERRA ─────────────────────────────────────────────────────────────────────
+
+def _exportar_serra(viagem, pedidos):
+    ALTURA_BASE   = 18
+    LINHAS_PAGINA = 42
+    LINHAS_HEADER = 4   # 2 branco + 1 título + 1 espaço
+    LINHAS_UTEIS  = LINHAS_PAGINA - LINHAS_HEADER
+    ESPACO_SHOP   = 2
+
+    estrutura, ordem_shoppings, ordem_lojas = _organizar_estrutura(pedidos)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Tarefas"
+    _configurar_colunas(ws)
+
+    fonte_padrao     = Font(size=13)
+    fill_shop        = PatternFill(start_color="F7F7F7", end_color="F7F7F7", fill_type="solid")
+    linhas_sem_borda = set()
+    paginas_bordas   = []
+
+    def _escrever_cabecalho_pagina(row):
+        """Escreve 2 linhas branco + header + 1 espaço. Retorna próxima row."""
+        for r in (row, row + 1):
+            ws.row_dimensions[r].height = ALTURA_BASE
+            linhas_sem_borda.add(r)
+        row += 2
+        row = _escrever_header(ws, row, viagem, ALTURA_BASE)  # escreve 1 linha, row+1
+        ws.row_dimensions[row].height = ALTURA_BASE
+        row += 1
+        return row
+
+    def _tam_shopping(shopping_id):
+        """Quantas linhas esse shopping vai ocupar (nome + pedidos + espaço)."""
+        total = 1  # linha do nome do shopping
+        for loja_id, loja_nome in ordem_lojas[shopping_id]:
+            for p in estrutura[shopping_id][loja_id]:
+                cliente = (p["cliente_nome"] or "-").upper()
+                tipo    = (p["tipo"] or "-").replace(",", ", ").replace("_", "/").upper()
+                doc     = p["cpf_cnpj"] or "-"
+                h = _calcular_altura_linha(
+                    [loja_nome, cliente, tipo, doc],
+                    [24, 32, 20, 22], ALTURA_BASE)
+                total += max(1, round(h / ALTURA_BASE))
+        total += ESPACO_SHOP
+        return total
+
+    def _escrever_shopping(row, shopping_id, shopping_nome):
+        linhas = 1  # linha do nome
+        cel = ws.cell(row=row, column=1, value=shopping_nome.upper())
+        cel.font      = Font(size=13, bold=True)
+        cel.alignment = Alignment(wrap_text=True, vertical="center")
+        ws.row_dimensions[row].height = ALTURA_BASE
+        for col in range(1, 5):
+            ws.cell(row=row, column=col).fill = fill_shop
+        row += 1
+
+        for loja_id, loja_nome in ordem_lojas[shopping_id]:
+            for p in estrutura[shopping_id][loja_id]:
+                h = _escrever_linha_pedido(ws, row, loja_nome, p, fonte_padrao, ALTURA_BASE)
+                linhas_gastas = max(1, round(h / ALTURA_BASE))
+                linhas += linhas_gastas
+                row += 1
+
+        for _ in range(ESPACO_SHOP):
+            ws.row_dimensions[row].height = ALTURA_BASE
+            row += 1
+        linhas += ESPACO_SHOP
+
+        return row, linhas  # retorna row E linhas reais
+
+    def _preencher_fim_pagina(row, linhas_usadas):
+        faltam = LINHAS_PAGINA - linhas_usadas
+        for _ in range(max(0, faltam)):
+            ws.row_dimensions[row].height = ALTURA_BASE
+            row += 1
+        return row
+
+    # ── PRIMEIRA PÁGINA ──
+    row_ini_pagina = 1
+    row = _escrever_cabecalho_pagina(1)
+    linhas_usadas = LINHAS_HEADER
+
+    for shopping_id, shopping_nome in ordem_shoppings:
+        tam = _tam_shopping(shopping_id)
+
+        # cabe na página atual?
+        if linhas_usadas + tam > LINHAS_UTEIS:
+            if linhas_usadas > LINHAS_HEADER:
+            # preenche até o fim e quebra
+                row = _preencher_fim_pagina(row, linhas_usadas)
+                paginas_bordas.append((row_ini_pagina, row - 1))
+                ws.row_breaks.append(Break(id=row - 1))
+
+                row_ini_pagina = row
+                row = _escrever_cabecalho_pagina(row)
+                linhas_usadas = LINHAS_HEADER
+
+        row, tam_real = _escrever_shopping(row, shopping_id, shopping_nome)
+        linhas_usadas += tam_real
+
+    # preenche última página
+    row = _preencher_fim_pagina(row, linhas_usadas)
+    paginas_bordas.append((row_ini_pagina, row - 1))
+
+    for ini, fim in paginas_bordas:
+        _aplicar_bordas_pagina(ws, ini, fim, linhas_sem_borda)
+
+    _configurar_impressao(ws, row - 1)
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    return send_file(buf, as_attachment=True,
+                     download_name=_nome_arquivo(viagem),
+                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+# ── SANTA CATARINA ────────────────────────────────────────────────────────────
+
+def _exportar_santa_catarina(viagem, pedidos):
+    ALTURA_BASE   = 18
+    LINHAS_PAGINA = 42
+
+    estrutura, ordem_shoppings, ordem_lojas = _organizar_estrutura(pedidos)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Tarefas"
+    _configurar_colunas(ws)
+
+    fonte_padrao = Font(size=13)
+    fonte_aviso  = Font(size=11, bold=True, italic=True)
+    fill_shop    = PatternFill(start_color="F7F7F7", end_color="F7F7F7", fill_type="solid")
+    fill_aviso   = PatternFill(start_color="FFE0E0", end_color="FFE0E0", fill_type="solid")
+    linhas_sem_borda = set()
+
+    # header = 2 branco + 1 título + 1 espaço = 4 linhas
+    LINHAS_HEADER = 4
+    LINHAS_UTIL   = LINHAS_PAGINA - LINHAS_HEADER
+    LINHAS_SHOP_1 = LINHAS_UTIL // 2
+    LINHAS_SHOP_2 = LINHAS_UTIL - LINHAS_SHOP_1  # pega o resto se ímpar
+
+    def _escrever_bloco_shopping(shopping_id, shopping_nome, row_inicio, linhas_disponiveis):
+        r = row_inicio
+
+        cel = ws.cell(row=r, column=1, value=shopping_nome.upper())
+        cel.font      = Font(size=13, bold=True)
+        cel.alignment = Alignment(wrap_text=True, vertical="center")
+        ws.row_dimensions[r].height = ALTURA_BASE
+        for col in range(1, 5):
+            ws.cell(row=r, column=col).fill = fill_shop
+        r += 1
+        linhas_usadas = 1
+
+        LIMITE = linhas_disponiveis - 1 # reserva 1 pra aviso
+        pedidos_nao_exibidos = 0
+
+        for loja_id, loja_nome in ordem_lojas.get(shopping_id, []):
+            for p in estrutura[shopping_id][loja_id]:
+
+                if pedidos_nao_exibidos > 0:
+                    pedidos_nao_exibidos += 1
+                    continue
+
+                h = _escrever_linha_pedido(ws, r, loja_nome, p, fonte_padrao, ALTURA_BASE)
+                linhas_gastas = max(1, round(h / ALTURA_BASE))
+
+                if linhas_usadas + linhas_gastas > LIMITE:
+                    print(f"  REJEITOU | linhas_usadas={linhas_usadas} linhas_gastas={linhas_gastas} LIMITE={LIMITE}")
+                    for col in range(1, 5):
+                        ws.cell(row=r, column=col).value     = None
+                        ws.cell(row=r, column=col).font      = Font()
+                        ws.cell(row=r, column=col).alignment = Alignment()
+                    ws.row_dimensions[r].height = ALTURA_BASE
+                    pedidos_nao_exibidos += 1
+                    continue
+
+                linhas_usadas += linhas_gastas
+                r += 1
+
+        if pedidos_nao_exibidos > 0:
+            for col in range(1, 5):
+                ws.cell(row=r, column=col).value = None
+                ws.cell(row=r, column=col).fill  = fill_aviso
+            cel_aviso = ws.cell(row=r, column=1,
+                                value=f"⚠ +{pedidos_nao_exibidos} pedido(s) não exibido(s)")
+            cel_aviso.font      = fonte_aviso
+            cel_aviso.alignment = Alignment(vertical="center")
+            ws.row_dimensions[r].height = ALTURA_BASE
+            r += 1
+            linhas_usadas += 1
+
+        while linhas_usadas < linhas_disponiveis:
+            ws.row_dimensions[r].height = ALTURA_BASE
+            r += 1
+            linhas_usadas += 1
+
+        return r
+
+    def _bloco_vazio(row_inicio, linhas):
+        r = row_inicio
+        for _ in range(linhas):
+            ws.row_dimensions[r].height = ALTURA_BASE
+            r += 1
+        return r
+
+    paginas_bordas = []
+
+    # ── PÁGINA 1 ──────────────────────────────────────────────
+    row_ini_pag1 = 1
+
+    for r_b in (1, 2):
+        ws.row_dimensions[r_b].height = ALTURA_BASE
+        linhas_sem_borda.add(r_b)
+
+    row = 3
+    row = _escrever_header(ws, row, viagem, ALTURA_BASE)  # row vira 4
+
+    ws.row_dimensions[row].height = ALTURA_BASE  # 1 espaço após header
+    row += 1
+
+    # shop 0
+    if len(ordem_shoppings) > 0:
+        sid, snome = ordem_shoppings[0]
+        row = _escrever_bloco_shopping(sid, snome, row, LINHAS_SHOP_1)
+    else:
+        row = _bloco_vazio(row, LINHAS_SHOP_1)
+
+    # shop 1
+    if len(ordem_shoppings) > 1:
+        sid, snome = ordem_shoppings[1]
+        row = _escrever_bloco_shopping(sid, snome, row, LINHAS_SHOP_2)
+    else:
+        row = _bloco_vazio(row, LINHAS_SHOP_2)
+
+    paginas_bordas.append((row_ini_pag1, row - 1))
+
+    # ── PÁGINA 2 ──────────────────────────────────────────────
+    ws.row_breaks.append(Break(id=row - 1))
+    row_ini_pag2 = row
+
+    for _ in range(2):
+        ws.row_dimensions[row].height = ALTURA_BASE
+        linhas_sem_borda.add(row)
+        row += 1
+
+    row = _escrever_header(ws, row, viagem, ALTURA_BASE)
+
+    ws.row_dimensions[row].height = ALTURA_BASE  # 1 espaço após header
+    row += 1
+
+    # shop 2
+    if len(ordem_shoppings) > 2:
+        sid, snome = ordem_shoppings[2]
+        row = _escrever_bloco_shopping(sid, snome, row, LINHAS_SHOP_1)
+    else:
+        row = _bloco_vazio(row, LINHAS_SHOP_1)
+
+    # shop 3
+    if len(ordem_shoppings) > 3:
+        sid, snome = ordem_shoppings[3]
+        row = _escrever_bloco_shopping(sid, snome, row, LINHAS_SHOP_2)
+    else:
+        row = _bloco_vazio(row, LINHAS_SHOP_2)
+
+    paginas_bordas.append((row_ini_pag2, row - 1))
+
+    for ini, fim in paginas_bordas:
+        _aplicar_bordas_pagina(ws, ini, fim, linhas_sem_borda)
+
     ws.print_options.horizontalCentered = True
-    ws.print_options.verticalCentered = False
-    ws.page_setup.fitToHeight = False
-    ws.page_setup.fitToWidth = False
-    ws.page_setup.fitToPage = False
-    ws.page_setup.scale = 100
-    ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
-    ws.print_area = f"A1:D{row}"
+    ws.print_options.verticalCentered   = False
+    ws.page_setup.fitToHeight  = False
+    ws.page_setup.fitToWidth   = False
+    ws.page_setup.fitToPage    = False
+    ws.page_setup.scale        = 100
+    ws.page_setup.orientation  = ws.ORIENTATION_PORTRAIT
+    ws.print_area = f"A1:D{row - 1}"
     ws.page_margins = PageMargins(
-    left=0.05,
-    right=0.05,
-    top=0.05,
-    bottom=0.05
+        left=0.12, right=0.12, top=0.12, bottom=0.12,
+        header=0, footer=0
     )
-    # salva em memória
-    file = io.BytesIO()
-    wb.save(file)
-    file.seek(0)
+    ws.oddHeader.left.text   = ""
+    ws.oddHeader.center.text = ""
+    ws.oddHeader.right.text  = ""
+    ws.oddFooter.left.text   = ""
+    ws.oddFooter.center.text = ""
+    ws.oddFooter.right.text  = ""
 
-    return send_file(
-        file,
-        as_attachment=True,
-        download_name=nome_arquivo,
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
 
-
-
-
+    return send_file(buf, as_attachment=True,
+                     download_name=_nome_arquivo(viagem),
+                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
 #exportar ordem
@@ -1479,8 +1607,6 @@ def exportar_ordem(id):
 
     cursor.close()
     conn.close()
-
-    import unicodedata
 
     def limpar_texto(texto):
         return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
