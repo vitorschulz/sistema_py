@@ -1201,7 +1201,15 @@ def _calcular_altura_linha(textos, larguras, altura_base):
     for texto, larg in zip(textos, larguras):
         if not texto:
             continue
-        linhas = math.ceil(len(str(texto)) / larg)
+        # simula quebra palavra por palavra
+        linhas = 1
+        linha_atual = 0
+        for palavra in str(texto).split():
+            if linha_atual + len(palavra) > larg:
+                linhas += 1
+                linha_atual = len(palavra)
+            else:
+                linha_atual += len(palavra) + 1  # +1 pro espaço
         if linhas > maior:
             maior = linhas
     return altura_base * max(1, maior)
@@ -1225,7 +1233,7 @@ def _escrever_linha_pedido(ws, row, loja_nome, p, fonte_padrao, altura_base):
 
     altura = _calcular_altura_linha(
         [loja_nome, cliente, tipo, doc],
-        [24, 32, 20, 22],
+        [24, 32, 16, 22],
         altura_base
     )
     ws.row_dimensions[row].height = altura
@@ -1279,8 +1287,8 @@ def _preencher_ate_fim_pagina(ws, row, linha_inicio_pagina, linhas_pagina, altur
 
 def _exportar_serra(viagem, pedidos):
     ALTURA_BASE   = 18
-    LINHAS_PAGINA = 42
-    LINHAS_HEADER = 4   # 2 branco + 1 título + 1 espaço
+    LINHAS_PAGINA = 43
+    LINHAS_HEADER = 3   # 2 branco + 1 título
     LINHAS_UTEIS  = LINHAS_PAGINA - LINHAS_HEADER
     ESPACO_SHOP   = 2
 
@@ -1303,8 +1311,6 @@ def _exportar_serra(viagem, pedidos):
             linhas_sem_borda.add(r)
         row += 2
         row = _escrever_header(ws, row, viagem, ALTURA_BASE)  # escreve 1 linha, row+1
-        ws.row_dimensions[row].height = ALTURA_BASE
-        row += 1
         return row
 
     def _tam_shopping(shopping_id):
@@ -1317,7 +1323,7 @@ def _exportar_serra(viagem, pedidos):
                 doc     = p["cpf_cnpj"] or "-"
                 h = _calcular_altura_linha(
                     [loja_nome, cliente, tipo, doc],
-                    [24, 32, 20, 22], ALTURA_BASE)
+                    [24, 32, 16, 22], ALTURA_BASE)
                 total += max(1, round(h / ALTURA_BASE))
         total += ESPACO_SHOP
         return total
@@ -1362,7 +1368,7 @@ def _exportar_serra(viagem, pedidos):
         tam = _tam_shopping(shopping_id)
 
         # cabe na página atual?
-        if linhas_usadas + tam > LINHAS_UTEIS:
+        if linhas_usadas + tam > LINHAS_PAGINA:
             if linhas_usadas > LINHAS_HEADER:
             # preenche até o fim e quebra
                 row = _preencher_fim_pagina(row, linhas_usadas)
@@ -1398,7 +1404,7 @@ def _exportar_serra(viagem, pedidos):
 
 def _exportar_santa_catarina(viagem, pedidos):
     ALTURA_BASE   = 18
-    LINHAS_PAGINA = 42
+    LINHAS_PAGINA = 43
 
     estrutura, ordem_shoppings, ordem_lojas = _organizar_estrutura(pedidos)
 
@@ -1413,8 +1419,7 @@ def _exportar_santa_catarina(viagem, pedidos):
     fill_aviso   = PatternFill(start_color="FFE0E0", end_color="FFE0E0", fill_type="solid")
     linhas_sem_borda = set()
 
-    # header = 2 branco + 1 título + 1 espaço = 4 linhas
-    LINHAS_HEADER = 4
+    LINHAS_HEADER = 3
     LINHAS_UTIL   = LINHAS_PAGINA - LINHAS_HEADER
     LINHAS_SHOP_1 = LINHAS_UTIL // 2
     LINHAS_SHOP_2 = LINHAS_UTIL - LINHAS_SHOP_1  # pega o resto se ímpar
@@ -1445,7 +1450,6 @@ def _exportar_santa_catarina(viagem, pedidos):
                 linhas_gastas = max(1, round(h / ALTURA_BASE))
 
                 if linhas_usadas + linhas_gastas > LIMITE:
-                    print(f"  REJEITOU | linhas_usadas={linhas_usadas} linhas_gastas={linhas_gastas} LIMITE={LIMITE}")
                     for col in range(1, 5):
                         ws.cell(row=r, column=col).value     = None
                         ws.cell(row=r, column=col).font      = Font()
@@ -1495,8 +1499,6 @@ def _exportar_santa_catarina(viagem, pedidos):
     row = 3
     row = _escrever_header(ws, row, viagem, ALTURA_BASE)  # row vira 4
 
-    ws.row_dimensions[row].height = ALTURA_BASE  # 1 espaço após header
-    row += 1
 
     # shop 0
     if len(ordem_shoppings) > 0:
@@ -1524,9 +1526,6 @@ def _exportar_santa_catarina(viagem, pedidos):
         row += 1
 
     row = _escrever_header(ws, row, viagem, ALTURA_BASE)
-
-    ws.row_dimensions[row].height = ALTURA_BASE  # 1 espaço após header
-    row += 1
 
     # shop 2
     if len(ordem_shoppings) > 2:
@@ -1610,6 +1609,16 @@ def exportar_ordem(id):
 
     def limpar_texto(texto):
         return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
+    
+    def calcular_altura(textos, larguras, altura_base):
+        maior = 1
+        for texto, largura in zip(textos, larguras):
+            if not texto:
+                continue
+            linhas = math.ceil(len(str(texto)) / largura)
+            if linhas > maior:
+                maior = linhas
+        return altura_base * maior
 
     local = viagem["local"] if viagem and viagem["local"] else "viagem"
     data = viagem["data_viagem"] if viagem and viagem["data_viagem"] else None
@@ -1617,7 +1626,7 @@ def exportar_ordem(id):
     data_str = data.strftime("%d-%m-%Y") if data else "sem_data"
 
     nome_arquivo = f"OrdemClientes_{local_str}_{data_str}.xlsx"
-    altura_padrao = 30
+    altura_padrao = 24
 
     wb = Workbook()
     ws = wb.active
@@ -1626,7 +1635,7 @@ def exportar_ordem(id):
     # largura das colunas
     ws.column_dimensions['A'].width = 10   # ordem
     ws.column_dimensions['B'].width = 35   # nome
-    ws.column_dimensions['C'].width = 20   # endereço
+    ws.column_dimensions['C'].width = 35   # endereço
     ws.column_dimensions['D'].width = 20  # telefone
     ws.column_dimensions['E'].width = 20 #horario
 
@@ -1656,17 +1665,15 @@ def exportar_ordem(id):
 
     ws.row_dimensions[row].height = altura_padrao
 
-    max_end_len = 0
-
     row += 1
 
     # conteúdo
     for i, c in enumerate(clientes, start=1):
 
         nome = (c["nome"] or "-").upper()
-        endereco = c["endereco"]
+        endereco = c["endereco"] or "-"
+        endereco = endereco.replace(",", ",\n")
         telefone = c["telefone"] or "-"
-        max_end_len = max(max_end_len, len(endereco))
 
         # ordem (esquerda)
         cell_ordem = ws.cell(row=row, column=1, value=f"{i}.")
@@ -1694,14 +1701,14 @@ def exportar_ordem(id):
         ws.cell(row=row, column=5, value="")
 
         # altura maior pra leitura
-        ws.row_dimensions[row].height = altura_padrao
-
+        altura = calcular_altura(
+            [nome, endereco, telefone],
+            [30, 30, 15],  # proporcional às colunas
+            altura_padrao
+        )
+        ws.row_dimensions[row].height = altura
         row += 1
         
-
-    largura_endereco = max(max_end_len * 0.9, 20)
-    ws.column_dimensions['C'].width =  min(largura_endereco, 60)
-    ws.row_dimensions[row].height = altura_padrao
     ws.print_area = f"A1:E{row}"
     borda = Border(
     left=Side(style='thin'),
