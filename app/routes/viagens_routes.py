@@ -1672,7 +1672,6 @@ def exportar_ordem(id):
 
         nome = (c["nome"] or "-").upper()
         endereco = c["endereco"] or "-"
-        endereco = endereco.replace(",", ",\n")
         telefone = c["telefone"] or "-"
 
         # ordem (esquerda)
