@@ -1174,7 +1174,7 @@ def _organizar_estrutura(pedidos):
 
 def _configurar_colunas(ws):
     ws.column_dimensions['A'].width = 24
-    ws.column_dimensions['B'].width = 34
+    ws.column_dimensions['B'].width = 30
     ws.column_dimensions['C'].width = 24
     ws.column_dimensions['D'].width = 22
 
@@ -1190,8 +1190,8 @@ def _configurar_impressao(ws, ultima_linha):
     ws.page_setup.orientation  = ws.ORIENTATION_PORTRAIT
     ws.print_area = f"A1:D{ultima_linha}"
     ws.page_margins = PageMargins(
-    left=0.10, right=0.10, top=0.10, bottom=0.10,
-    header=0, footer=0
+    left=0.20, right=0.20, top=0.20, bottom=0.20,
+    header=0.0, footer=0.0
     )
     ws.oddHeader.center.text = ""
     ws.oddFooter.center.text = ""
@@ -1557,8 +1557,8 @@ def _exportar_santa_catarina(viagem, pedidos):
     ws.page_setup.scale        = 100
     ws.print_area = f"A1:D{row - 1}"
     ws.page_margins = PageMargins(
-        left=0.12, right=0.12, top=0.12, bottom=0.12,
-        header=0, footer=0
+        left=0.20, right=0.20, top=0.20, bottom=0.20,
+        header=0.0, footer=0.0
     )
     ws.oddHeader.left.text   = ""
     ws.oddHeader.center.text = ""
@@ -1635,11 +1635,11 @@ def exportar_ordem(id):
     ws.title = "Ordem de Clientes"
 
     # largura das colunas
-    ws.column_dimensions['A'].width = 9   # ordem
-    ws.column_dimensions['B'].width = 30   # nome
-    ws.column_dimensions['C'].width = 32   # endereço
+    ws.column_dimensions['A'].width = 8   # ordem
+    ws.column_dimensions['B'].width = 28   # nome
+    ws.column_dimensions['C'].width = 30   # endereço
     ws.column_dimensions['D'].width = 20  # telefone
-    ws.column_dimensions['E'].width = 16 #horario
+    ws.column_dimensions['E'].width = 15 #horario
 
     ws.row_dimensions[1].height = altura_padrao
     ws.row_dimensions[2].height = altura_padrao
@@ -1727,10 +1727,8 @@ def exportar_ordem(id):
         for c in range(1, 6):  # até coluna E
             ws.cell(row=r, column=c).border = borda
     ws.page_margins = PageMargins(
-    left=0.10,
-    right=0.10,
-    top=0.15,
-    bottom=0.15
+        left=0.20, right=0.20, top=0.20, bottom=0.20,
+        header=0.0, footer=0.0
     )
     ws.print_options.horizontalCentered = True
     ws.page_setup.paperSize  = ws.PAPERSIZE_A4
