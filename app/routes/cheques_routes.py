@@ -84,13 +84,15 @@ def novo_cheque():
         if not data_vencimento:
             data_vencimento = None
 
+        valor = request.form.get('valor', '').replace(',', '.')
+
         cursor.execute("""
             INSERT INTO cheques
             (codigo, valor, nome_destino, data_vencimento, status, ativo)
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (
             request.form['codigo'],
-            request.form['valor'],
+            valor,
             request.form.get('nome_destino'),
             data_vencimento,
             'PENDENTE',
@@ -211,6 +213,11 @@ def editar_cheque(id):
     cursor = conn.cursor(dictionary=True)
 
     if request.method == 'POST':
+        data_vencimento = request.form.get('data_vencimento')
+        if not data_vencimento:
+            data_vencimento = None
+
+        valor = request.form.get('valor', '').replace(',', '.')
         cursor.execute("""
             UPDATE cheques
             SET codigo = %s,
@@ -220,9 +227,9 @@ def editar_cheque(id):
             WHERE id = %s
         """, (
             request.form['codigo'],
-            request.form['valor'],
+            valor,
             request.form.get('nome_destino'),
-            request.form.get('data_vencimento'),
+            data_vencimento,
             id
         ))
 

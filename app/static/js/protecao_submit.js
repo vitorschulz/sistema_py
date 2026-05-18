@@ -9,9 +9,10 @@ document.addEventListener("submit", function(e) {
 
     const btn = form.querySelector("button[type='submit']");
     if (btn) {
-        btn.disabled = true;
-        btn.dataset.originalText = btn.innerText;
-        btn.innerText = "Salvando...";
+        setTimeout(() => {          // pequeno delay garante q o POST já saiu
+            btn.disabled = true;
+            btn.innerText = "Salvando...";
+        }, 100);
     }
 });
 

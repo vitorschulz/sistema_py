@@ -1173,15 +1173,16 @@ def _organizar_estrutura(pedidos):
 
 
 def _configurar_colunas(ws):
-    ws.column_dimensions['A'].width = 26
+    ws.column_dimensions['A'].width = 24
     ws.column_dimensions['B'].width = 34
-    ws.column_dimensions['C'].width = 22
-    ws.column_dimensions['D'].width = 24
+    ws.column_dimensions['C'].width = 24
+    ws.column_dimensions['D'].width = 22
 
 
 def _configurar_impressao(ws, ultima_linha):
     ws.print_options.horizontalCentered = True
     ws.print_options.verticalCentered   = False
+    ws.page_setup.paperSize  = ws.PAPERSIZE_A4
     ws.page_setup.fitToHeight  = False
     ws.page_setup.fitToWidth   = False
     ws.page_setup.fitToPage    = False
@@ -1287,7 +1288,7 @@ def _preencher_ate_fim_pagina(ws, row, linha_inicio_pagina, linhas_pagina, altur
 
 def _exportar_serra(viagem, pedidos):
     ALTURA_BASE   = 18
-    LINHAS_PAGINA = 43
+    LINHAS_PAGINA = 45
     LINHAS_HEADER = 3   # 2 branco + 1 título
     LINHAS_UTEIS  = LINHAS_PAGINA - LINHAS_HEADER
     ESPACO_SHOP   = 2
@@ -1404,7 +1405,7 @@ def _exportar_serra(viagem, pedidos):
 
 def _exportar_santa_catarina(viagem, pedidos):
     ALTURA_BASE   = 18
-    LINHAS_PAGINA = 43
+    LINHAS_PAGINA = 45
 
     estrutura, ordem_shoppings, ordem_lojas = _organizar_estrutura(pedidos)
 
@@ -1546,13 +1547,14 @@ def _exportar_santa_catarina(viagem, pedidos):
     for ini, fim in paginas_bordas:
         _aplicar_bordas_pagina(ws, ini, fim, linhas_sem_borda)
 
+    ws.page_setup.paperSize   = ws.PAPERSIZE_A4
+    ws.page_setup.orientation  = ws.ORIENTATION_PORTRAIT
     ws.print_options.horizontalCentered = True
     ws.print_options.verticalCentered   = False
     ws.page_setup.fitToHeight  = False
     ws.page_setup.fitToWidth   = False
     ws.page_setup.fitToPage    = False
     ws.page_setup.scale        = 100
-    ws.page_setup.orientation  = ws.ORIENTATION_PORTRAIT
     ws.print_area = f"A1:D{row - 1}"
     ws.page_margins = PageMargins(
         left=0.12, right=0.12, top=0.12, bottom=0.12,
@@ -1633,11 +1635,11 @@ def exportar_ordem(id):
     ws.title = "Ordem de Clientes"
 
     # largura das colunas
-    ws.column_dimensions['A'].width = 10   # ordem
-    ws.column_dimensions['B'].width = 35   # nome
-    ws.column_dimensions['C'].width = 35   # endereço
+    ws.column_dimensions['A'].width = 9   # ordem
+    ws.column_dimensions['B'].width = 30   # nome
+    ws.column_dimensions['C'].width = 32   # endereço
     ws.column_dimensions['D'].width = 20  # telefone
-    ws.column_dimensions['E'].width = 20 #horario
+    ws.column_dimensions['E'].width = 16 #horario
 
     ws.row_dimensions[1].height = altura_padrao
     ws.row_dimensions[2].height = altura_padrao
@@ -1730,6 +1732,8 @@ def exportar_ordem(id):
     top=0.15,
     bottom=0.15
     )
+    ws.print_options.horizontalCentered = True
+    ws.page_setup.paperSize  = ws.PAPERSIZE_A4
     if len(clientes) <= 20:
         ws.page_setup.fitToHeight = 1
         ws.page_setup.fitToWidth = 1
