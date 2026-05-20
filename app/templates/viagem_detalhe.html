@@ -198,7 +198,22 @@
 
                 {% for pedido in dados_loja.pedidos %}
 
-                    <div class="pedido-item">
+                    <div class="pedido-item {% if pedido.anotacao %}anotacao{% endif %}">
+
+                        {% if pedido.anotacao %}
+
+                            <span class="anotacao-texto">✎ Anotação</span>
+
+                            <div class="pedido-acoes">
+                                <a data-id="{{ pedido.id }}" class="btn-ordem subir">↑</a>
+                                <a data-id="{{ pedido.id }}" class="btn-ordem descer">↓</a>
+                                <a href="/pedidos/{{ pedido.id }}/editar?next={{ request.path }}" class="btn-editar">Editar</a>
+                                <a href="/pedidos/{{ pedido.id }}/excluir"
+                                class="btn-excluir"
+                                data-confirm="Deseja excluir esta anotação?">Excluir</a>
+                            </div>
+
+                        {% else %}
 
                         <div class="pedido-info">
                             
@@ -251,9 +266,11 @@
 
                         </div>
 
-                    </div>
+                    {% endif %}
 
-                        {% endfor %}
+                    </div>
+                        
+                    {% endfor %}
 
                     </div>
 

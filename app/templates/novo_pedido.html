@@ -6,134 +6,147 @@
 
     <section class="acoes">
 
-    <button 
-    data-url="{{ request.args.get('next', '/viagens') }}"
-    onclick="window.location.href=this.dataset.url">
-        ← Voltar
-    </button>
+        <div class="acoes-tarefa-header">
+            <button 
+            data-url="{{ request.args.get('next', '/viagens') }}"
+            onclick="window.location.href=this.dataset.url">
+                ← Voltar
+            </button>
 
-</section>
+            <label class="toggle-anotacao-label">
+                Modo anotação
+                <span class="toggle-track">
+                    <input type="checkbox" id="toggle-anotacao" name="anotacao" value="1"
+                        {% if pedido and pedido.anotacao %}checked{% endif %}>
+                    <span class="toggle-thumb"></span>
+                </span>
+            </label>
+        </div>
+
+    </section>
 
 <section class="card">
 
     <form method="POST"  data-validate-tipo>
 
-        <div class="form-group">
-            
-            <label>Shopping</label>
+        <div id="campos-tarefa">
+            <div class="form-group">
+                
+                <label>Shopping</label>
 
-            <select id="shopping" required>
-                <option value="" disabled {% if not ultimo_shopping_id %}selected{% endif %}>
-                    Selecione um shopping
-                </option>
-
-                {% for s in shoppings %}
-                    <option value="{{ s.id }}"
-                        {% if pedido %}
-                            {% for l in lojas %}
-                                {% if l.id == pedido.loja_id and l.shopping_id == s.id %}
-                                    selected
-                                {% endif %}
-                            {% endfor %}
-                        {% elif ultimo_shopping_id and ultimo_shopping_id == s.id %}
-                            selected
-                        {% endif %}>
-                    {{ s.nome }}
+                <select id="shopping" required>
+                    <option value="" disabled {% if not ultimo_shopping_id %}selected{% endif %}>
+                        Selecione um shopping
                     </option>
-                {% endfor %}
 
-            </select>
+                    {% for s in shoppings %}
+                        <option value="{{ s.id }}"
+                            {% if pedido %}
+                                {% for l in lojas %}
+                                    {% if l.id == pedido.loja_id and l.shopping_id == s.id %}
+                                        selected
+                                    {% endif %}
+                                {% endfor %}
+                            {% elif ultimo_shopping_id and ultimo_shopping_id == s.id %}
+                                selected
+                            {% endif %}>
+                        {{ s.nome }}
+                        </option>
+                    {% endfor %}
 
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Loja</label>
-
-            <select name="loja_id" id="loja" required>
-                <option value="" selected disabled>Selecione uma loja</option>
-
-                {% for l in lojas %}
-                    <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
-                        {% if pedido and pedido.loja_id == l.id %}
-                            selected
-                        {% elif ultimo_loja_id and ultimo_loja_id == l.id %}
-                            selected
-                        {% endif %}>
-                        {{ l.nome }}
-                    </option>
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Cliente</label>
-
-            <select name="cliente_id" required>
-                <option value="" disabled>Selecione um cliente</option>
-
-                {% for c in clientes %}
-                    <option value="{{ c.id }}"
-                        {% if pedido and pedido.cliente_id == c.id %}
-                            selected
-                        {% elif ultimo_cliente_id and ultimo_cliente_id == c.id %}
-                            selected
-                        {% endif %}>
-                        {{ c.nome }}
-                    </option>
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>Tipo</label>
-
-            <div class="checkbox-group">
-
-                {% set tipos = pedido.tipo.split(",") if pedido and pedido.tipo else [] %}
-
-                <label>
-                    <input type="checkbox" name="tipo[]" value="PEDIDO"
-                    {% if "PEDIDO" in tipos %}checked{% endif %}>
-                    Pedido
-                </label>
-
-                <label>
-                    <input type="checkbox" name="tipo[]" value="ACERTO"
-                    {% if "ACERTO" in tipos %}checked{% endif %}>
-                    Acerto
-                </label>
-
-                <label>
-                    <input type="checkbox" name="tipo[]" value="TROCA"
-                    {% if "TROCA" in tipos %}checked{% endif %}>
-                    Troca
-                </label>
-
-                <label>
-                    <input type="checkbox" name="tipo[]" value="DEFEITO"
-                    {% if "DEFEITO" in tipos %}checked{% endif %}>
-                    Defeito
-                </label>
-
-                <label>
-                    <input type="checkbox" name="tipo[]" value="DEVOLUCAO"
-                    {% if "DEVOLUCAO" in tipos %}checked{% endif %}>
-                    Devolução
-                </label>
+                </select>
 
             </div>
-        </div>
 
+
+            <div class="form-group">
+
+                <label>Loja</label>
+
+                <select name="loja_id" id="loja" required>
+                    <option value="" selected disabled>Selecione uma loja</option>
+
+                    {% for l in lojas %}
+                        <option value="{{ l.id }}" data-shopping="{{ l.shopping_id }}"
+                            {% if pedido and pedido.loja_id == l.id %}
+                                selected
+                            {% elif ultimo_loja_id and ultimo_loja_id == l.id %}
+                                selected
+                            {% endif %}>
+                            {{ l.nome }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Cliente</label>
+
+                <select name="cliente_id" required>
+                    <option value="" disabled>Selecione um cliente</option>
+
+                    {% for c in clientes %}
+                        <option value="{{ c.id }}"
+                            {% if pedido and pedido.cliente_id == c.id %}
+                                selected
+                            {% elif ultimo_cliente_id and ultimo_cliente_id == c.id %}
+                                selected
+                            {% endif %}>
+                            {{ c.nome }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Tipo</label>
+
+                <div class="checkbox-group">
+
+                    {% set tipos = pedido.tipo.split(",") if pedido and pedido.tipo else [] %}
+
+                    <label>
+                        <input type="checkbox" name="tipo[]" value="PEDIDO"
+                        {% if "PEDIDO" in tipos %}checked{% endif %}>
+                        Pedido
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo[]" value="ACERTO"
+                        {% if "ACERTO" in tipos %}checked{% endif %}>
+                        Acerto
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo[]" value="TROCA"
+                        {% if "TROCA" in tipos %}checked{% endif %}>
+                        Troca
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo[]" value="DEFEITO"
+                        {% if "DEFEITO" in tipos %}checked{% endif %}>
+                        Defeito
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo[]" value="DEVOLUCAO"
+                        {% if "DEVOLUCAO" in tipos %}checked{% endif %}>
+                        Devolução
+                    </label>
+
+                </div>
+            </div>
+
+        </div>
 
         <div class="form-group">
 
@@ -153,7 +166,8 @@
     </button>
 
 </section>
-            
+       
+<script src="{{ url_for('static', filename='js/anotacoes.js') }}"></script>
 <script src="{{ url_for('static', filename='js/pedido.js') }}"></script>
 
 {% endblock %}

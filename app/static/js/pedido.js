@@ -20,11 +20,13 @@ document.addEventListener("DOMContentLoaded", function(){
             return;
         }
 
+        const ehAnotacao = form.hasAttribute('data-anotacao');
+
         // pelo menos um checkbox deve estar marcado
         const checkboxes = form.querySelectorAll('input[name="tipo[]"]');
         const algumMarcado = Array.from(checkboxes).some(cb => cb.checked);
 
-        if(!algumMarcado){
+        if(!algumMarcado && !ehAnotacao){
             e.preventDefault();
             // Mostra alerta visual
             mostrarAlerta("Selecione pelo menos um tipo!", "error");

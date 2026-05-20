@@ -158,6 +158,7 @@ def detalhe_viagem(id):
             pedidos.ordem,
             pedidos.tipo,
             pedidos.observacoes,
+            pedidos.anotacao,
             clientes.nome AS cliente_nome,
             clientes.ativo AS cliente_ativo,
             lojas.id AS loja_id,
@@ -260,9 +261,11 @@ def detalhe_viagem(id):
     total_lojas = sum(len(shopping["lojas"]) for shopping in estrutura.values())
 
     total_pedidos = sum(
-    len(dados_loja["pedidos"])
+    1
     for dados in estrutura.values()
     for dados_loja in dados["lojas"].values()
+    for p in dados_loja["pedidos"]
+    if not p["anotacao"]
     )
 
     cursor.close()
@@ -454,6 +457,8 @@ def descer_loja(id):
 
     return redirect(f"/viagens/{atual['viagem_id']}")
 
+
+
 #registrar pedido na viagem
 @viagens.route("/viagens/<int:id>/novo_pedido", methods=["GET","POST"])
 @login_required
@@ -464,41 +469,44 @@ def novo_pedido(id):
 
     if request.method == "POST":
 
+        anotacao = 1 if request.form.get("anotacao") == "1" else 0
+        observacoes = request.form.get("observacoes", "").strip()
         loja_id = request.form["loja_id"]
-        cliente_id = request.form["cliente_id"]
-        tipos = request.form.getlist("tipo[]")
-        if not tipos:
-            flash("Selecione pelo menos um tipo.", "error")
-            return redirect(request.url)
 
-        tipo = ",".join(tipos)
-        observacoes = request.form.get("observacoes","").strip()
+        if anotacao:
+            cliente_id = None
+            tipo = "ANOTACAO"
+        else:
+            cliente_id = request.form["cliente_id"]
+            tipos = request.form.getlist("tipo[]")
+            if not tipos:
+                flash("Selecione pelo menos um tipo.", "error")
+                cursor.close()
+                conn.close()
+                return redirect(request.url)
+            tipo = ",".join(tipos)
 
-        cursor.execute("""
-            SELECT shopping_id FROM lojas WHERE id = %s
-        """, (loja_id,))
-
+        cursor.execute("SELECT shopping_id FROM lojas WHERE id = %s", (loja_id,))
         shopping_id = cursor.fetchone()["shopping_id"]
 
+        # salva sessão e insere viagem_shopping/viagem_loja sempre (anotação ou não)
         session["ultimo_loja_id"] = int(loja_id)
-        session["ultimo_cliente_id"] = int(cliente_id)
         session["ultimo_shopping_id"] = int(shopping_id)
+        if not anotacao:
+            session["ultimo_cliente_id"] = int(cliente_id)
 
         cursor.execute("""
             SELECT id FROM viagem_shopping
             WHERE viagem_id = %s AND shopping_id = %s
         """, (id, shopping_id))
 
-        vs = cursor.fetchone()
-
-        if not vs:
+        if not cursor.fetchone():
             cursor.execute("""
                 SELECT COALESCE(MAX(ordem),0)+1 AS ordem
                 FROM viagem_shopping
                 WHERE viagem_id = %s
             """, (id,))
             ordem_vs = cursor.fetchone()["ordem"]
-
             cursor.execute("""
                 INSERT INTO viagem_shopping (viagem_id, shopping_id, ordem)
                 VALUES (%s,%s,%s)
@@ -509,16 +517,13 @@ def novo_pedido(id):
             WHERE viagem_id = %s AND loja_id = %s
         """, (id, loja_id))
 
-        vl = cursor.fetchone()
-
-        if not vl:
+        if not cursor.fetchone():
             cursor.execute("""
                 SELECT COALESCE(MAX(ordem),0)+1 AS ordem
                 FROM viagem_loja
                 WHERE viagem_id = %s AND shopping_id = %s
             """, (id, shopping_id))
             ordem_vl = cursor.fetchone()["ordem"]
-
             cursor.execute("""
                 INSERT INTO viagem_loja (viagem_id, shopping_id, loja_id, ordem)
                 VALUES (%s,%s,%s,%s)
@@ -527,25 +532,21 @@ def novo_pedido(id):
         cursor.execute("""
             SELECT COALESCE(MAX(ordem),0)+1 AS nova_ordem
             FROM pedidos
-            WHERE viagem_id = %s
-            AND loja_id = %s
+            WHERE viagem_id = %s AND loja_id = %s
         """, (id, loja_id))
-
         ordem = cursor.fetchone()["nova_ordem"]
 
         cursor.execute("""
             INSERT INTO pedidos
-            (viagem_id, loja_id, cliente_id, tipo, observacoes, ordem)
-            VALUES (%s,%s,%s,%s,%s,%s)
-        """,(id, loja_id, cliente_id, tipo, observacoes, ordem))
+            (viagem_id, loja_id, cliente_id, tipo, observacoes, ordem, anotacao)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+        """, (id, loja_id, cliente_id, tipo, observacoes, ordem, anotacao))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
         flash("Tarefa adicionada com sucesso!", "success")
-
         return redirect(f"/viagens/{id}")
 
     cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
@@ -573,7 +574,8 @@ def novo_pedido(id):
         ultimo_loja_id=ultimo_loja_id,
         ultimo_cliente_id=ultimo_cliente_id,
         ultimo_shopping_id=ultimo_shopping_id
-        )
+    )
+
 
 #status viagem
 @viagens.route("/viagens/<int:id>/status", methods=["POST"])
@@ -768,31 +770,74 @@ def editar_pedido(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
+    cursor.execute("SELECT * FROM pedidos WHERE id=%s", (id,))
+    pedido = cursor.fetchone()
+    viagem_id = pedido["viagem_id"]
+
     if request.method == "POST":
-
-        loja_id = request.form["loja_id"]
-        cliente_id = request.form["cliente_id"]
-        tipos = request.form.getlist("tipo[]")
-
-        if not tipos:
-            flash("Selecione pelo menos um tipo.", "error")
-            return redirect(request.url)
-
-        tipo = ",".join(tipos)
-        observacoes = request.form.get("observacoes","").strip()
+        anotacao = 1 if request.form.get("anotacao") == "1" else 0
+        observacoes = request.form.get("observacoes", "").strip()
         next_url = request.form.get("next")
+        loja_id = request.form["loja_id"]
+
+        if anotacao:
+            cliente_id = None
+            tipo = "ANOTACAO"
+        else:
+            cliente_id = request.form["cliente_id"]
+            tipos = request.form.getlist("tipo[]")
+            if not tipos:
+                flash("Selecione pelo menos um tipo.", "error")
+                cursor.close()
+                conn.close()
+                return redirect(request.url)
+            tipo = ",".join(tipos)
+
+        cursor.execute("SELECT shopping_id FROM lojas WHERE id = %s", (loja_id,))
+        shopping_id = cursor.fetchone()["shopping_id"]
+
+        # garante viagem_shopping e viagem_loja existem pra nova loja escolhida
+        cursor.execute("""
+            SELECT id FROM viagem_shopping
+            WHERE viagem_id = %s AND shopping_id = %s
+        """, (viagem_id, shopping_id))
+
+        if not cursor.fetchone():
+            cursor.execute("""
+                SELECT COALESCE(MAX(ordem),0)+1 AS ordem
+                FROM viagem_shopping
+                WHERE viagem_id = %s
+            """, (viagem_id,))
+            ordem_vs = cursor.fetchone()["ordem"]
+            cursor.execute("""
+                INSERT INTO viagem_shopping (viagem_id, shopping_id, ordem)
+                VALUES (%s,%s,%s)
+            """, (viagem_id, shopping_id, ordem_vs))
+
+        cursor.execute("""
+            SELECT id FROM viagem_loja
+            WHERE viagem_id = %s AND loja_id = %s
+        """, (viagem_id, loja_id))
+
+        if not cursor.fetchone():
+            cursor.execute("""
+                SELECT COALESCE(MAX(ordem),0)+1 AS ordem
+                FROM viagem_loja
+                WHERE viagem_id = %s AND shopping_id = %s
+            """, (viagem_id, shopping_id))
+            ordem_vl = cursor.fetchone()["ordem"]
+            cursor.execute("""
+                INSERT INTO viagem_loja (viagem_id, shopping_id, loja_id, ordem)
+                VALUES (%s,%s,%s,%s)
+            """, (viagem_id, shopping_id, loja_id, ordem_vl))
 
         cursor.execute("""
             UPDATE pedidos
-            SET loja_id=%s, cliente_id=%s, tipo=%s, observacoes=%s
+            SET loja_id=%s, cliente_id=%s, tipo=%s, observacoes=%s, anotacao=%s
             WHERE id=%s
-        """,(loja_id, cliente_id, tipo, observacoes, id))
+        """, (loja_id, cliente_id, tipo, observacoes, anotacao, id))
 
         conn.commit()
-
-        cursor.execute("SELECT viagem_id FROM pedidos WHERE id=%s",(id,))
-        viagem_id = cursor.fetchone()["viagem_id"]
-
         cursor.close()
         conn.close()
 
@@ -800,17 +845,7 @@ def editar_pedido(id):
 
         if next_url:
             return redirect(next_url)
-
         return redirect(f"/viagens/{viagem_id}")
-
-    cursor.execute("""
-        SELECT *
-        FROM pedidos
-        WHERE id=%s
-    """,(id,))
-    pedido = cursor.fetchone()
-
-    viagem_id = pedido["viagem_id"]
 
     cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     shoppings = cursor.fetchall()
@@ -1099,6 +1134,7 @@ def exportar_tarefas(id):
         SELECT
             pedidos.ordem,
             pedidos.tipo,
+            pedidos.anotacao,
             clientes.nome AS cliente_nome,
             clientes.cpf_cnpj,
             lojas.nome AS loja_nome,
@@ -1217,6 +1253,13 @@ def _calcular_altura_linha(textos, larguras, altura_base):
 
 
 def _escrever_linha_pedido(ws, row, loja_nome, p, fonte_padrao, altura_base):
+    if p.get("anotacao"):
+        for col in range(1, 5):
+            cel = ws.cell(row=row, column=col, value="")
+            cel.alignment = Alignment(vertical="center")
+            cel.font = fonte_padrao
+        ws.row_dimensions[row].height = altura_base
+        return altura_base
     cliente = (p["cliente_nome"] or "-").upper()
     tipo    = (p["tipo"] or "-")
     tipo    = tipo.replace(",", ", ").replace("_", "/").upper() if tipo != "-" else "-"
@@ -1319,6 +1362,9 @@ def _exportar_serra(viagem, pedidos):
         total = 1  # linha do nome do shopping
         for loja_id, loja_nome in ordem_lojas[shopping_id]:
             for p in estrutura[shopping_id][loja_id]:
+                if p.get("anotacao"):
+                    total += 1  # linha vazia = 1 linha sempre
+                    continue
                 cliente = (p["cliente_nome"] or "-").upper()
                 tipo    = (p["tipo"] or "-").replace(",", ", ").replace("_", "/").upper()
                 doc     = p["cpf_cnpj"] or "-"
@@ -1444,7 +1490,8 @@ def _exportar_santa_catarina(viagem, pedidos):
             for p in estrutura[shopping_id][loja_id]:
 
                 if pedidos_nao_exibidos > 0:
-                    pedidos_nao_exibidos += 1
+                    if not p.get("anotacao"):
+                        pedidos_nao_exibidos += 1
                     continue
 
                 h = _escrever_linha_pedido(ws, r, loja_nome, p, fonte_padrao, ALTURA_BASE)
@@ -1456,7 +1503,8 @@ def _exportar_santa_catarina(viagem, pedidos):
                         ws.cell(row=r, column=col).font      = Font()
                         ws.cell(row=r, column=col).alignment = Alignment()
                     ws.row_dimensions[r].height = ALTURA_BASE
-                    pedidos_nao_exibidos += 1
+                    if not p.get("anotacao"):      # ← só conta se não for anotação
+                        pedidos_nao_exibidos += 1
                     continue
 
                 linhas_usadas += linhas_gastas
