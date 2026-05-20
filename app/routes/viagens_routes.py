@@ -549,11 +549,14 @@ def novo_pedido(id):
         flash("Tarefa adicionada com sucesso!", "success")
         return redirect(f"/viagens/{id}")
 
-    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
+    cursor.execute("SELECT id,nome,local FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     shoppings = cursor.fetchall()
 
     cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1 ORDER BY shopping_id, LOWER(nome) ASC")
     lojas = cursor.fetchall()
+
+    cursor.execute("SELECT local FROM viagens WHERE id = %s", (id,))
+    viagem_local = cursor.fetchone()["local"]
 
     cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     clientes = cursor.fetchall()
@@ -568,6 +571,7 @@ def novo_pedido(id):
     return render_template(
         "novo_pedido.html",
         viagem_id=id,
+        viagem_local=viagem_local,
         shoppings=shoppings,
         lojas=lojas,
         clientes=clientes,
@@ -847,7 +851,7 @@ def editar_pedido(id):
             return redirect(next_url)
         return redirect(f"/viagens/{viagem_id}")
 
-    cursor.execute("SELECT id,nome FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
+    cursor.execute("SELECT id,nome,local FROM shopping WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     shoppings = cursor.fetchall()
 
     cursor.execute("SELECT id,nome,shopping_id FROM lojas WHERE ativo=1 ORDER BY shopping_id, LOWER(nome) ASC")
@@ -856,6 +860,9 @@ def editar_pedido(id):
     cursor.execute("SELECT id,nome FROM clientes WHERE ativo=1 ORDER BY LOWER(nome) ASC")
     clientes = cursor.fetchall()
 
+    cursor.execute("SELECT local FROM viagens WHERE id = %s", (viagem_id,))
+    viagem_local = cursor.fetchone()["local"]
+
     cursor.close()
     conn.close()
 
@@ -863,6 +870,7 @@ def editar_pedido(id):
         "novo_pedido.html",
         pedido=pedido,
         viagem_id=viagem_id,
+        viagem_local=viagem_local,
         shoppings=shoppings,
         lojas=lojas,
         clientes=clientes

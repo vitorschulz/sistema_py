@@ -27,6 +27,8 @@
 
 <section class="card">
 
+    <input type="hidden" id="viagem-local" value="{{ viagem_local }}">
+
     <form method="POST"  data-validate-tipo>
 
         <div id="campos-tarefa">
@@ -40,7 +42,7 @@
                     </option>
 
                     {% for s in shoppings %}
-                        <option value="{{ s.id }}"
+                        <option value="{{ s.id }}" data-local="{{ s.local }}"
                             {% if pedido %}
                                 {% for l in lojas %}
                                     {% if l.id == pedido.loja_id and l.shopping_id == s.id %}

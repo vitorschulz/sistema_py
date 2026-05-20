@@ -2,6 +2,32 @@
 const shopping = document.getElementById("shopping")
 // Select de lojas (vai ser filtrado dinamicamente)
 const loja = document.getElementById("loja")
+// Pega o local da viagem
+const viagemLocal = document.getElementById("viagem-local")?.value
+
+// Filtra shoppings pelo local da viagem
+function filtrarShoppings() {
+    let primeiraSelecionavel = null
+
+    for (let option of shopping.options) {
+        if (option.value === "") continue // mantém placeholder
+
+        const pertence = option.dataset.local === viagemLocal
+        option.hidden = !pertence
+        option.disabled = !pertence
+
+        if (pertence && !primeiraSelecionavel) {
+            primeiraSelecionavel = option
+        }
+    }
+
+    // Se a opção atual não é do local, reseta
+    const optionAtual = shopping.options[shopping.selectedIndex]
+    if (optionAtual && optionAtual.disabled) {
+        shopping.value = ""
+        filtrarLojas()
+    }
+}
 
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -9,6 +35,8 @@ document.addEventListener("DOMContentLoaded", function(){
 
     // Se não existir form, para execução (evita erro global)
     if(!form) return;
+
+    if (viagemLocal) filtrarShoppings()
 
     form.addEventListener("submit", function(e){
 

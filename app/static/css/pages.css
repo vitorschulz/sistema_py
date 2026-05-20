@@ -1495,6 +1495,13 @@ background-color: rgba(46, 125, 50, 0.08);
     font-size: 13px;
     }
     
+    .btn-voltar {
+    flex: none !important;;
+    width: auto !important;;
+    min-width: 110px !important;;
+    max-width: 150px !important;;
+    }
+
     /*VIAGENS*/
 
     .filtro-viagens {
