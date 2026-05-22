@@ -1,0 +1,47 @@
+services:
+  web:
+    build: .
+    container_name: sistema_mae
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: gestao
+      SECRET_KEY: ${SECRET_KEY}
+
+  db:
+    image: mysql:8
+    container_name: meu_mysql
+    restart: always
+
+    command:
+      - --bind-address=0.0.0.0
+      - --mysqlx=0
+      - --innodb-buffer-pool-size=32M
+      - --max-connections=10
+      - --innodb-log-file-size=16M
+      - --table-open-cache=64
+      - --performance-schema=OFF
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: gestao
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  mysql_data:
